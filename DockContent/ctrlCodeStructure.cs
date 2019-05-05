@@ -32,10 +32,9 @@ namespace Peter
 {
     public partial class ctrlCodeStructure : DockContent, IPeterPluginTab
     {
-        private IPeterPluginHost m_Host;
         MainForm MainF;
-        private bool m_CanScroll;
-      //  private TextEditorControl m_Editor;
+
+        //  private TextEditorControl m_Editor;
         private Editor m_Editor;
         public string TEXT = "";
 
@@ -49,7 +48,7 @@ namespace Peter
            
             InitializeComponent();
             MainF = f;
-            this.m_CanScroll = true;
+            this.CanScroll = true;
             this.TabText = "Code Struktur";
             //this.treeMain.AfterSelect += new TreeViewEventHandler(treeMain_AfterSelect);
             this.treeMain.NodeMouseDoubleClick += new TreeNodeMouseClickEventHandler(treeMain_NodeMouseDoubleClick);
@@ -61,7 +60,7 @@ namespace Peter
         {
             if (this.tsbGotoCode.Checked)
             {
-                if (this.m_CanScroll)
+                if (this.CanScroll)
                 {
                     if (e.Node.Parent != null)
                     {
@@ -103,25 +102,20 @@ namespace Peter
         /// <summary>
         /// Gets or Sets if we are able to scroll to the selected item...
         /// </summary>
-        public bool CanScroll
-        {
-            get { return this.m_CanScroll; }
-
-            set { this.m_CanScroll = value; }
-        }
+        public bool CanScroll { get; set; }
 
         /// <summary>
         /// After an item is selected, scroll to it...
         /// </summary>
         /// <param name="sender">TreeView</param>
         /// <param name="e">TreeViewEventArgs</param>
-       
+
 
         /// <summary>
         /// Occurs when the active content is changed...
         /// </summary>
         /// <param name="content">New Content</param>
-       // public void ActiveContentChanged (IDockContent content)
+        // public void ActiveContentChanged (IDockContent content)
         public void ActiveContentChanged(Editor e, bool treeupdate)
         {
 
@@ -302,12 +296,7 @@ namespace Peter
         {
         }
 
-        public IPeterPluginHost Host
-        {
-            get { return this.m_Host; }
-
-            set { this.m_Host = value; }
-        }
+        public IPeterPluginHost Host { get; set; }
 
         public string FileName
         {
@@ -419,7 +408,7 @@ namespace Peter
                 {
                     string ext = Path.GetExtension(this.m_Editor.FileName).ToLower();
                     this.SetImageList(ext);
-                    this.m_CanScroll = true;
+                    this.CanScroll = true;
                     lConsts.Clear();
                     lVars.Clear();
                     lFuncs.Clear();
@@ -445,14 +434,14 @@ namespace Peter
                         case ".xslt":
                         case ".xsd":
                         case ".jpx":
-                            this.m_CanScroll = false;
+                            this.CanScroll = false;
                             XmlParser.ParseToTree(this.m_Editor.FileName, this.TreeNodes());
                             break;
                         case ".cs":
                             CSParser.CSParser.ParseToTree(this.m_Editor.FileName, this.TreeNodes());
                             break;
                         case ".css":
-                            this.m_CanScroll = false;
+                            this.CanScroll = false;
                             CSSParser.CSSParser.ParseToTree(this.m_Editor.FileName, this.TreeNodes());
                             break;
                         case ".java":

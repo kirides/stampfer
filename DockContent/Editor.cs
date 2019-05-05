@@ -41,7 +41,6 @@ namespace Peter
         public LoadFileDelegate m_LoadFile;
         public CloseDelegate m_CloseDel;
         private bool DialogMode = false;
-        private string m_Project;
         public DialogCreator DiaC;
         public bool AutoCompleteAuto;
         public bool ignoreclose = false;
@@ -77,7 +76,7 @@ namespace Peter
             this.m_FindPos = -1;
             this.m_MainForm = main;
             // this.m_ToolTip = new cHtmlToolTip(this);
-            this.m_Project = "";
+            this.Project = "";
 
             M_AutoCompleteDa.Active = false;
 
@@ -828,11 +827,7 @@ namespace Peter
         /// <summary>
         /// Gets or Sets the Project related to the file...
         /// </summary>
-        public string Project
-        {
-            get => this.m_Project;
-            set => this.m_Project = value;
-        }
+        public string Project { get; set; }
 
         #endregion
 
@@ -1110,7 +1105,7 @@ namespace Peter
             else
             {
                 return this.GetType().ToString() + "|" + this.TabText + "|" + this.FileName + "|" +
-                    this.m_Editor.ActiveTextAreaControl.Caret.Offset.ToString() + "|" + this.m_Project;
+                    this.m_Editor.ActiveTextAreaControl.Caret.Offset.ToString() + "|" + this.Project;
             }
         }
 
@@ -1871,7 +1866,7 @@ namespace Peter
                 var offset = activeElement.GetAttribute("offset");
                 this.m_Host.CreateEditor(file, Path.GetFileName(file), this.Host.GetFileIcon(file, false), this);
                 this.m_MainForm.GetEditor(file).ScrollTo(Convert.ToInt32(offset));
-                this.m_MainForm.GetEditor(file).Project = this.m_Project;
+                this.m_MainForm.GetEditor(file).Project = this.Project;
             }
         }
 

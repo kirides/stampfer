@@ -29,13 +29,11 @@ namespace Peter
 {
     public partial class Project : Form
     {
-        private string m_ProjectFile;
-
         public Project()
         {
             InitializeComponent();
 
-            this.m_ProjectFile = null;
+            this.ProjectFile = null;
             this.cmbType.SelectedIndex = 0;
         }
 
@@ -43,7 +41,7 @@ namespace Peter
         {
             try
             {
-                this.m_ProjectFile = filePath;
+                this.ProjectFile = filePath;
                 XmlDocument xDoc = new XmlDocument();
                 xDoc.Load(filePath);
                 XmlNodeList nodes = xDoc.GetElementsByTagName("name");
@@ -124,10 +122,7 @@ namespace Peter
         /// <summary>
         /// Gets the location of the project...
         /// </summary>
-        public string ProjectFile
-        {
-            get { return this.m_ProjectFile; }
-        }
+        public string ProjectFile { get; private set; }
 
         private void btnAddFolder_Click(object sender, EventArgs e)
         {
@@ -172,23 +167,23 @@ namespace Peter
             }
             else
             {
-                if (string.IsNullOrEmpty(this.m_ProjectFile))
+                if (string.IsNullOrEmpty(this.ProjectFile))
                 {
                     if (this.saveFileDialog1.ShowDialog() == DialogResult.OK)
                     {
                         this.WriteXML(this.saveFileDialog1.FileName);
-                        this.m_ProjectFile = this.saveFileDialog1.FileName;
+                        this.ProjectFile = this.saveFileDialog1.FileName;
                         this.Hide();
                     }
                 }
                 else
                 {
-                    if (File.Exists(this.m_ProjectFile))
+                    if (File.Exists(this.ProjectFile))
                     {
-                        File.Delete(this.m_ProjectFile);
+                        File.Delete(this.ProjectFile);
                     }
 
-                    this.WriteXML(this.m_ProjectFile);
+                    this.WriteXML(this.ProjectFile);
                     this.Close();
                 }
             }

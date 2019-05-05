@@ -30,8 +30,6 @@ namespace Peter
 {
     public partial class FileDifference : DockContent, IPeterPluginTab
     {
-        private IPeterPluginHost m_Host;
-
         public FileDifference(string[] fileList, string activeFile)
         {
             InitializeComponent();
@@ -104,12 +102,7 @@ namespace Peter
             return true;
         }
 
-        public IPeterPluginHost Host
-        {
-            get { return this.m_Host; }
-
-            set { this.m_Host = value; }
-        }
+        public IPeterPluginHost Host { get; set; }
 
         public string FileName
         {

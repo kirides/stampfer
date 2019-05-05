@@ -29,35 +29,23 @@ namespace Peter
 {
     public partial class FindResults : DockContent, IPeterPluginTab
     {
-        private IPeterPluginHost m_Host;
-
         public FindResults()
         {
             InitializeComponent(); 
             System.Resources.ResourceManager mngr = new System.Resources.ResourceManager("Peter.InternalImages", this.GetType().Assembly);
-            this.imgMain.Images.Add("Next", (Image)mngr.GetObject("Next"));
+            this.Images.Images.Add("Next", (Image)mngr.GetObject("Next"));
             this.TabText = "Suchergebnisse";
         }
 
         /// <summary>
         /// Gets or Sets the Tree View...
         /// </summary>
-        public TreeView Tree
-        {
-            get { return this.treeMain; }
-
-            set { this.treeMain = value; }
-        }
+        public TreeView Tree { get; set; }
 
         /// <summary>
         /// Gets or Sets the Image List...
         /// </summary>
-        public ImageList Images
-        {
-            get { return this.imgMain; }
-
-            set { this.imgMain = value; }
-        }
+        public ImageList Images { get; set; }
 
         /// <summary>
         /// Overrides the Close Action...
@@ -86,9 +74,9 @@ namespace Peter
 
         public void Copy()
         {
-            if (this.treeMain.SelectedNode != null)
+            if (this.Tree.SelectedNode != null)
             {
-                Clipboard.SetText(this.treeMain.SelectedNode.Text);
+                Clipboard.SetText(this.Tree.SelectedNode.Text);
             }
         }
 
@@ -114,15 +102,15 @@ namespace Peter
 
         public void Delete()
         {
-            if (this.treeMain.SelectedNode != null)
+            if (this.Tree.SelectedNode != null)
             {
-                if (this.treeMain.SelectedNode.Parent == null)
+                if (this.Tree.SelectedNode.Parent == null)
                 {
-                    this.treeMain.Nodes.Remove(this.treeMain.SelectedNode);
+                    this.Tree.Nodes.Remove(this.Tree.SelectedNode);
                 }
                 else
                 {
-                    this.treeMain.SelectedNode.Parent.Nodes.Remove(this.treeMain.SelectedNode);
+                    this.Tree.SelectedNode.Parent.Nodes.Remove(this.Tree.SelectedNode);
                 }
             }
         }
@@ -158,12 +146,7 @@ namespace Peter
         {
         }
 
-        public IPeterPluginHost Host
-        {
-            get { return this.m_Host; }
-
-            set { this.m_Host = value; }
-        }
+        public IPeterPluginHost Host { get; set; }
 
         public string FileName
         {

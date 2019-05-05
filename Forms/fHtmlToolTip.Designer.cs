@@ -45,22 +45,22 @@ namespace Peter
         /// </summary>
         private void InitializeComponent()
         {
-            this.WebMain = new System.Windows.Forms.WebBrowser();
+            this.WebBrowser = new System.Windows.Forms.WebBrowser();
             this.SuspendLayout();
             // 
             // WebMain
             // 
-            this.WebMain.AllowNavigation = false;
-            this.WebMain.AllowWebBrowserDrop = false;
-            this.WebMain.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.WebMain.IsWebBrowserContextMenuEnabled = false;
-            this.WebMain.Location = new System.Drawing.Point(0, 0);
-            this.WebMain.MinimumSize = new System.Drawing.Size(20, 20);
-            this.WebMain.Name = "WebMain";
-            this.WebMain.ScriptErrorsSuppressed = true;
-            this.WebMain.ScrollBarsEnabled = false;
-            this.WebMain.Size = new System.Drawing.Size(202, 49);
-            this.WebMain.TabIndex = 0;
+            this.WebBrowser.AllowNavigation = false;
+            this.WebBrowser.AllowWebBrowserDrop = false;
+            this.WebBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.WebBrowser.IsWebBrowserContextMenuEnabled = false;
+            this.WebBrowser.Location = new System.Drawing.Point(0, 0);
+            this.WebBrowser.MinimumSize = new System.Drawing.Size(20, 20);
+            this.WebBrowser.Name = "WebMain";
+            this.WebBrowser.ScriptErrorsSuppressed = true;
+            this.WebBrowser.ScrollBarsEnabled = false;
+            this.WebBrowser.Size = new System.Drawing.Size(202, 49);
+            this.WebBrowser.TabIndex = 0;
             // 
             // HtmlToolTip
             // 
@@ -69,7 +69,7 @@ namespace Peter
             this.BackColor = System.Drawing.SystemColors.Info;
             this.ClientSize = new System.Drawing.Size(202, 49);
             this.ControlBox = false;
-            this.Controls.Add(this.WebMain);
+            this.Controls.Add(this.WebBrowser);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "HtmlToolTip";
             this.ShowIcon = false;
@@ -82,6 +82,5 @@ namespace Peter
 
         #endregion
 
-        private System.Windows.Forms.WebBrowser WebMain;
     }
 }

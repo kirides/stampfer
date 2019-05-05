@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Collections;
 
 namespace Peter.DParser
 {
-    struct TokenMatch
+    internal struct TokenMatch
     {
         public string Value;
         public int Position;
@@ -19,59 +16,33 @@ namespace Peter.DParser
 
     public class DCodeInfo
     {
-        private ArrayList m_VarDeclarations;
-        private ArrayList m_Functions;
-        private ArrayList m_Instances;
-        private ArrayList m_ConstDeclarations;
-       
-
         public DCodeInfo()
         {
-            this.m_VarDeclarations = new ArrayList();
-            this.m_ConstDeclarations = new ArrayList();
-            this.m_Functions = new ArrayList();
-            this.m_Instances = new ArrayList();
-           
+            this.VarDeclarations = new ArrayList();
+            this.ConstDeclarations = new ArrayList();
+            this.Functions = new ArrayList();
+            this.Instances = new ArrayList();
+
         }
 
         /// <summary>
         /// Gets or Sets the List of 'using ...' in the code...
         /// </summary>
-        
 
-        public ArrayList VarDeclarations
-        {
-            get { return this.m_VarDeclarations; }
 
-            set { this.m_VarDeclarations = value; }
-        }
-        public ArrayList ConstDeclarations
-        {
-            get { return this.m_ConstDeclarations; }
-
-            set { this.m_ConstDeclarations = value; }
-        }
+        public ArrayList VarDeclarations { get; set; }
+        public ArrayList ConstDeclarations { get; set; }
 
         /// <summary>
         /// Gets or Sets the List of 'namespace ...' in the code...
         /// </summary>
-        public ArrayList Functions
-        {
-            get { return this.m_Functions; }
-
-            set { this.m_Functions = value; }
-        }
+        public ArrayList Functions { get; set; }
 
         /// <summary>
         /// Gets or Sets the List of Fields in the code...
         /// </summary>
-        public ArrayList Instances
-        {
-            get { return this.m_Instances; }
+        public ArrayList Instances { get; set; }
 
-            set { this.m_Instances = value; }
-        }
 
-        
     }
 }

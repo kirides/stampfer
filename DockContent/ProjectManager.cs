@@ -39,8 +39,6 @@ namespace Peter
 
     public partial class ProjectManager : DockContent, IPeterPluginTab
     {
-        private IPeterPluginHost m_Host;
-        private ContextMenuStrip m_ctxRoot;
         private MainForm m_MainForm;
         private TraceDelegate m_delTrace;
 
@@ -51,14 +49,14 @@ namespace Peter
             InitializeComponent();
 
             this.m_MainForm = main;
-            this.m_ctxRoot = new ContextMenuStrip();
+            this.RootContextMenu = new ContextMenuStrip();
             ToolStripMenuItem tsmiBuild = new ToolStripMenuItem("Build");
             tsmiBuild.Click += new EventHandler(Build);
             ToolStripMenuItem tsmiRmvProject = new ToolStripMenuItem("Remove Project");
             tsmiRmvProject.Click += new EventHandler(RemoveProject);
 
-            this.m_ctxRoot.Items.Add(tsmiBuild);
-            this.m_ctxRoot.Items.Add(tsmiRmvProject);
+            this.RootContextMenu.Items.Add(tsmiBuild);
+            this.RootContextMenu.Items.Add(tsmiRmvProject);
 
             this.TabText = "Projekte";
             this.m_delTrace = new TraceDelegate(this.m_MainForm.Trace);
@@ -179,7 +177,7 @@ namespace Peter
                     }
                     cProjectInfo pInfo = (cProjectInfo)n.Tag;
                     string file = this.treeMain.SelectedNode.Tag.ToString();
-                    this.m_Host.CreateEditor(file, Path.GetFileName(file));
+                    this.Host.CreateEditor(file, Path.GetFileName(file));
                     this.m_MainForm.GetEditor(file).Project = pInfo.Path;
                 }
             }
@@ -280,7 +278,7 @@ namespace Peter
                 TreeNode root = new TreeNode(proj);
                 root.Name = proj;
                 root.ImageIndex = root.SelectedImageIndex = 1;
-                root.ContextMenuStrip = this.m_ctxRoot;
+                root.ContextMenuStrip = this.RootContextMenu;
 
                 // Get Project Type...
                 nodes = xDoc.GetElementsByTagName("type");
@@ -643,12 +641,7 @@ namespace Peter
             return true;
         }
 
-        public IPeterPluginHost Host
-        {
-            get {  return this.m_Host; }
-
-            set { this.m_Host = value; }
-        }
+        public IPeterPluginHost Host { get; set; }
 
         public string FileName
         {
@@ -856,12 +849,7 @@ namespace Peter
         /// <summary>
         /// Gets or Sets the Context Menu used for the Root nodes...
         /// </summary>
-        public ContextMenuStrip RootContextMenu
-        {
-            get { return this.m_ctxRoot; }
-
-            set { this.m_ctxRoot = value; }
-        }
+        public ContextMenuStrip RootContextMenu { get; set; }
 
         protected override string GetPersistString ()
         {

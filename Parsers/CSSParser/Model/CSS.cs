@@ -7,15 +7,10 @@ namespace Peter.CSSParser
     /// <summary></summary>
     public class CSS
     {
-        private string filename;
         private List<Selector> selectors = new List<Selector>();
 
         /// <summary></summary>
-        public string FileName
-        {
-            get { return filename; }
-            set { filename = value; }
-        }
+        public string FileName { get; set; }
 
         /// <summary></summary>
         public List<Selector> Selectors

@@ -45,7 +45,6 @@ namespace Peter
         private int m_RecentProjectCount;
         private int m_RecentFileCount;
         private bool m_SaveonExit;
-        private string m_DockConfigFile;
         private string m_ConfigFile;
         public string m_ScriptsPath = @"E:\Spiele\Gothic II MDK\_work\Data\Scripts";
         public string m_BilderPath;
@@ -61,7 +60,6 @@ namespace Peter
         private Find m_FindControl;
         private GoToLine m_GotoControl;
         private ProjectManager m_ProjMan;
-        private IDockContent m_ActiveContent;
         private ctrlCodeStructure m_CodeStructure;
         public ctrlGothicInstances m_GothicStructure;
         private ctrlQuestManager m_QuestManager;
@@ -92,7 +90,7 @@ namespace Peter
             this.Deactivate += new EventHandler(MainForm_Deactivate);
 
             // Set the Config File...
-            this.m_DockConfigFile = Path.GetDirectoryName(Application.ExecutablePath) + "\\" + DOCK_CONFIG_FILE;
+            this.DockConfigFile = Path.GetDirectoryName(Application.ExecutablePath) + "\\" + DOCK_CONFIG_FILE;
             this.m_ConfigFile = Path.GetDirectoryName(Application.ExecutablePath) + "\\" + CONFIG_FILE;
             this.m_EditorConfig = new Classes.Configuration.Editor();
 
@@ -109,7 +107,7 @@ namespace Peter
             this.mnuHighlighting.Enabled = false;
             this.bookMarksToolStripMenuItem.Enabled = false;
             this.mnuCode.Enabled = false;
-            this.m_ActiveContent = null;
+            this.ActiveContent = null;
 
             // Set up Find Control...
             this.m_FindControl = new Find(this)
@@ -214,9 +212,9 @@ namespace Peter
             this.LoadPlugins();
 
             // Load Configuration...
-            if (File.Exists(this.m_DockConfigFile))
+            if (File.Exists(this.DockConfigFile))
             {
-                this.DockMain.LoadFromXml(this.m_DockConfigFile, new DeserializeDockContent(this.GetContent));
+                this.DockMain.LoadFromXml(this.DockConfigFile, new DeserializeDockContent(this.GetContent));
             }
 
             // Load Files passed by arguments...
@@ -443,7 +441,7 @@ namespace Peter
         /// <summary>
         /// Gets the Active Tab Interface...
         /// </summary>
-        private IPeterPluginTab ActiveTab => (IPeterPluginTab)this.m_ActiveContent;
+        private IPeterPluginTab ActiveTab => (IPeterPluginTab)this.ActiveContent;
 
         /// <summary>
         /// Gets the Active Editor...
@@ -454,9 +452,9 @@ namespace Peter
             {
                 if (this.ActiveTab != null)
                 {
-                    if (this.m_ActiveContent.GetType() == typeof(Editor))
+                    if (this.ActiveContent.GetType() == typeof(Editor))
                     {
-                        return (Editor)this.m_ActiveContent;
+                        return (Editor)this.ActiveContent;
                     }
                 }
                 return null;
@@ -466,7 +464,7 @@ namespace Peter
         /// <summary>
         /// Gets the Active Content...
         /// </summary>
-        public IDockContent ActiveContent => this.m_ActiveContent;
+        public IDockContent ActiveContent { get; private set; }
 
         /// <summary>
         /// Gets the Type for a Editor in string format (typeof(Editor))...
@@ -481,7 +479,7 @@ namespace Peter
         /// <summary>
         /// Gets the location of the Dock Config File...
         /// </summary>
-        public string DockConfigFile => this.m_DockConfigFile;
+        public string DockConfigFile { get; private set; }
 
         #endregion
 
@@ -761,7 +759,7 @@ namespace Peter
                 // Set the Active content...
 
 
-                this.m_ActiveContent = this.DockMain.ActiveContent;
+                this.ActiveContent = this.DockMain.ActiveContent;
 
                 //MessageBox.Show(m_ActiveContent.DockHandler.TabText);
                 if (this.DockMain.ActiveContent.GetType() == typeof(Editor))
@@ -2082,13 +2080,13 @@ namespace Peter
                 // Save Dock Layout...
                 if (this.m_SaveonExit)
                 {
-                    this.DockMain.SaveAsXml(this.m_DockConfigFile);
+                    this.DockMain.SaveAsXml(this.DockConfigFile);
                 }
                 else
                 {
-                    if (File.Exists(this.m_DockConfigFile))
+                    if (File.Exists(this.DockConfigFile))
                     {
-                        File.Delete(this.m_DockConfigFile);
+                        File.Delete(this.DockConfigFile);
                     }
                 }
 

@@ -23,13 +23,7 @@ namespace Peter
 {
     public class GListBox : ListBox
     {
-        private ImageList _myImageList;
-
-        public ImageList ImageList
-        {
-            get { return _myImageList; }
-            set { _myImageList = value; }
-        }
+        public ImageList ImageList { get; set; }
 
         public GListBox ()
         {
@@ -46,7 +40,7 @@ namespace Peter
             {
                 GListBoxItem item;
                 Rectangle bounds = e.Bounds;
-                Size imageSize = _myImageList.ImageSize;
+                Size imageSize = ImageList.ImageSize;
                 try
                 {
                     item = (GListBoxItem)Items[e.Index];
@@ -82,14 +76,9 @@ namespace Peter
 
     public class GListBoxItem
     {
-        private string _myText;
         private int _myImageIndex;
         // properties 
-        public string Text
-        {
-            get { return _myText; }
-            set { _myText = value; }
-        }
+        public string Text { get; set; }
         public int ImageIndex
         {
             get { return _myImageIndex; }
@@ -98,14 +87,14 @@ namespace Peter
         //constructor
         public GListBoxItem (string text, int index)
         {
-            _myText = text;
+            Text = text;
             _myImageIndex = index;
         }
         public GListBoxItem (string text) : this(text, -1) { }
         public GListBoxItem () : this("") { }
         public override string ToString ()
         {
-            return _myText;
+            return Text;
         }
     }
 }

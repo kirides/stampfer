@@ -31,8 +31,6 @@ namespace Peter
 {
     public partial class DialogCreator : DockContent, IPeterPluginTab
     {
-        private IPeterPluginHost m_Host;
-       
         MainForm MainF;
 
         private int DialogVariable=0;
@@ -240,12 +238,7 @@ namespace Peter
             return true;
         }
 
-        public IPeterPluginHost Host
-        {
-            get { return this.m_Host; }
-
-            set { this.m_Host = value; }
-        }
+        public IPeterPluginHost Host { get; set; }
 
         public string FileName
         {

@@ -37,11 +37,7 @@ namespace Peter
         /// <summary>
         /// Gets or Sets the WebBrowser Control...
         /// </summary>
-        public WebBrowser WebBrowser
-        {
-            get { return this.WebMain; }
-            set { this.WebMain = value; }
-        }
+        public WebBrowser WebBrowser { get; set; }
 
         protected override bool ShowWithoutActivation
         {

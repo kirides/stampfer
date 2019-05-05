@@ -23,15 +23,11 @@ namespace Peter.VBParser
         public Token t;    // last recognized token
         public Token la;   // lookahead token
         int errDist = minErrDist;
-        private VBCodeInfo m_CodeInfo = new VBCodeInfo();
 
         //public Util util = new Util();
 
 
-        public VBCodeInfo CodeInfo
-        {
-            get { return this.m_CodeInfo; }
-        }
+        public VBCodeInfo CodeInfo { get; } = new VBCodeInfo();
 
         public Parser(Scanner scanner)
         {
@@ -173,7 +169,7 @@ namespace Peter.VBParser
         {
             string nmspc;
             Expect(4);
-            this.m_CodeInfo.Imports.Add(new TokenMatch(la.val, la.pos));
+            this.CodeInfo.Imports.Add(new TokenMatch(la.val, la.pos));
             QualName(out nmspc);
             //util.Writeline("using " + nmspc + ";");
         }

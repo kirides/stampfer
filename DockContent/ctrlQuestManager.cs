@@ -34,11 +34,10 @@ namespace Peter
 {
     public partial class ctrlQuestManager : DockContent, IPeterPluginTab
     {
-        private IPeterPluginHost m_Host;
         MainForm MainF;
-        private bool m_CanScroll;
-      //  private TextEditorControl m_Editor;
-        
+
+        //  private TextEditorControl m_Editor;
+
         public string TEXT = "";
         public ArrayList Quests = new ArrayList();
         Hashtable hs = new Hashtable();
@@ -49,7 +48,7 @@ namespace Peter
            
             InitializeComponent();
             MainF = f;
-            this.m_CanScroll = true;
+            this.CanScroll = true;
             this.TabText = "Quest Manager";
             //this.treeMain.AfterSelect += new TreeViewEventHandler(treeMain_AfterSelect);
             this.treeMain.NodeMouseDoubleClick += new TreeNodeMouseClickEventHandler(treeMain_NodeMouseDoubleClick);
@@ -82,12 +81,7 @@ namespace Peter
         /// <summary>
         /// Gets or Sets if we are able to scroll to the selected item...
         /// </summary>
-        public bool CanScroll
-        {
-            get { return this.m_CanScroll; }
-
-            set { this.m_CanScroll = value; }
-        }
+        public bool CanScroll { get; set; }
 
         /// <summary>
         /// Scrolls the active editor to the given offset...
@@ -235,12 +229,7 @@ namespace Peter
         {
         }
 
-        public IPeterPluginHost Host
-        {
-            get { return this.m_Host; }
-
-            set { this.m_Host = value; }
-        }
+        public IPeterPluginHost Host { get; set; }
 
         public string FileName
         {

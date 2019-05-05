@@ -46,21 +46,21 @@ namespace Peter
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.treeMain = new System.Windows.Forms.TreeView();
+            this.Tree = new System.Windows.Forms.TreeView();
             this.imgMain = new System.Windows.Forms.ImageList(this.components);
             this.SuspendLayout();
             // 
             // treeMain
             // 
-            this.treeMain.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.treeMain.ImageIndex = 0;
-            this.treeMain.ImageList = this.imgMain;
-            this.treeMain.Location = new System.Drawing.Point(0, 0);
-            this.treeMain.Name = "treeMain";
-            this.treeMain.SelectedImageIndex = 0;
-            this.treeMain.Size = new System.Drawing.Size(292, 273);
-            this.treeMain.TabIndex = 0;
-            this.treeMain.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeMain_AfterSelect);
+            this.Tree.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.Tree.ImageIndex = 0;
+            this.Tree.ImageList = this.imgMain;
+            this.Tree.Location = new System.Drawing.Point(0, 0);
+            this.Tree.Name = "treeMain";
+            this.Tree.SelectedImageIndex = 0;
+            this.Tree.Size = new System.Drawing.Size(292, 273);
+            this.Tree.TabIndex = 0;
+            this.Tree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeMain_AfterSelect);
             // 
             // imgMain
             // 
@@ -73,7 +73,7 @@ namespace Peter
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(292, 273);
-            this.Controls.Add(this.treeMain);
+            this.Controls.Add(this.Tree);
             this.Name = "FindResults";
             this.TabText = "FindResults";
             this.Text = "Suchergebnisse";
@@ -83,7 +83,6 @@ namespace Peter
 
         #endregion
 
-        private System.Windows.Forms.TreeView treeMain;
         private System.Windows.Forms.ImageList imgMain;
     }
 }

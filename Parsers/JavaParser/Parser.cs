@@ -58,15 +58,11 @@ namespace Peter.JavaParser
         public Token la;   // lookahead token
         int errDist = minErrDist;
         private string m_Current = "";
-        private JavaCodeInfo m_CodeInfo = new JavaCodeInfo();
 
         /// <summary>
         /// Gets the Info about the Code...
         /// </summary>
-        public JavaCodeInfo CodeInfo
-        {
-            get { return this.m_CodeInfo; }
-        }
+        public JavaCodeInfo CodeInfo { get; } = new JavaCodeInfo();
 
         public class Modifier
         {
@@ -525,7 +521,7 @@ namespace Peter.JavaParser
             QualifiedImport();
             Expect(40);
             tm.Value = this.m_Current;
-            this.m_CodeInfo.Imports.Add(tm);
+            this.CodeInfo.Imports.Add(tm);
         }
 
         void TypeDeclaration()
@@ -985,7 +981,7 @@ namespace Peter.JavaParser
                     this.m_Current += ")";
                 }
                 tm.Value += this.m_Current;
-                this.m_CodeInfo.Constructors.Add(tm);
+                this.CodeInfo.Constructors.Add(tm);
             }
             else if (StartOf(14))
             {
@@ -993,7 +989,7 @@ namespace Peter.JavaParser
                 tm.Position = la.pos;
                 MethodOrFieldDecl(m);
                 tm.Value = this.m_Current + ":" + dataType;
-                this.m_CodeInfo.Fields.Add(tm);
+                this.CodeInfo.Fields.Add(tm);
             }
             else if (la.kind == 23)
             {
@@ -1013,7 +1009,7 @@ namespace Peter.JavaParser
                     this.m_Current += ")" + ":" + dataType;
                 }
                 tm.Value += this.m_Current;
-                this.m_CodeInfo.Methods.Add(tm);
+                this.CodeInfo.Methods.Add(tm);
             }
             else if (la.kind == 9)
             {

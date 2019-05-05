@@ -154,12 +154,8 @@ namespace Peter.CSParser
 
         ArrayList ccs = new ArrayList();
         public ArrayList exts = new ArrayList();
-        private CSCodeInfo m_CodeInfo = new CSCodeInfo();
 
-        public CSCodeInfo CodeInfo
-        {
-            get { return this.m_CodeInfo; }
-        }
+        public CSCodeInfo CodeInfo { get; } = new CSCodeInfo();
 
         public void AddConditionalCompilationSymbols(String[] symbols)
         {
@@ -889,7 +885,7 @@ namespace Peter.CSParser
             this.m_Current = la.val;
             TypeName();
             tm.Value = this.m_Current;
-            this.m_CodeInfo.Usings.Add(tm);
+            this.CodeInfo.Usings.Add(tm);
             Expect(114);
         }
 
@@ -945,7 +941,7 @@ namespace Peter.CSParser
                 {
                     Get();
                 }
-                this.m_CodeInfo.NameSpaces.Add(this.m_Current);
+                this.CodeInfo.NameSpaces.Add(this.m_Current);
             }
             else if (StartOf(2))
             {
@@ -1629,7 +1625,7 @@ namespace Peter.CSParser
                     Expression();
                 }
                 Expect(114);
-                this.m_CodeInfo.Fields.Add(tm);
+                this.CodeInfo.Fields.Add(tm);
             }
             else if (la.kind == 26)
             {
@@ -1669,7 +1665,7 @@ namespace Peter.CSParser
                     this.m_Current += ")";
                 }
                 tm.Value += this.m_Current;
-                this.m_CodeInfo.Constructors.Add(tm);
+                this.CodeInfo.Constructors.Add(tm);
                 if (la.kind == 86)
                 {
                     m.Check(Modifier.constructors);
@@ -1747,7 +1743,7 @@ namespace Peter.CSParser
                     m.Check(Modifier.fields);
                     if (type == TypeKind.@void) { Error("field type must not be void"); }
 
-                    this.m_CodeInfo.Fields.Add(new TokenMatch(la.val + ":" + dataType, la.pos));
+                    this.CodeInfo.Fields.Add(new TokenMatch(la.val + ":" + dataType, la.pos));
                     VariableDeclarators();
                     Expect(114);
                 }
@@ -1769,7 +1765,7 @@ namespace Peter.CSParser
 
                         tm.Value += this.m_Current;
                         tm.Value += ":" + dataType;
-                        this.m_CodeInfo.Properties.Add(tm);
+                        this.CodeInfo.Properties.Add(tm);
                     }
                     else if (la.kind == 90)
                     {
@@ -1819,7 +1815,7 @@ namespace Peter.CSParser
                         else SynErr(150);
 
                         tm.Value += ":" + dataType;
-                        this.m_CodeInfo.Methods.Add(tm);
+                        this.CodeInfo.Methods.Add(tm);
                     }
                     else SynErr(151);
                 }

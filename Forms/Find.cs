@@ -34,12 +34,10 @@ namespace Peter
 
     public partial class Find : Form
     {
-        private IPeterPluginHost m_Host;
         private const string OPEN_DOC = "In allen offenen Dateien";
         private const string BROWSE = "Durchsuchen...";
         private const string GOTHIC = "Im Gothic-Script-Verzeichnis...";
         private ArrayList m_FindLocations;
-        private FindResults m_Results;
         private AddTreeNodeDelegate m_AddTreeNode;
         private TraceDelegate m_Trace;
         private MainForm m_MainForm;
@@ -70,20 +68,15 @@ namespace Peter
             this.m_Trace = new TraceDelegate(this.Trace);
             this.m_AddTreeNode = new AddTreeNodeDelegate(this.AddNode);
             this.m_FindLocations = new ArrayList();
-            this.m_Results = new FindResults();
-            this.m_Results.Tree.DoubleClick += new EventHandler(Tree_DoubleClick);
+            this.Results = new FindResults();
+            this.Results.Tree.DoubleClick += new EventHandler(Tree_DoubleClick);
             this.cmbFindText.KeyDown += new KeyEventHandler(cmbFindText_KeyDown);
         }
 
         /// <summary>
         /// Gets or Sets the Host Application...
         /// </summary>
-        public IPeterPluginHost Host
-        {
-            get { return this.m_Host; }
-
-            set { this.m_Host = value; }
-        }
+        public IPeterPluginHost Host { get; set; }
 
         private void AddNode(TreeNode node)
         {
@@ -93,29 +86,29 @@ namespace Peter
             {
                 ext = "none";
             }
-            if (!this.m_Results.Images.Images.ContainsKey(ext))
+            if (!this.Results.Images.Images.ContainsKey(ext))
             {
-                this.m_Results.Images.Images.Add(ext, Common.GetFileIcon(file, false).ToBitmap());
+                this.Results.Images.Images.Add(ext, Common.GetFileIcon(file, false).ToBitmap());
             }
 
-            node.ImageIndex = node.SelectedImageIndex = this.m_Results.Images.Images.IndexOfKey(ext);
+            node.ImageIndex = node.SelectedImageIndex = this.Results.Images.Images.IndexOfKey(ext);
 
-            this.m_Results.Tree.Nodes.Add(node);
+            this.Results.Tree.Nodes.Add(node);
             node.Expand();
 
             // Update count...
-            if (this.m_Results.TabText.IndexOf("-") != -1)
+            if (this.Results.TabText.IndexOf("-") != -1)
             {
-                string[] txt = this.m_Results.TabText.Split('-');
+                string[] txt = this.Results.TabText.Split('-');
                 string matchCnt = txt[1].Trim();
                 matchCnt = matchCnt.Split(' ')[0].Trim();
                 matchCnt = Convert.ToString(Convert.ToInt32(matchCnt) + node.Nodes.Count);
-                this.m_Results.TabText = "Suchergebnisse - " + matchCnt;
+                this.Results.TabText = "Suchergebnisse - " + matchCnt;
                 //this.m_Results.TabText += (matchCnt.Equals("1")) ? " Ergebnis" : " Ergebnisse";
             }
             else
             {
-                this.m_Results.TabText += " - " + node.Nodes.Count.ToString();
+                this.Results.TabText += " - " + node.Nodes.Count.ToString();
                 //this.m_Results.TabText += (node.Nodes.Count == 1) ? " Ergebnis" : " Ergebnisse";
             }
         }
@@ -126,7 +119,7 @@ namespace Peter
             {
                 this.btnStop.Visible = false;
             }
-            this.m_Host.Trace(text);
+            this.Host.Trace(text);
         }
 
         protected override void OnClosing(CancelEventArgs e)
@@ -253,10 +246,7 @@ namespace Peter
         /// <summary>
         /// Gets the Find Results DockControl...
         /// </summary>
-        public FindResults Results
-        {
-            get { return this.m_Results; }
-        }
+        public FindResults Results { get; }
 
         /// <summary>
         /// Gets if we should search up or not...
@@ -531,15 +521,15 @@ namespace Peter
             {
                 if (this.ckbFindIn.Checked)
                 {
-                    this.m_Results.Tree.Nodes.Clear();
-                    this.m_Results.TabText = "Suchergebnisse";
-                    if (this.m_Results.DockState == DockState.Unknown)
+                    this.Results.Tree.Nodes.Clear();
+                    this.Results.TabText = "Suchergebnisse";
+                    if (this.Results.DockState == DockState.Unknown)
                     {
-                        this.m_Host.AddDockContent(this.m_Results, DockState.DockBottom);
+                        this.Host.AddDockContent(this.Results, DockState.DockBottom);
                     }
-                    else if (this.m_Results.DockState == DockState.Hidden)
+                    else if (this.Results.DockState == DockState.Hidden)
                     {
-                        this.m_Results.Show();
+                        this.Results.Show();
                     }
                     // Find All in Files...
                     if (this.cmbFindIn.Text == OPEN_DOC)
@@ -614,10 +604,10 @@ namespace Peter
 
         private void Tree_DoubleClick(object sender, EventArgs e)
         {
-            if (this.m_Results.Tree.SelectedNode != null
-                && this.m_Results.Tree.SelectedNode.Tag != null)
+            if (this.Results.Tree.SelectedNode != null
+                && this.Results.Tree.SelectedNode.Tag != null)
             {
-                FindInfo fi = (FindInfo)this.m_Results.Tree.SelectedNode.Tag;
+                FindInfo fi = (FindInfo)this.Results.Tree.SelectedNode.Tag;
                 this.m_MainForm.CreateEditor(fi.FilePath, Path.GetFileName(fi.FilePath));
                 this.m_MainForm.SelectWord(fi.Line - 1, fi.Index, fi.FindString.Length);
             }

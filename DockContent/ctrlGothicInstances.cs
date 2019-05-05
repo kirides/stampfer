@@ -31,7 +31,6 @@ namespace Peter
 {
     public partial class ctrlGothicInstances : DockContent, IPeterPluginTab
     {
-        private IPeterPluginHost m_Host;
         private MainForm MainF;
         private Regex NoSpaces = new Regex(@"  ");
         private bool readfromfile = false;
@@ -345,12 +344,7 @@ namespace Peter
         {
         }
 
-        public IPeterPluginHost Host
-        {
-            get { return this.m_Host; }
-
-            set { this.m_Host = value; }
-        }
+        public IPeterPluginHost Host { get; set; }
 
         public string FileName
         {

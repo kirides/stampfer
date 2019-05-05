@@ -31,7 +31,6 @@ namespace Peter
         public delegate void UpdateOutputCallback(string text);
         private StreamWriter m_Writer;
         private bool m_Command;
-        private IPeterPluginHost m_Host;
 
         public CommandPrompt()
         {
@@ -231,12 +230,7 @@ namespace Peter
             return true;
         }
 
-        public IPeterPluginHost Host
-        {
-            get {  return this.m_Host; }
-
-            set { this.m_Host = value; }
-        }
+        public IPeterPluginHost Host { get; set; }
 
         public string FileName
         {

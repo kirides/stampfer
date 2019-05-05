@@ -24,7 +24,7 @@ namespace Peter.OutlookGrid
         #region OutlookGrid constructor
         public OutlookGrid ()
         {
-            this.m_Collapsable = true;
+            this.CanCollapse = true;
             this.m_Layout = false;
             InitializeComponent();
 
@@ -32,7 +32,7 @@ namespace Peter.OutlookGrid
             // in this case our custom OutlookGridRow class
             this.SetStyle(ControlStyles.ResizeRedraw, true);
             base.RowTemplate = new OutlookGridRow();
-            this.groupTemplate = new OutlookgGridDefaultGroup();
+            this.GroupTemplate = new OutlookgGridDefaultGroup();
             this.AutoSize = true;
             this.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
         }
@@ -46,52 +46,21 @@ namespace Peter.OutlookGrid
             get { return base.RowTemplate; }
         }
 
-        private IOutlookGridGroup groupTemplate;
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public IOutlookGridGroup GroupTemplate
-        {
-            get
-            {
-                return groupTemplate;
-            }
-            set
-            {
-                groupTemplate = value;
-            }
-        }
+        public IOutlookGridGroup GroupTemplate { get; set; }
 
-        private Image iconCollapse;
         [Category("Appearance")]
-        public Image CollapseIcon
-        {
-            get { return iconCollapse; }
-            set { iconCollapse = value; }
-        }
+        public Image CollapseIcon { get; set; }
 
-        private Image iconExpand;
         [Category("Appearance")]
-        public Image ExpandIcon
-        {
-            get { return iconExpand; }
-            set { iconExpand = value; }
-        }
+        public Image ExpandIcon { get; set; }
 
-        private bool m_Collapsable;
         [Category("Appearance")]
-        public bool CanCollapse
-        {
-            get { return this.m_Collapsable; }
-            set { this.m_Collapsable = value; }
-        }
+        public bool CanCollapse { get; set; }
 
-        private bool m_ShowItemCount;
         [Category("Appearance")]
-        public bool ShowItemCount
-        {
-            get { return this.m_ShowItemCount; }
-            set { this.m_ShowItemCount = value; }
-        }
+        public bool ShowItemCount { get; set; }
 
         private DataSourceManager dataSource;
         public new object DataSource
@@ -123,7 +92,7 @@ namespace Peter.OutlookGrid
 
         public void ClearGroups ()
         {
-            groupTemplate.Column = null; //reset
+            GroupTemplate.Column = null; //reset
             FillGrid(null);
         }
 
@@ -148,7 +117,7 @@ namespace Peter.OutlookGrid
                 dataSource = new DataSourceManager(this, null);
 
             dataSource.Sort(comparer);
-            FillGrid(groupTemplate);
+            FillGrid(GroupTemplate);
         }
 
         public void SetDataSource (object ds)
@@ -163,7 +132,7 @@ namespace Peter.OutlookGrid
                 dataSource = new DataSourceManager(this, null);
 
             dataSource.Sort(new OutlookGridRowComparer(dataGridViewColumn.Index, direction));
-            FillGrid(groupTemplate);
+            FillGrid(GroupTemplate);
         }
         #endregion OutlookGrid new methods
 
@@ -183,7 +152,7 @@ namespace Peter.OutlookGrid
             {
 
                 OutlookGridRow row = (OutlookGridRow)base.Rows[e.RowIndex];
-                if (row.IsGroupRow && this.m_Collapsable)
+                if (row.IsGroupRow && this.CanCollapse)
                 {
                     row.Group.Collapsed = !row.Group.Collapsed;
 
@@ -205,7 +174,7 @@ namespace Peter.OutlookGrid
             if (e.RowIndex < 0) return;
 
             OutlookGridRow row = (OutlookGridRow)base.Rows[e.RowIndex];
-            if (row.IsGroupRow && row.IsIconHit(e) && this.m_Collapsable)
+            if (row.IsGroupRow && row.IsIconHit(e) && this.CanCollapse)
             {
                 System.Diagnostics.Debug.WriteLine("OnCellMouseDown " + DateTime.Now.Ticks.ToString());
                 row.Group.Collapsed = !row.Group.Collapsed;
@@ -258,10 +227,10 @@ namespace Peter.OutlookGrid
         private void SetGroupCollapse (bool collapsed)
         {
             if (Rows.Count == 0) return;
-            if (groupTemplate == null) return;
+            if (GroupTemplate == null) return;
 
             // set the default grouping style template collapsed property
-            groupTemplate.Collapsed = collapsed;
+            GroupTemplate.Collapsed = collapsed;
 
             // loop through all rows to find the GroupRows
             foreach (OutlookGridRow row in Rows)

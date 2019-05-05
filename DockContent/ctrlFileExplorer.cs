@@ -33,7 +33,6 @@ namespace Peter
 
     public partial class ctrlFileExplorer : DockContent, PeterInterface.IPeterPluginTab
     {
-        private PeterInterface.IPeterPluginHost m_Host;
         private MainForm MainF;
         private ExpandDelegate m_Expand;
         private string m_XML;
@@ -47,7 +46,7 @@ namespace Peter
 
 
             MainF = f;
-            this.m_Host = f;
+            this.Host = f;
             this.TabText = "Datei Explorer";
             this.m_Expand = new ExpandDelegate(this.ExpandNode);
 
@@ -155,13 +154,13 @@ namespace Peter
                 {
                     if (this.treeMain.SelectedNode.ImageIndex != -1)
                     {
-                        this.m_Host.CreateEditor(this.treeMain.SelectedNode.Tag.ToString(),
+                        this.Host.CreateEditor(this.treeMain.SelectedNode.Tag.ToString(),
                             Path.GetFileName(this.treeMain.SelectedNode.Tag.ToString()),
                             Icon.FromHandle(((Bitmap)this.imgMain.Images[this.treeMain.SelectedNode.ImageIndex]).GetHicon()));
                     }
                     else
                     {
-                        this.m_Host.CreateEditor(this.treeMain.SelectedNode.Tag.ToString(),
+                        this.Host.CreateEditor(this.treeMain.SelectedNode.Tag.ToString(),
                             Path.GetFileName(this.treeMain.SelectedNode.Tag.ToString()));
                     }
                 }
@@ -460,17 +459,7 @@ namespace Peter
         {
         }
 
-        public PeterInterface.IPeterPluginHost Host
-        {
-            get
-            {
-                return this.m_Host;
-            }
-            set
-            {
-                this.m_Host = value;
-            }
-        }
+        public PeterInterface.IPeterPluginHost Host { get; set; }
 
         public string FileName
         {
@@ -623,7 +612,7 @@ namespace Peter
                     FileStream f = File.Create(path + e.Label);
                     f.Close();
 
-                    this.imgMain.Images.Add(this.m_Host.GetFileIcon(e.Node.Tag.ToString(), false));
+                    this.imgMain.Images.Add(this.Host.GetFileIcon(e.Node.Tag.ToString(), false));
                     e.Node.SelectedImageIndex = e.Node.ImageIndex = this.imgMain.Images.Count - 1;
                 }
                 this.treeMain.SelectedNode = e.Node;

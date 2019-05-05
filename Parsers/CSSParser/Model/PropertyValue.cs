@@ -8,23 +8,13 @@ namespace Peter.CSSParser
     /// <summary></summary>
     public class PropertyValue
     {
-        private ValType type;
-        private Unit unit;
         private string value;
 
         /// <summary></summary>
-        public ValType Type
-        {
-            get { return this.type; }
-            set { this.type = value; }
-        }
+        public ValType Type { get; set; }
 
         /// <summary></summary>
-        public Unit Unit
-        {
-            get { return this.unit; }
-            set { this.unit = value; }
-        }
+        public Unit Unit { get; set; }
 
         /// <summary></summary>
         public string Value
@@ -38,12 +28,12 @@ namespace Peter.CSSParser
         public override string ToString()
         {
             System.Text.StringBuilder txt = new System.Text.StringBuilder(value);
-            if (type == ValType.Unit)
+            if (Type == ValType.Unit)
             {
-                txt.Append(unit.ToString());
+                txt.Append(Unit.ToString());
             }
             txt.Append(" [");
-            txt.Append(type.ToString());
+            txt.Append(Type.ToString());
             txt.Append("]");
             return txt.ToString();
         }
@@ -52,7 +42,7 @@ namespace Peter.CSSParser
         {
             get
             {
-                if (type == ValType.Hex && (value.Length == 6 || (value.Length == 7 && value.StartsWith("#"))))
+                if (Type == ValType.Hex && (value.Length == 6 || (value.Length == 7 && value.StartsWith("#"))))
                 {
                     bool hex = true;
                     foreach (char c in value)
@@ -71,7 +61,7 @@ namespace Peter.CSSParser
                     }
                     return hex;
                 }
-                else if (type == ValType.String)
+                else if (Type == ValType.String)
                 {
                     try
                     {
@@ -87,7 +77,7 @@ namespace Peter.CSSParser
         public Color ToColor()
         {
             string hex = "000000";
-            if (type == ValType.Hex)
+            if (Type == ValType.Hex)
             {
                 if (value.Length == 7 && value.StartsWith("#"))
                 {

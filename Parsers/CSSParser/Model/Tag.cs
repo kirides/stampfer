@@ -7,19 +7,10 @@ namespace Peter.CSSParser
     /// <summary></summary>
     public class Tag
     {
-        private TagType tagtype;
-        private string name;
-        private string cls;
-        private string pseudo;
         private string id;
-        private List<Tag> subtags = new List<Tag>();
 
         /// <summary></summary>
-        public TagType TagType
-        {
-            get { return tagtype; }
-            set { tagtype = value; }
-        }
+        public TagType TagType { get; set; }
 
         /// <summary></summary>
         public bool IsIDSelector
@@ -31,41 +22,29 @@ namespace Peter.CSSParser
         /// <summary></summary>
         public bool HasName
         {
-            get { return name != null; }
+            get { return Name != null; }
         }
 
         /// <summary></summary>
         public bool HasClass
         {
-            get { return cls != null; }
+            get { return Class != null; }
         }
 
         /// <summary></summary>
         public bool HasPseudoClass
         {
-            get { return pseudo != null; }
+            get { return Pseudo != null; }
         }
 
         /// <summary></summary>
-        public string Name
-        {
-            get { return name; }
-            set { name = value; }
-        }
+        public string Name { get; set; }
 
         /// <summary></summary>
-        public string Class
-        {
-            get { return cls; }
-            set { cls = value; }
-        }
+        public string Class { get; set; }
 
         /// <summary></summary>
-        public string Pseudo
-        {
-            get { return pseudo; }
-            set { pseudo = value; }
-        }
+        public string Pseudo { get; set; }
 
         /// <summary></summary>
         public string Id
@@ -75,11 +54,7 @@ namespace Peter.CSSParser
         }
 
         /// <summary></summary>
-        public List<Tag> SubTags
-        {
-            get { return subtags; }
-            set { subtags = value; }
-        }
+        public List<Tag> SubTags { get; set; } = new List<Tag>();
 
         /// <summary></summary>
         /// <returns></returns>
@@ -87,7 +62,7 @@ namespace Peter.CSSParser
         {
             System.Text.StringBuilder txt = new System.Text.StringBuilder(ToShortString());
 
-            foreach (Tag t in subtags)
+            foreach (Tag t in SubTags)
             {
                 txt.Append(" ");
                 txt.Append(t.ToString());
@@ -102,12 +77,12 @@ namespace Peter.CSSParser
             System.Text.StringBuilder txt = new System.Text.StringBuilder();
             if (HasName)
             {
-                txt.Append(name);
+                txt.Append(Name);
             }
             if (HasClass)
             {
                 txt.Append(".");
-                txt.Append(cls);
+                txt.Append(Class);
             }
             if (IsIDSelector)
             {
@@ -117,7 +92,7 @@ namespace Peter.CSSParser
             if (HasPseudoClass)
             {
                 txt.Append(":");
-                txt.Append(pseudo);
+                txt.Append(Pseudo);
             }
             return txt.ToString();
         }
