@@ -207,7 +207,7 @@ namespace Peter
             this.btnFont.TabIndex = 23;
             this.btnFont.Text = "Schriftart...";
             this.btnFont.UseVisualStyleBackColor = true;
-            this.btnFont.Click += new System.EventHandler(this.btnFont_Click);
+            this.btnFont.Click += new System.EventHandler(this.BtnFont_Click);
             // 
             // label8
             // 
@@ -238,7 +238,7 @@ namespace Peter
             this.cmbBracketStyle.Name = "cmbBracketStyle";
             this.cmbBracketStyle.Size = new System.Drawing.Size(74, 21);
             this.cmbBracketStyle.TabIndex = 20;
-            this.cmbBracketStyle.SelectedIndexChanged += new System.EventHandler(this.cmbBracketStyle_SelectedIndexChanged);
+            this.cmbBracketStyle.SelectedIndexChanged += new System.EventHandler(AnyOptionCheckbox_CheckedChanged);
             // 
             // cmbIndentStyle
             // 
@@ -252,7 +252,7 @@ namespace Peter
             this.cmbIndentStyle.Name = "cmbIndentStyle";
             this.cmbIndentStyle.Size = new System.Drawing.Size(74, 21);
             this.cmbIndentStyle.TabIndex = 19;
-            this.cmbIndentStyle.SelectedIndexChanged += new System.EventHandler(this.cmbIndentStyle_SelectedIndexChanged);
+            this.cmbIndentStyle.SelectedIndexChanged += new System.EventHandler(AnyOptionCheckbox_CheckedChanged);
             // 
             // label6
             // 
@@ -279,7 +279,7 @@ namespace Peter
             this.nudVRuler.Size = new System.Drawing.Size(74, 20);
             this.nudVRuler.TabIndex = 16;
             this.nudVRuler.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.nudVRuler.ValueChanged += new System.EventHandler(this.nudVRuler_ValueChanged);
+            this.nudVRuler.ValueChanged += new System.EventHandler(AnyOptionCheckbox_CheckedChanged);
             // 
             // nudTabIndent
             // 
@@ -288,7 +288,7 @@ namespace Peter
             this.nudTabIndent.Size = new System.Drawing.Size(74, 20);
             this.nudTabIndent.TabIndex = 15;
             this.nudTabIndent.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.nudTabIndent.ValueChanged += new System.EventHandler(this.nudTabIndent_ValueChanged);
+            this.nudTabIndent.ValueChanged += new System.EventHandler(AnyOptionCheckbox_CheckedChanged);
             // 
             // ckbAutoInsertBracket
             // 
@@ -299,7 +299,7 @@ namespace Peter
             this.ckbAutoInsertBracket.TabIndex = 14;
             this.ckbAutoInsertBracket.Text = "Auto Klammerplatzierung";
             this.ckbAutoInsertBracket.UseVisualStyleBackColor = true;
-            this.ckbAutoInsertBracket.CheckedChanged += new System.EventHandler(this.ckbAutoInsertBracket_CheckedChanged);
+            this.ckbAutoInsertBracket.CheckedChanged += new System.EventHandler(AnyOptionCheckbox_CheckedChanged);
             // 
             // ckbHighlightCurrentLine
             // 
@@ -310,7 +310,7 @@ namespace Peter
             this.ckbHighlightCurrentLine.TabIndex = 13;
             this.ckbHighlightCurrentLine.Text = "Aktuelle Zeile hervorheben";
             this.ckbHighlightCurrentLine.UseVisualStyleBackColor = true;
-            this.ckbHighlightCurrentLine.CheckedChanged += new System.EventHandler(this.ckbHighlightCurrentLine_CheckedChanged);
+            this.ckbHighlightCurrentLine.CheckedChanged += new System.EventHandler(AnyOptionCheckbox_CheckedChanged);
             // 
             // ckbAllowCaretBeyondEol
             // 
@@ -321,7 +321,7 @@ namespace Peter
             this.ckbAllowCaretBeyondEol.TabIndex = 12;
             this.ckbAllowCaretBeyondEol.Text = "Marker hinter dem Zeilenende";
             this.ckbAllowCaretBeyondEol.UseVisualStyleBackColor = true;
-            this.ckbAllowCaretBeyondEol.CheckedChanged += new System.EventHandler(this.ckbAllowCaretBeyondEol_CheckedChanged);
+            this.ckbAllowCaretBeyondEol.CheckedChanged += new System.EventHandler(AnyOptionCheckbox_CheckedChanged);
             // 
             // ckbUseAntiAlias
             // 
@@ -332,7 +332,7 @@ namespace Peter
             this.ckbUseAntiAlias.TabIndex = 11;
             this.ckbUseAntiAlias.Text = "Schrift glätten";
             this.ckbUseAntiAlias.UseVisualStyleBackColor = true;
-            this.ckbUseAntiAlias.CheckedChanged += new System.EventHandler(this.ckbUseAntiAlias_CheckedChanged);
+            this.ckbUseAntiAlias.CheckedChanged += new System.EventHandler(AnyOptionCheckbox_CheckedChanged);
             // 
             // ckbConvertTabs
             // 
@@ -343,7 +343,7 @@ namespace Peter
             this.ckbConvertTabs.TabIndex = 10;
             this.ckbConvertTabs.Text = "Tabulatoren in Leerzeichen";
             this.ckbConvertTabs.UseVisualStyleBackColor = true;
-            this.ckbConvertTabs.CheckedChanged += new System.EventHandler(this.ckbConvertTabs_CheckedChanged);
+            this.ckbConvertTabs.CheckedChanged += new System.EventHandler(AnyOptionCheckbox_CheckedChanged);
             // 
             // ckbEnableCodeFolding
             // 
@@ -354,7 +354,7 @@ namespace Peter
             this.ckbEnableCodeFolding.TabIndex = 9;
             this.ckbEnableCodeFolding.Text = "Code Folding verwenden";
             this.ckbEnableCodeFolding.UseVisualStyleBackColor = true;
-            this.ckbEnableCodeFolding.CheckedChanged += new System.EventHandler(this.ckbEnableCodeFolding_CheckedChanged);
+            this.ckbEnableCodeFolding.CheckedChanged += new System.EventHandler(AnyOptionCheckbox_CheckedChanged);
             // 
             // ckbShowVRuler
             // 
@@ -365,7 +365,7 @@ namespace Peter
             this.ckbShowVRuler.TabIndex = 8;
             this.ckbShowVRuler.Text = "Vertikales Lineal";
             this.ckbShowVRuler.UseVisualStyleBackColor = true;
-            this.ckbShowVRuler.CheckedChanged += new System.EventHandler(this.ckbShowVRuler_CheckedChanged);
+            this.ckbShowVRuler.CheckedChanged += new System.EventHandler(AnyOptionCheckbox_CheckedChanged);
             // 
             // ckbShowHRuler
             // 
@@ -376,7 +376,7 @@ namespace Peter
             this.ckbShowHRuler.TabIndex = 7;
             this.ckbShowHRuler.Text = "Horizontales Lineal";
             this.ckbShowHRuler.UseVisualStyleBackColor = true;
-            this.ckbShowHRuler.CheckedChanged += new System.EventHandler(this.ckbShowHRuler_CheckedChanged);
+            this.ckbShowHRuler.CheckedChanged += new System.EventHandler(AnyOptionCheckbox_CheckedChanged);
             // 
             // ckbShowLineNumbes
             // 
@@ -387,7 +387,7 @@ namespace Peter
             this.ckbShowLineNumbes.TabIndex = 6;
             this.ckbShowLineNumbes.Text = "Zeilennummern anzeigen";
             this.ckbShowLineNumbes.UseVisualStyleBackColor = true;
-            this.ckbShowLineNumbes.CheckedChanged += new System.EventHandler(this.ckbShowLineNumbes_CheckedChanged);
+            this.ckbShowLineNumbes.CheckedChanged += new System.EventHandler(AnyOptionCheckbox_CheckedChanged);
             // 
             // ckbShowMatchingBracket
             // 
@@ -398,7 +398,7 @@ namespace Peter
             this.ckbShowMatchingBracket.TabIndex = 5;
             this.ckbShowMatchingBracket.Text = "Zusammengehörende Klammern";
             this.ckbShowMatchingBracket.UseVisualStyleBackColor = true;
-            this.ckbShowMatchingBracket.CheckedChanged += new System.EventHandler(this.ckbShowMatchingBracket_CheckedChanged);
+            this.ckbShowMatchingBracket.CheckedChanged += new System.EventHandler(AnyOptionCheckbox_CheckedChanged);
             // 
             // ckbShowTabs
             // 
@@ -409,7 +409,7 @@ namespace Peter
             this.ckbShowTabs.TabIndex = 4;
             this.ckbShowTabs.Text = "Tab Marker anzeigen";
             this.ckbShowTabs.UseVisualStyleBackColor = true;
-            this.ckbShowTabs.CheckedChanged += new System.EventHandler(this.ckbShowTabs_CheckedChanged);
+            this.ckbShowTabs.CheckedChanged += new System.EventHandler(AnyOptionCheckbox_CheckedChanged);
             // 
             // ckbShowSpaces
             // 
@@ -420,7 +420,7 @@ namespace Peter
             this.ckbShowSpaces.TabIndex = 3;
             this.ckbShowSpaces.Text = "Space Marker anzeigen";
             this.ckbShowSpaces.UseVisualStyleBackColor = true;
-            this.ckbShowSpaces.CheckedChanged += new System.EventHandler(this.ckbShowSpaces_CheckedChanged);
+            this.ckbShowSpaces.CheckedChanged += new System.EventHandler(AnyOptionCheckbox_CheckedChanged);
             // 
             // ckbShowInvalidLines
             // 
@@ -431,7 +431,7 @@ namespace Peter
             this.ckbShowInvalidLines.TabIndex = 2;
             this.ckbShowInvalidLines.Text = "Empty Line Marker anzeigen";
             this.ckbShowInvalidLines.UseVisualStyleBackColor = true;
-            this.ckbShowInvalidLines.CheckedChanged += new System.EventHandler(this.ckbShowInvalidLines_CheckedChanged);
+            this.ckbShowInvalidLines.CheckedChanged += new System.EventHandler(AnyOptionCheckbox_CheckedChanged);
             // 
             // ckbShowEol
             // 
@@ -442,7 +442,7 @@ namespace Peter
             this.ckbShowEol.TabIndex = 1;
             this.ckbShowEol.Text = "End of Line Marker anzeigen";
             this.ckbShowEol.UseVisualStyleBackColor = true;
-            this.ckbShowEol.CheckedChanged += new System.EventHandler(this.ckbShowEol_CheckedChanged);
+            this.ckbShowEol.CheckedChanged += new System.EventHandler(this.AnyOptionCheckbox_CheckedChanged);
             // 
             // label4
             // 

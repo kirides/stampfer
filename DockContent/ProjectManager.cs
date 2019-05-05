@@ -16,26 +16,19 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **************************************************************************************/
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
-using System.Text;
-using System.Windows.Forms;
-using WeifenLuo.WinFormsUI.Docking;
-using PeterInterface;
-using System.Xml;
-using System.IO;
 using System.Collections;
-using System.Threading;
-using Peter.CSParser;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.IO.Compression;
+using System.Drawing;
+using System.IO;
 using System.Runtime.Remoting.Messaging;
+using System.Windows.Forms;
+using System.Xml;
+using Peter.CSParser;
+using PeterInterface;
+using WeifenLuo.WinFormsUI.Docking;
 
 namespace Peter
 {
-    public delegate void StartParsing (ArrayList fileList, cProjectInfo projNode);
+    public delegate void StartParsing(ArrayList fileList, cProjectInfo projNode);
 
     public partial class ProjectManager : DockContent, IPeterPluginTab
     {
@@ -50,9 +43,9 @@ namespace Peter
 
             this.m_MainForm = main;
             this.RootContextMenu = new ContextMenuStrip();
-            ToolStripMenuItem tsmiBuild = new ToolStripMenuItem("Build");
+            var tsmiBuild = new ToolStripMenuItem("Build");
             tsmiBuild.Click += new EventHandler(Build);
-            ToolStripMenuItem tsmiRmvProject = new ToolStripMenuItem("Remove Project");
+            var tsmiRmvProject = new ToolStripMenuItem("Remove Project");
             tsmiRmvProject.Click += new EventHandler(RemoveProject);
 
             this.RootContextMenu.Items.Add(tsmiBuild);
@@ -60,26 +53,26 @@ namespace Peter
 
             this.TabText = "Projekte";
             this.m_delTrace = new TraceDelegate(this.m_MainForm.Trace);
-            this.treeMain.BeforeExpand += new TreeViewCancelEventHandler(treeMain_BeforeExpand);
-            this.treeMain.DoubleClick += new EventHandler(treeMain_DoubleClick);
-            this.treeMain.AfterSelect += new TreeViewEventHandler(treeMain_AfterSelect);
+            this.treeMain.BeforeExpand += new TreeViewCancelEventHandler(TreeMain_BeforeExpand);
+            this.treeMain.DoubleClick += new EventHandler(TreeMain_DoubleClick);
+            this.treeMain.AfterSelect += new TreeViewEventHandler(TreeMain_AfterSelect);
         }
 
         #endregion
 
         #region -= Build =-
 
-        void Build(object sender, EventArgs e)
+        private void Build(object sender, EventArgs e)
         {
-            string script = "";
-            string workingDir = "";
-            string proj = this.treeMain.SelectedNode.Tag.ToString();
+            var script = "";
+            var workingDir = "";
+            var proj = this.treeMain.SelectedNode.Tag.ToString();
 
-            XmlDocument xDoc = new XmlDocument();
+            var xDoc = new XmlDocument();
             xDoc.Load(proj);
 
             // Working Dir...
-            XmlNodeList nodes = xDoc.GetElementsByTagName("WorkingDir");
+            var nodes = xDoc.GetElementsByTagName("WorkingDir");
             if (nodes.Count == 1)
             {
                 workingDir = nodes[0].InnerText;
@@ -88,21 +81,21 @@ namespace Peter
             {
                 workingDir = Application.StartupPath;
             }
-            
+
             // Build Script...
             nodes = xDoc.GetElementsByTagName("BuildScript");
             if (nodes.Count == 1)
             {
                 script = nodes[0].InnerText;
             }
-            
+
             // Pre-Build/Post-Build Files...
             string preBuild = "", postBuild = System.Environment.NewLine;
             nodes = xDoc.GetElementsByTagName("BuildFile");
             foreach (XmlNode node in nodes)
             {
-                bool bpreBuild = false;
-                string file = "";
+                var bpreBuild = false;
+                var file = "";
                 foreach (XmlNode cNode in node.ChildNodes)
                 {
                     if (cNode.Name.ToLower() == "file")
@@ -134,7 +127,7 @@ namespace Peter
 
         #region -= Tree Selection =-
 
-        void treeMain_AfterSelect(object sender, TreeViewEventArgs e)
+        private void TreeMain_AfterSelect(object sender, TreeViewEventArgs e)
         {
             if (this.treeMain.SelectedNode != null)
             {
@@ -164,26 +157,26 @@ namespace Peter
             }
         }
 
-        void treeMain_DoubleClick(object sender, EventArgs e)
+        private void TreeMain_DoubleClick(object sender, EventArgs e)
         {
             if (this.treeMain.SelectedNode != null)
             {
                 if (this.treeMain.SelectedNode.Nodes.Count == 0)
                 {
-                    TreeNode n = this.treeMain.SelectedNode.Parent;
+                    var n = this.treeMain.SelectedNode.Parent;
                     while (n.Parent != null)
                     {
                         n = n.Parent;
                     }
-                    cProjectInfo pInfo = (cProjectInfo)n.Tag;
-                    string file = this.treeMain.SelectedNode.Tag.ToString();
+                    var pInfo = (cProjectInfo)n.Tag;
+                    var file = this.treeMain.SelectedNode.Tag.ToString();
                     this.Host.CreateEditor(file, Path.GetFileName(file));
                     this.m_MainForm.GetEditor(file).Project = pInfo.Path;
                 }
             }
         }
 
-        void treeMain_BeforeExpand(object sender, TreeViewCancelEventArgs e)
+        private void TreeMain_BeforeExpand(object sender, TreeViewCancelEventArgs e)
         {
             if (e.Node.Tag.ToString().ToLower() != "vfolder")
             {
@@ -201,28 +194,32 @@ namespace Peter
         private void GetDirContent(TreeNode node)
         {
             node.Nodes.Clear();
-            DirectoryInfo dirInfo = new DirectoryInfo(node.Tag.ToString());
+            var dirInfo = new DirectoryInfo(node.Tag.ToString());
             if (dirInfo.Exists)
             {
-                DirectoryInfo[] dirs = dirInfo.GetDirectories();
+                var dirs = dirInfo.GetDirectories();
                 Array.Sort(dirs, new cDirectorySorter());
-                foreach (DirectoryInfo dir in dirs)
+                foreach (var dir in dirs)
                 {
-                    TreeNode tNode = new TreeNode();
-                    tNode.Tag = dir.FullName;
-                    string folder = dir.FullName.Substring(dir.FullName.LastIndexOf('\\') + 1);
+                    var tNode = new TreeNode
+                    {
+                        Tag = dir.FullName
+                    };
+                    var folder = dir.FullName.Substring(dir.FullName.LastIndexOf('\\') + 1);
                     tNode.Text = tNode.Name = folder;
                     tNode.Nodes.Add("");
 
                     node.Nodes.Add(tNode);
                 }
 
-                FileInfo[] files = dirInfo.GetFiles();
+                var files = dirInfo.GetFiles();
                 Array.Sort(files, new cFileSorter());
-                foreach (FileInfo file in files)
+                foreach (var file in files)
                 {
-                    TreeNode tNode = new TreeNode();
-                    tNode.Tag = file.FullName;
+                    var tNode = new TreeNode
+                    {
+                        Tag = file.FullName
+                    };
                     tNode.Text = tNode.Name = Path.GetFileName(file.FullName);
                     this.GetNodeImage(tNode);
 
@@ -259,24 +256,26 @@ namespace Peter
             // Does the file Exist???
             if (File.Exists(filePath))
             {
-                cProjectInfo pInfo = new cProjectInfo();
+                var pInfo = new cProjectInfo();
 
                 // Load project file...
-                XmlDocument xDoc = new XmlDocument();
+                var xDoc = new XmlDocument();
                 xDoc.Load(filePath);
 
                 // Get Project Name...
-                XmlNodeList nodes = xDoc.GetElementsByTagName("name");
+                var nodes = xDoc.GetElementsByTagName("name");
                 if (nodes.Count < 1)
                 {
                     // No name, get out of here...
                     return null;
                 }
-                string proj = nodes[0].InnerText;
+                var proj = nodes[0].InnerText;
 
                 // Set up Root Node...
-                TreeNode root = new TreeNode(proj);
-                root.Name = proj;
+                var root = new TreeNode(proj)
+                {
+                    Name = proj
+                };
                 root.ImageIndex = root.SelectedImageIndex = 1;
                 root.ContextMenuStrip = this.RootContextMenu;
 
@@ -295,8 +294,8 @@ namespace Peter
                 root.Tag = pInfo;
 
                 // List of folders and files...
-                ArrayList folders = new ArrayList();
-                ArrayList files = new ArrayList();
+                var folders = new ArrayList();
+                var files = new ArrayList();
 
                 // Get Folders...
                 nodes = xDoc.GetElementsByTagName("folder");
@@ -321,8 +320,8 @@ namespace Peter
                 // Parse Project...
                 if (!pInfo.Equals("None"))
                 {
-                    ArrayList fileList = new ArrayList();
-                    string[] filters = new string[1];
+                    var fileList = new ArrayList();
+                    var filters = new string[1];
                     filters[0] = "*.*";
                     switch (pInfo.Type.ToLower())
                     {
@@ -335,11 +334,11 @@ namespace Peter
 
                     foreach (string folder in folders)
                     {
-                        DirectoryInfo di = new DirectoryInfo(folder);
-                        foreach (string filter in filters)
+                        var di = new DirectoryInfo(folder);
+                        foreach (var filter in filters)
                         {
-                            FileInfo[] dirFiles = di.GetFiles(filter, SearchOption.AllDirectories);
-                            foreach (FileInfo fi in dirFiles)
+                            var dirFiles = di.GetFiles(filter, SearchOption.AllDirectories);
+                            foreach (var fi in dirFiles)
                             {
                                 fileList.Add(fi);
                             }
@@ -350,7 +349,7 @@ namespace Peter
                         switch (pInfo.Type.ToLower())
                         {
                             case "c project":
-                                foreach (string filter in filters)
+                                foreach (var filter in filters)
                                 {
                                     if (filter.Equals("*" + Path.GetExtension(file)))
                                     {
@@ -361,7 +360,7 @@ namespace Peter
                         }
                     }
 
-                    StartParsing del = new StartParsing(ParseProject);
+                    var del = new StartParsing(ParseProject);
                     del.BeginInvoke(fileList, pInfo, new AsyncCallback(CallBack), null);
                 }
 
@@ -375,19 +374,19 @@ namespace Peter
 
         #endregion
 
-        public void CallBack (IAsyncResult ar)
+        public void CallBack(IAsyncResult ar)
         {
-            StartParsing del = (StartParsing)((AsyncResult)ar).AsyncDelegate;
+            var del = (StartParsing)((AsyncResult)ar).AsyncDelegate;
             Console.WriteLine("--- Done Parsing ---");
             del.EndInvoke(ar);
         }
 
-        public void ParseProject (ArrayList fileList, cProjectInfo pInfo)
+        public void ParseProject(ArrayList fileList, cProjectInfo pInfo)
         {
             //cProjectInfo pInfo = (cProjectInfo)projNode.Tag;
             pInfo.Data = new TreeNode("root");
 
-            switch(pInfo.Type.ToLower())
+            switch (pInfo.Type.ToLower())
             {
                 case "c project":
                     foreach (FileInfo fi in fileList)
@@ -399,50 +398,66 @@ namespace Peter
             this.m_delTrace.BeginInvoke(pInfo.Name + " Project Data Complete.", null, null);
         }
 
-        private  void ParseCFile (TreeNode data, FileInfo fi)
+        private void ParseCFile(TreeNode data, FileInfo fi)
         {
             this.m_delTrace.BeginInvoke("Gathering Project Data for file: " + fi.FullName, null, null);
-            TreeNode file = new TreeNode(fi.FullName);
-            file.Name = fi.FullName;
+            var file = new TreeNode(fi.FullName)
+            {
+                Name = fi.FullName
+            };
 
-            TreeNode prototypes = new TreeNode("prototypes");
-            prototypes.Name = "prototypes";
+            var prototypes = new TreeNode("prototypes")
+            {
+                Name = "prototypes"
+            };
 
-            TreeNode variables = new TreeNode("variables");
-            variables.Name = "variables";
+            var variables = new TreeNode("variables")
+            {
+                Name = "variables"
+            };
 
-            TreeNode defines = new TreeNode("defines");
-            defines.Name = "defines";
+            var defines = new TreeNode("defines")
+            {
+                Name = "defines"
+            };
 
-            Peter.CParser.Scanner scanner = new Peter.CParser.Scanner(fi.FullName);
-            Peter.CParser.Parser parser = new Peter.CParser.Parser(scanner);
+            var scanner = new Peter.CParser.Scanner(fi.FullName);
+            var parser = new Peter.CParser.Parser(scanner);
             parser.Parse();
             foreach (TokenMatch tm in parser.CodeInfo.Defines)
             {
-                TreeNode node = new TreeNode(tm.Value);
-                node.Name = tm.Value;
-                node.Tag = tm.Position;
+                var node = new TreeNode(tm.Value)
+                {
+                    Name = tm.Value,
+                    Tag = tm.Position
+                };
                 defines.Nodes.Add(node);
             }
             foreach (TokenMatch tm in parser.CodeInfo.Prototypes)
             {
-                TreeNode node = new TreeNode(tm.Value);
-                node.Name = tm.Value;
-                node.Tag = tm.Position;
+                var node = new TreeNode(tm.Value)
+                {
+                    Name = tm.Value,
+                    Tag = tm.Position
+                };
                 prototypes.Nodes.Add(node);
             }
             foreach (TokenMatch tm in parser.CodeInfo.Functions)
             {
-                TreeNode node = new TreeNode(tm.Value);
-                node.Name = tm.Value;
-                node.Tag = tm.Position;
+                var node = new TreeNode(tm.Value)
+                {
+                    Name = tm.Value,
+                    Tag = tm.Position
+                };
                 prototypes.Nodes.Add(node);
             }
             foreach (TokenMatch tm in parser.CodeInfo.GlobalVariables)
             {
-                TreeNode node = new TreeNode(tm.Value);
-                node.Name = tm.Value;
-                node.Tag = tm.Position;
+                var node = new TreeNode(tm.Value)
+                {
+                    Name = tm.Value,
+                    Tag = tm.Position
+                };
                 variables.Nodes.Add(node);
             }
 
@@ -453,10 +468,10 @@ namespace Peter
             if (file.Nodes.Count > 0) data.Nodes.Add(file);
         }
 
-        public string LookUp (string word, string project)
+        public string LookUp(string word, string project)
         {
-            string rtn = "<ul>";
-            TreeNode pData = this.GetProjectData(project);
+            var rtn = "<ul>";
+            var pData = this.GetProjectData(project);
             if (pData != null)
             {
                 foreach (TreeNode fileNode in pData.Nodes)
@@ -467,7 +482,7 @@ namespace Peter
                         {
                             if (infoNode.Text.Contains(word))
                             {
-                                rtn += "<li><b><a href=\"" + fileNode.Text + "\" TITLE=\"" + fileNode.Text + "\" offset=\"" + 
+                                rtn += "<li><b><a href=\"" + fileNode.Text + "\" TITLE=\"" + fileNode.Text + "\" offset=\"" +
                                     infoNode.Tag.ToString() + "\">" + Path.GetFileName(fileNode.Text);
                                 rtn += "</a></b><ul><li>" + infoNode.Text + "</li></ul></li>";
                             }
@@ -479,11 +494,11 @@ namespace Peter
             return rtn;
         }
 
-        private TreeNode GetProjectData (string project)
+        private TreeNode GetProjectData(string project)
         {
             foreach (TreeNode node in this.treeMain.Nodes)
             {
-                cProjectInfo pInfo = (cProjectInfo)node.Tag;
+                var pInfo = (cProjectInfo)node.Tag;
                 if (pInfo.Path.Equals(project))
                 {
                     return pInfo.Data;
@@ -493,13 +508,13 @@ namespace Peter
             return null;
         }
 
-        public string CheckFileInProject (string filePath)
+        public string CheckFileInProject(string filePath)
         {
             try
             {
                 foreach (TreeNode node in this.treeMain.Nodes)
                 {
-                    cProjectInfo pInfo = (cProjectInfo)node.Tag;
+                    var pInfo = (cProjectInfo)node.Tag;
                     if (pInfo.Data != null)
                     {
                         foreach (TreeNode n in pInfo.Data.Nodes["files"].Nodes)
@@ -522,8 +537,8 @@ namespace Peter
         private void GetFile(TreeNode root, XmlNode node)
         {
 
-            TreeNode tNode = new TreeNode();
-            string file = node.InnerText;
+            var tNode = new TreeNode();
+            var file = node.InnerText;
             tNode.Tag = file;
             file = Path.GetFileName(file);
             tNode.Text = tNode.Name = file;
@@ -534,8 +549,8 @@ namespace Peter
 
         private static void GetFolder(TreeNode root, XmlNode node)
         {
-            TreeNode tNode = new TreeNode();
-            string folder = node.InnerText;
+            var tNode = new TreeNode();
+            var folder = node.InnerText;
             tNode.Tag = folder;
             folder = folder.Substring(folder.LastIndexOf('\\') + 1);
             tNode.Text = tNode.Name = folder;
@@ -547,7 +562,7 @@ namespace Peter
         private void GetNodeImage(TreeNode node)
         {
             Image image = Common.GetFileIcon(node.Tag.ToString(), false).ToBitmap();
-            int index = this.imgMain.Images.Add(image, Color.Transparent);
+            var index = this.imgMain.Images.Add(image, Color.Transparent);
 
             node.SelectedImageIndex = node.ImageIndex = index;
         }
@@ -600,7 +615,7 @@ namespace Peter
                 if (MessageBox.Show("Hierbei wird das Projekt '" + this.treeMain.SelectedNode.Text + "' gelöscht.\nSind Sie damit einverstanden?",
                     "Stampfer", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
                 {
-                    if(File.Exists(this.treeMain.SelectedNode.Tag.ToString()))
+                    if (File.Exists(this.treeMain.SelectedNode.Tag.ToString()))
                     {
                         File.Delete(this.treeMain.SelectedNode.Tag.ToString());
                         return;
@@ -609,12 +624,12 @@ namespace Peter
                 return;
             }
 
-            TreeNode root = this.treeMain.SelectedNode;
-            while(root.Parent != null)
+            var root = this.treeMain.SelectedNode;
+            while (root.Parent != null)
             {
                 root = root.Parent;
             }
-            XmlDocument xDoc = new XmlDocument();
+            var xDoc = new XmlDocument();
             xDoc.Load(root.Tag.ToString());
             foreach (XmlNode node in xDoc.FirstChild.ChildNodes)
             {
@@ -627,7 +642,7 @@ namespace Peter
                 }
             }
 
-            MessageBox.Show("Datei kann nicht entfernt werden.", "Stampfer", 
+            MessageBox.Show("Datei kann nicht entfernt werden.", "Stampfer",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
@@ -650,7 +665,7 @@ namespace Peter
 
         public string Selection
         {
-            get 
+            get
             {
                 if (this.treeMain.SelectedNode != null)
                 {
@@ -731,19 +746,19 @@ namespace Peter
 
         #region -= Tool Bar =-
 
-        private void tsbProperties_Click(object sender, EventArgs e)
+        private void TsbProperties_Click(object sender, EventArgs e)
         {
-            Project prj = new Project();
+            var prj = new Project();
             prj.SetProjectFile(this.treeMain.SelectedNode.Tag.ToString());
             prj.ShowDialog();
         }
 
-        private void tsbAddFolder_Click(object sender, EventArgs e)
+        private void TsbAddFolder_Click(object sender, EventArgs e)
         {
             if (this.fbdMain.ShowDialog() == DialogResult.OK)
             {
-                string path = this.fbdMain.SelectedPath;
-                string proj = this.treeMain.SelectedNode.Tag.ToString();
+                var path = this.fbdMain.SelectedPath;
+                var proj = this.treeMain.SelectedNode.Tag.ToString();
 
                 foreach (TreeNode node in this.treeMain.SelectedNode.Nodes)
                 {
@@ -753,14 +768,14 @@ namespace Peter
                     }
                 }
 
-                XmlDocument xDoc = new XmlDocument();
+                var xDoc = new XmlDocument();
                 xDoc.Load(proj);
-                XmlNode addNode = xDoc.CreateNode(XmlNodeType.Element, "folder", null);
+                var addNode = xDoc.CreateNode(XmlNodeType.Element, "folder", null);
                 addNode.InnerText = path;
                 xDoc.FirstChild.AppendChild(addNode);
                 xDoc.Save(proj);
 
-                TreeNode newFolder = new TreeNode(path.Substring(path.LastIndexOf('\\') + 1));
+                var newFolder = new TreeNode(path.Substring(path.LastIndexOf('\\') + 1));
                 newFolder.Name = newFolder.Text;
                 newFolder.Tag = path;
                 newFolder.Nodes.Add("");
@@ -772,11 +787,11 @@ namespace Peter
         {
             if (this.ofdMain.ShowDialog() == DialogResult.OK)
             {
-                string proj = this.treeMain.SelectedNode.Tag.ToString();
-                XmlDocument xDoc = new XmlDocument();
+                var proj = this.treeMain.SelectedNode.Tag.ToString();
+                var xDoc = new XmlDocument();
                 xDoc.Load(proj);
 
-                foreach (string file in this.ofdMain.FileNames)
+                foreach (var file in this.ofdMain.FileNames)
                 {
                     foreach (TreeNode node in this.treeMain.SelectedNode.Nodes)
                     {
@@ -785,11 +800,11 @@ namespace Peter
                             return;
                         }
                     }
-                    XmlNode addNode = xDoc.CreateNode(XmlNodeType.Element, "file", null);
+                    var addNode = xDoc.CreateNode(XmlNodeType.Element, "file", null);
                     addNode.InnerText = file;
                     xDoc.FirstChild.AppendChild(addNode);
 
-                    TreeNode newFile = new TreeNode(Path.GetFileName(file));
+                    var newFile = new TreeNode(Path.GetFileName(file));
                     newFile.Name = newFile.Text;
                     newFile.Tag = file;
                     this.GetNodeImage(newFile);
@@ -799,7 +814,7 @@ namespace Peter
             }
         }
 
-        private void tsbRefresh_Click(object sender, EventArgs e)
+        private void TsbRefresh_Click(object sender, EventArgs e)
         {
             if (this.treeMain.SelectedNode.Parent == null)
             {
@@ -818,12 +833,12 @@ namespace Peter
             }
         }
 
-        private void tsbDelete_Click(object sender, EventArgs e)
+        private void TsbDelete_Click(object sender, EventArgs e)
         {
             this.Delete();
         }
 
-        private void tsbOpenDir_Click(object sender, EventArgs e)
+        private void TsbOpenDir_Click(object sender, EventArgs e)
         {
             if (this.treeMain.SelectedNode != null)
             {
@@ -851,23 +866,23 @@ namespace Peter
         /// </summary>
         public ContextMenuStrip RootContextMenu { get; set; }
 
-        protected override string GetPersistString ()
+        protected override string GetPersistString()
         {
-            string projs = "";
+            var projs = "";
             foreach (TreeNode node in this.treeMain.Nodes)
             {
-                cProjectInfo pInfo = (cProjectInfo)node.Tag;
+                var pInfo = (cProjectInfo)node.Tag;
                 projs += pInfo.Path + ";";
             }
 
             return this.GetType().ToString() + "|" + projs.TrimEnd(new char[] { ';' });
         }
 
-        void RemoveProject (object sender, EventArgs e)
+        private void RemoveProject(object sender, EventArgs e)
         {
             try
             {
-                cProjectInfo pInfo = (cProjectInfo)this.treeMain.SelectedNode.Tag;
+                var pInfo = (cProjectInfo)this.treeMain.SelectedNode.Tag;
                 if (pInfo.Data != null)
                 {
                     pInfo.Data.Nodes.Clear();

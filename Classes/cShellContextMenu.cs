@@ -119,30 +119,6 @@ namespace Peter
         /// <returns>true if the message has been handled, false otherwise</returns>
         protected override void WndProc(ref Message m)
         {
-            #region IContextMenu
-
-            if (_oContextMenu != null &&
-                m.Msg == (int)WM.MENUSELECT &&
-                ((int)ShellHelper.HiWord(m.WParam) & (int)MFT.SEPARATOR) == 0 &&
-                ((int)ShellHelper.HiWord(m.WParam) & (int)MFT.POPUP) == 0)
-            {
-                var info = string.Empty;
-
-                if (ShellHelper.LoWord(m.WParam) == (int)CMD_CUSTOM.ExpandCollapse)
-                    info = "Expands or collapses the current selected item";
-                else
-                {
-                    info = "";/* ContextMenuHelper.GetCommandString(
-                         _oContextMenu,
-                         ShellHelper.LoWord(m.WParam) - CMD_FIRST,
-                         false);*/
-                }
-
-                //br.OnContextMenuMouseHover(new ContextMenuMouseHoverEventArgs(info.ToString()));
-            }
-
-            #endregion
-
             #region IContextMenu2
 
             if (_oContextMenu2 != null &&
@@ -1546,7 +1522,8 @@ namespace Peter
                 m_hookType,
                 m_filterFunc,
                 IntPtr.Zero,
-                AppDomain.GetCurrentThreadId());
+                System.Threading.Thread.CurrentThread.ManagedThreadId
+            );
         }
         // ************************************************************************
 

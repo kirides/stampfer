@@ -101,7 +101,9 @@ namespace Peter.Forms
                 i = 0;
                 loc = 0;
             }
+#pragma warning disable CS1717 // Die Zuweisung wurde für dieselbe Variable durchgeführt.
             for (i = i; i < LbNPCs.Items.Count; i++)
+#pragma warning restore CS1717 // Die Zuweisung wurde für dieselbe Variable durchgeführt.
             {
                 if (LbNPCs.Items[i].ToString().ToLower().Contains(searchstring))
                 {

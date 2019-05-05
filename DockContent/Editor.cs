@@ -161,9 +161,9 @@ namespace Peter
         {
             var p = GetBaseWord();
 
-            if (this.m_MainForm.m_AutoComplete.MyItems.Count == 0) return;
-            if (this.m_MainForm.m_AutoComplete.MyItems[this.m_MainForm.m_AutoComplete.listView1.SelectedIndices[0]] == null) return;
-            var s = this.m_MainForm.m_AutoComplete.MyItems[this.m_MainForm.m_AutoComplete.listView1.SelectedIndices[0]].ToString();
+            if (this.m_MainForm.m_AutoComplete.KeyWords.Count == 0) return;
+            if (this.m_MainForm.m_AutoComplete.KeyWords[this.m_MainForm.m_AutoComplete.listView1.SelectedIndices[0]] == null) return;
+            var s = this.m_MainForm.m_AutoComplete.KeyWords[this.m_MainForm.m_AutoComplete.listView1.SelectedIndices[0]].ToString();
            
             var saveoffset = this.m_Editor.ActiveTextAreaControl.Caret.Offset;
             this.m_Editor.ActiveTextAreaControl.Document.Remove(p.X, saveoffset - p.X);
@@ -212,7 +212,7 @@ namespace Peter
                 RemoveAutoComplete();
             }
             this.m_MainForm.m_AutoComplete.UpdateContent(s);
-            if (firstupdate == true && AutoCompleteAuto && this.m_MainForm.m_AutoComplete.MyItems.Count == 0)
+            if (firstupdate == true && AutoCompleteAuto && this.m_MainForm.m_AutoComplete.KeyWords.Count == 0)
             {
 
                 RemoveAutoComplete();
@@ -253,7 +253,7 @@ namespace Peter
 
                 if (keyData == Keys.Up)
                 {
-                    if (this.m_MainForm.m_AutoComplete.MyItems.Count == 0) return true;
+                    if (this.m_MainForm.m_AutoComplete.KeyWords.Count == 0) return true;
                     if (this.m_MainForm.m_AutoComplete.listView1.SelectedIndices[0] > 0)
                     {
 
@@ -265,8 +265,8 @@ namespace Peter
                 }
                 else if (keyData == Keys.Down)
                 {
-                    if (this.m_MainForm.m_AutoComplete.MyItems.Count == 0) return true;
-                    if (this.m_MainForm.m_AutoComplete.listView1.SelectedIndices[0] < this.m_MainForm.m_AutoComplete.MyItems.Count - 1)
+                    if (this.m_MainForm.m_AutoComplete.KeyWords.Count == 0) return true;
+                    if (this.m_MainForm.m_AutoComplete.listView1.SelectedIndices[0] < this.m_MainForm.m_AutoComplete.KeyWords.Count - 1)
                     {
                         this.m_MainForm.m_AutoComplete.listView1.Items[this.m_MainForm.m_AutoComplete.listView1.SelectedIndices[0] + 1].Selected = true;
                         this.m_MainForm.m_AutoComplete.listView1.EnsureVisible(this.m_MainForm.m_AutoComplete.listView1.SelectedIndices[0]);//.TopItem = this.m_MainForm.m_AutoComplete.listView1.Items[tempsel];
@@ -290,7 +290,7 @@ namespace Peter
                 if (keyData == (Keys.PageUp))
                 {
                     var scrolled = false;
-                    if (this.m_MainForm.m_AutoComplete.MyItems.Count == 0) return true;
+                    if (this.m_MainForm.m_AutoComplete.KeyWords.Count == 0) return true;
                     for (var kl = this.m_MainForm.m_AutoComplete.listView1.SelectedIndices[0]; kl > 0; kl--)
                     {
                         if (this.m_MainForm.m_AutoComplete.listView1.Items[kl].Position.Y < -this.m_MainForm.m_AutoComplete.listView1.Height)
@@ -311,7 +311,7 @@ namespace Peter
                 else if (keyData == (Keys.PageDown))
                 {
                     var scrolled = false;
-                    if (this.m_MainForm.m_AutoComplete.MyItems.Count == 0) return true;
+                    if (this.m_MainForm.m_AutoComplete.KeyWords.Count == 0) return true;
                     for (var kl = this.m_MainForm.m_AutoComplete.listView1.SelectedIndices[0]; kl < this.m_MainForm.m_AutoComplete.listView1.VirtualListSize; kl++)
                     {
                         if (this.m_MainForm.m_AutoComplete.listView1.Items[kl].Position.Y > this.m_MainForm.m_AutoComplete.listView1.Height)

@@ -1,7 +1,7 @@
 
 using System;
-using System.IO;
 using System.Collections;
+using System.IO;
 
 
 namespace Peter.DParser
@@ -19,7 +19,7 @@ namespace Peter.DParser
     //-----------------------------------------------------------------------------------
     // Buffer
     //-----------------------------------------------------------------------------------
-    public class Buffer
+    public class Buffer : IDisposable
     {
         // This Buffer supports the following cases:
         // 1) seekable stream (file)
@@ -28,15 +28,15 @@ namespace Peter.DParser
         // 2) non seekable stream (network, console)
 
         public const int EOF = char.MaxValue + 1;
-        const int MIN_BUFFER_LENGTH = 1024; // 1KB
-        const int MAX_BUFFER_LENGTH = MIN_BUFFER_LENGTH * 64; // 64KB
-        byte[] buf;         // input buffer
-        int bufStart;       // position of first byte in buffer relative to input stream
-        int bufLen;         // length of buffer
-        int fileLen;        // length of input stream (may change if the stream is no file)
-        int bufPos;         // current position in buffer
-        Stream stream;      // input stream (seekable)
-        readonly bool isUserStream;  // was the stream opened by the user?
+        private const int MIN_BUFFER_LENGTH = 1024; // 1KB
+        private const int MAX_BUFFER_LENGTH = MIN_BUFFER_LENGTH * 64; // 64KB
+        private byte[] buf;         // input buffer
+        private int bufStart;       // position of first byte in buffer relative to input stream
+        private int bufLen;         // length of buffer
+        private int fileLen;        // length of input stream (may change if the stream is no file)
+        private int bufPos;         // current position in buffer
+        private Stream stream;      // input stream (seekable)
+        private readonly bool isUserStream;  // was the stream opened by the user?
 
         public Buffer(Stream s, bool isUserStream)
         {
@@ -46,7 +46,7 @@ namespace Peter.DParser
             {
                 fileLen = (int)stream.Length;
                 bufLen = Math.Min(fileLen, MAX_BUFFER_LENGTH);
-                bufStart = Int32.MaxValue; // nothing in the buffer so far
+                bufStart = int.MaxValue; // nothing in the buffer so far
             }
             else
             {
@@ -72,15 +72,9 @@ namespace Peter.DParser
             isUserStream = b.isUserStream;
         }
 
-        ~Buffer() { Close(); }
-
         protected void Close()
         {
-            if (!isUserStream && stream != null)
-            {
-                stream.Close();
-                stream = null;
-            }
+            Dispose();
         }
 
         public virtual int Read()
@@ -106,21 +100,21 @@ namespace Peter.DParser
 
         public int Peek()
         {
-            int curPos = Pos;
-            int ch = Read();
+            var curPos = Pos;
+            var ch = Read();
             Pos = curPos;
             return ch;
         }
 
         public string GetString(int beg, int end)
         {
-            int len = end - beg;
-            char[] buf = new char[len];
-            int oldPos = Pos;
+            var len = end - beg;
+            var buf = new char[len];
+            var oldPos = Pos;
             Pos = beg;
-            for (int i = 0; i < len; i++) buf[i] = (char)Read();
+            for (var i = 0; i < len; i++) buf[i] = (char)Read();
             Pos = oldPos;
-            return new String(buf);
+            return new string(buf);
         }
 
         public int Pos
@@ -165,19 +159,19 @@ namespace Peter.DParser
         // Returns the number of bytes read.
         private int ReadNextStreamChunk()
         {
-            int free = buf.Length - bufLen;
+            var free = buf.Length - bufLen;
             if (free == 0)
             {
                 // in the case of a growing input stream
                 // we can neither seek in the stream, nor can we
                 // foresee the maximum length, thus we must adapt
                 // the buffer size on demand.
-                byte[] newBuf = new byte[bufLen * 2];
+                var newBuf = new byte[bufLen * 2];
                 Array.Copy(buf, newBuf, bufLen);
                 buf = newBuf;
                 free = bufLen;
             }
-            int read = stream.Read(buf, bufLen, free);
+            var read = stream.Read(buf, bufLen, free);
             if (read > 0)
             {
                 fileLen = bufLen = (bufLen + read);
@@ -185,6 +179,14 @@ namespace Peter.DParser
             }
             // end of stream reached
             return 0;
+        }
+
+        public void Dispose()
+        {
+            if (!isUserStream)
+            {
+                ((IDisposable)this.stream).Dispose();
+            }
         }
     }
 
@@ -211,25 +213,25 @@ namespace Peter.DParser
             else if ((ch & 0xF0) == 0xF0)
             {
                 // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-                int c1 = ch & 0x07; ch = base.Read();
-                int c2 = ch & 0x3F; ch = base.Read();
-                int c3 = ch & 0x3F; ch = base.Read();
-                int c4 = ch & 0x3F;
+                var c1 = ch & 0x07; ch = base.Read();
+                var c2 = ch & 0x3F; ch = base.Read();
+                var c3 = ch & 0x3F; ch = base.Read();
+                var c4 = ch & 0x3F;
                 ch = (((((c1 << 6) | c2) << 6) | c3) << 6) | c4;
             }
             else if ((ch & 0xE0) == 0xE0)
             {
                 // 1110xxxx 10xxxxxx 10xxxxxx
-                int c1 = ch & 0x0F; ch = base.Read();
-                int c2 = ch & 0x3F; ch = base.Read();
-                int c3 = ch & 0x3F;
+                var c1 = ch & 0x0F; ch = base.Read();
+                var c2 = ch & 0x3F; ch = base.Read();
+                var c3 = ch & 0x3F;
                 ch = (((c1 << 6) | c2) << 6) | c3;
             }
             else if ((ch & 0xC0) == 0xC0)
             {
                 // 110xxxxx 10xxxxxx
-                int c1 = ch & 0x1F; ch = base.Read();
-                int c2 = ch & 0x3F;
+                var c1 = ch & 0x1F; ch = base.Read();
+                var c2 = ch & 0x3F;
                 ch = (c1 << 6) | c2;
             }
             return ch;
@@ -241,41 +243,41 @@ namespace Peter.DParser
     //-----------------------------------------------------------------------------------
     public class Scanner
     {
-        const char EOL = '\n';
-        const int eofSym = 0; /* pdt */
-        const int maxT = 67;
-        const int noSym = 67;
-        char valCh;       // current input character (for token.val)
+        private const char EOL = '\n';
+        private const int eofSym = 0; /* pdt */
+        private const int maxT = 67;
+        private const int noSym = 67;
+        private char valCh;       // current input character (for token.val)
 
         public Buffer buffer; // scanner buffer
 
-        Token t;          // current token
-        int ch;           // current input character
-        int pos;          // byte position of current character
-        int col;          // column number of current character
-        int line;         // line number of current character
-        int oldEols;      // EOLs that appeared in a comment;
-        static readonly Hashtable start; // maps first token character to start state
+        private Token t;          // current token
+        private int ch;           // current input character
+        private int pos;          // byte position of current character
+        private int col;          // column number of current character
+        private int line;         // line number of current character
+        private int oldEols;      // EOLs that appeared in a comment;
+        private static readonly Hashtable start; // maps first token character to start state
         public Stream stream;
-        Token tokens;     // list of tokens already peeked (first token is a dummy)
-        Token pt;         // current peek token
+        private Token tokens;     // list of tokens already peeked (first token is a dummy)
+        private Token pt;         // current peek token
 
-        char[] tval = new char[128]; // text of current token
-        int tlen;         // length of current token
+        private char[] tval = new char[128]; // text of current token
+        private int tlen;         // length of current token
 
         static Scanner()
         {
             start = new Hashtable(128);
-            for (int i = 95; i <= 95; ++i) start[i] = 1;
-            for (int i = 97; i <= 122; ++i) start[i] = 1;
-            for (int i = 196; i <= 196; ++i) start[i] = 1;
-            for (int i = 214; i <= 214; ++i) start[i] = 1;
-            for (int i = 220; i <= 220; ++i) start[i] = 1;
-            for (int i = 223; i <= 223; ++i) start[i] = 1;
-            for (int i = 228; i <= 228; ++i) start[i] = 1;
-            for (int i = 246; i <= 246; ++i) start[i] = 1;
-            for (int i = 252; i <= 252; ++i) start[i] = 1;
-            for (int i = 48; i <= 57; ++i) start[i] = 9;
+            for (var i = 95; i <= 95; ++i) start[i] = 1;
+            for (var i = 97; i <= 122; ++i) start[i] = 1;
+            for (var i = 196; i <= 196; ++i) start[i] = 1;
+            for (var i = 214; i <= 214; ++i) start[i] = 1;
+            for (var i = 220; i <= 220; ++i) start[i] = 1;
+            for (var i = 223; i <= 223; ++i) start[i] = 1;
+            for (var i = 228; i <= 228; ++i) start[i] = 1;
+            for (var i = 246; i <= 246; ++i) start[i] = 1;
+            for (var i = 252; i <= 252; ++i) start[i] = 1;
+            for (var i = 48; i <= 57; ++i) start[i] = 9;
             start[46] = 38;
             start[34] = 7;
             start[61] = 39;
@@ -323,18 +325,18 @@ namespace Peter.DParser
             Init();
         }
 
-        void Init()
+        private void Init()
         {
             pos = -1; line = 1; col = 0;
             oldEols = 0;
             NextCh();
             if (ch == 0xEF)
             { // check optional byte order mark for UTF-8
-                NextCh(); int ch1 = ch;
-                NextCh(); int ch2 = ch;
+                NextCh(); var ch1 = ch;
+                NextCh(); var ch2 = ch;
                 if (ch1 != 0xBB || ch2 != 0xBF)
                 {
-                    throw new FatalError(String.Format("illegal byte order mark: EF {0,2:X} {1,2:X}", ch1, ch2));
+                    throw new FatalError(string.Format("illegal byte order mark: EF {0,2:X} {1,2:X}", ch1, ch2));
                 }
                 buffer = new UTF8Buffer(buffer); col = 0;
                 NextCh();
@@ -342,7 +344,7 @@ namespace Peter.DParser
             pt = tokens = new Token();  // first token is a dummy
         }
 
-        void NextCh()
+        private void NextCh()
         {
             if (oldEols > 0) { ch = EOL; oldEols--; }
             else
@@ -362,11 +364,11 @@ namespace Peter.DParser
 
         }
 
-        void AddCh()
+        private void AddCh()
         {
             if (tlen >= tval.Length)
             {
-                char[] newBuf = new char[2 * tval.Length];
+                var newBuf = new char[2 * tval.Length];
                 Array.Copy(tval, 0, newBuf, 0, tval.Length);
                 tval = newBuf;
             }
@@ -374,9 +376,7 @@ namespace Peter.DParser
             NextCh();
         }
 
-
-
-        bool Comment0()
+        private bool Comment0()
         {
             int level = 1, pos0 = pos, line0 = line, col0 = col;
             NextCh();
@@ -402,7 +402,7 @@ namespace Peter.DParser
             return false;
         }
 
-        bool Comment1()
+        private bool Comment1()
         {
             int level = 1, pos0 = pos, line0 = line, col0 = col;
             NextCh();
@@ -432,8 +432,7 @@ namespace Peter.DParser
             return false;
         }
 
-
-        void CheckLiteral()
+        private void CheckLiteral()
         {
             switch (t.val.ToLower())
             {
@@ -461,14 +460,18 @@ namespace Peter.DParser
             }
         }
 
-        Token NextToken()
+        private Token NextToken()
         {
             while (ch == ' ' ||
                 ch >= 9 && ch <= 10 || ch == 13
             ) NextCh();
             if (ch == '/' && Comment0() || ch == '/' && Comment1()) return NextToken();
-            t = new Token();
-            t.pos = pos; t.col = col; t.line = line;
+            t = new Token
+            {
+                pos = pos,
+                col = col,
+                line = line
+            };
             int state;
             if (start.ContainsKey(ch)) { state = (int)start[ch]; }
             else { state = 0; }
@@ -480,7 +483,7 @@ namespace Peter.DParser
                 case 0: { t.kind = noSym; break; }   // NextCh already done
                 case 1:
                     if (ch >= '0' && ch <= '9' || ch == '_' || ch >= 'a' && ch <= 'z' || ch == 196 || ch == 214 || ch == 220 || ch == 223 || ch == 228 || ch == 246 || ch == 252) { AddCh(); goto case 1; }
-                    else { t.kind = 1; t.val = new String(tval, 0, tlen); CheckLiteral(); return t; }
+                    else { t.kind = 1; t.val = new string(tval, 0, tlen); CheckLiteral(); return t; }
                 case 2:
                     if (ch == '+' || ch == '-') { AddCh(); goto case 3; }
                     else { t.kind = noSym; break; }
@@ -619,7 +622,7 @@ namespace Peter.DParser
                     else { t.kind = 56; break; }
 
             }
-            t.val = new String(tval, 0, tlen);
+            t.val = new string(tval, 0, tlen);
             return t;
         }
 

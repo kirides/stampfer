@@ -45,7 +45,6 @@ namespace Peter
         private int m_RecentProjectCount;
         private int m_RecentFileCount;
         private bool m_SaveonExit;
-        private string m_ConfigFile;
         public string m_ScriptsPath = @"E:\Spiele\Gothic II MDK\_work\Data\Scripts";
         public string m_BilderPath;
         public bool m_ParserMessageBox;
@@ -69,7 +68,8 @@ namespace Peter
         public bool initialized = false;
         public string autocompletemenuauto = "Auto-Ergänzung > auto";
         public string autocompletemenumanu = "Auto-Ergänzung > manuell";
-        private Classes.Configuration.PeterConfig m_PeterConfig;
+        public Classes.Configuration.PeterConfig Config { get; private set; }
+
         #region -= Constructor =-
 
         public MainForm(string[] args)
@@ -91,14 +91,14 @@ namespace Peter
 
             // Set the Config File...
             this.DockConfigFile = Path.GetDirectoryName(Application.ExecutablePath) + "\\" + DOCK_CONFIG_FILE;
-            this.m_ConfigFile = Path.GetDirectoryName(Application.ExecutablePath) + "\\" + CONFIG_FILE;
+            this.ConfigFile = Path.GetDirectoryName(Application.ExecutablePath) + "\\" + CONFIG_FILE;
             this.m_EditorConfig = new Classes.Configuration.Editor();
 
             // Load Any Configuration from Config File...
-            if (File.Exists(this.m_ConfigFile))
+            if (File.Exists(this.ConfigFile))
             {
                 // Load Config File...
-                this.m_PeterConfig = LoadConfigFile(false);
+                this.Config = LoadConfigFile(false);
             }
 
             // Set Variabales...
@@ -332,7 +332,7 @@ namespace Peter
         {
             var serializer = new XmlSerializer(typeof(Classes.Configuration.PeterConfig));
             Classes.Configuration.PeterConfig configFile;
-            using (var fs = File.OpenRead(this.m_ConfigFile))
+            using (var fs = File.OpenRead(this.ConfigFile))
             {
                 configFile = (Classes.Configuration.PeterConfig)serializer.Deserialize(fs);
             }
@@ -349,7 +349,7 @@ namespace Peter
                 }
                 if (this.Left > w)
                 {
-                    this.Left = this.Left - w;
+                    this.Left -= w;
                 }
                 this.Width = configFile.Application.Width;
                 this.Height = configFile.Application.Height;
@@ -474,7 +474,7 @@ namespace Peter
         /// <summary>
         /// Gets the Location of the Application Config File...
         /// </summary>
-        public string ConfigFile => this.m_ConfigFile;
+        public string ConfigFile { get; private set; }
 
         /// <summary>
         /// Gets the location of the Dock Config File...
@@ -1020,7 +1020,6 @@ namespace Peter
         private void Save()
         {
             Editor current = null;
-            var l = 0;
             var tab = this.ActiveTab;
             if (tab.FileName == null)
             {
@@ -1035,7 +1034,7 @@ namespace Peter
             }
             if (this.m_CodeStructure != null) m_CodeStructure.treeMain.BeginUpdate();
             //::m_GothicStructure.BeginTreeUpdate();
-            l = UpdateInstances(tab, ref current);
+            var l = UpdateInstances(tab, ref current);
             if (current != null && this.m_CodeStructure != null)
             {
                 this.m_CodeStructure.ActiveContentChanged(current, true);
@@ -1062,14 +1061,13 @@ namespace Peter
         public void SaveAs(IPeterPluginTab tab)
         {
             Editor current = null;
-            var l = 0;
             if (this.sfdMain.ShowDialog() == DialogResult.OK)
             {
                 tab.SaveAs(this.sfdMain.FileName);
             }
             //::m_GothicStructure.BeginTreeUpdate();
             if (this.m_CodeStructure != null) m_CodeStructure.treeMain.BeginUpdate();
-            l = UpdateInstances(tab, ref current);
+            var l = UpdateInstances(tab, ref current);
             if (current != null && this.m_CodeStructure != null)
             {
 
@@ -1444,9 +1442,9 @@ namespace Peter
             // Update Config file...
             var inList = false;
             var count = 0;
-            if (m_PeterConfig.RecentFiles.File.Count == 1)
+            if (Config.RecentFiles.File.Count == 1)
             {
-                foreach (var n in m_PeterConfig.RecentFiles.File)
+                foreach (var n in Config.RecentFiles.File)
                 {
                     count++;
                     if (n == this.ofdMain.FileName)
@@ -1461,10 +1459,10 @@ namespace Peter
                     if (count == this.m_RecentFileCount)
                     {
                         // Remove the First Node...
-                        m_PeterConfig.RecentFiles.File.RemoveAt(0);
+                        Config.RecentFiles.File.RemoveAt(0);
                     }
 
-                    m_PeterConfig.RecentFiles.File.Add(filePath);
+                    Config.RecentFiles.File.Add(filePath);
                     SaveConfig();
                 }
             }
@@ -1545,7 +1543,7 @@ namespace Peter
         /// </summary>
         /// <param name="sender">ToolStripButton</param>
         /// <param name="e">Events</param>
-        private void tsbNew_Click(object sender, EventArgs e)
+        private void TsbNew_Click(object sender, EventArgs e)
         {
             this.NewDocument();
         }
@@ -1555,7 +1553,7 @@ namespace Peter
         /// </summary>
         /// <param name="sender">ToolStripButton</param>
         /// <param name="e">Events</param>
-        private void tsbOpen_Click(object sender, EventArgs e)
+        private void TsbOpen_Click(object sender, EventArgs e)
         {
             this.Open();
         }
@@ -1565,7 +1563,7 @@ namespace Peter
         /// </summary>
         /// <param name="sender">ToolStripButton</param>
         /// <param name="e">Events</param>
-        private void tsbSave_Click(object sender, EventArgs e)
+        private void TsbSave_Click(object sender, EventArgs e)
         {
 
             this.Save();
@@ -1576,7 +1574,7 @@ namespace Peter
         /// </summary>
         /// <param name="sender">ToolStripButton</param>
         /// <param name="e">Events</param>
-        private void tsbSaveAll_Click(object sender, EventArgs e)
+        private void TsbSaveAll_Click(object sender, EventArgs e)
         {
             this.SaveAll();
         }
@@ -1586,7 +1584,7 @@ namespace Peter
         /// </summary>
         /// <param name="sender">ToolStripButton</param>
         /// <param name="e">Events</param>
-        private void tsbCut_Click(object sender, EventArgs e)
+        private void TsbCut_Click(object sender, EventArgs e)
         {
             this.Cut();
         }
@@ -1596,7 +1594,7 @@ namespace Peter
         /// </summary>
         /// <param name="sender">ToolStripButton</param>
         /// <param name="e">Events</param>
-        private void tsbCopy_Click(object sender, EventArgs e)
+        private void TsbCopy_Click(object sender, EventArgs e)
         {
             this.Copy();
         }
@@ -1606,7 +1604,7 @@ namespace Peter
         /// </summary>
         /// <param name="sender">ToolStripButton</param>
         /// <param name="e">Events</param>
-        private void tsbPaste_Click(object sender, EventArgs e)
+        private void TsbPaste_Click(object sender, EventArgs e)
         {
             this.Paste();
         }
@@ -1616,7 +1614,7 @@ namespace Peter
         /// </summary>
         /// <param name="sender">ToolStripButton</param>
         /// <param name="e">Events</param>
-        private void tsbUndo_Click(object sender, EventArgs e)
+        private void TsbUndo_Click(object sender, EventArgs e)
         {
             this.Undo();
         }
@@ -1626,7 +1624,7 @@ namespace Peter
         /// </summary>
         /// <param name="sender">ToolStripButton</param>
         /// <param name="e">Events</param>
-        private void tsbRedo_Click(object sender, EventArgs e)
+        private void TsbRedo_Click(object sender, EventArgs e)
         {
             this.Redo();
         }
@@ -1636,7 +1634,7 @@ namespace Peter
         /// </summary>
         /// <param name="sender">ToolStripButton</param>
         /// <param name="e">Events</param>
-        private void tsbPrint_Click(object sender, EventArgs e)
+        private void TsbPrint_Click(object sender, EventArgs e)
         {
             this.ActiveTab.Print();
         }
@@ -2091,13 +2089,13 @@ namespace Peter
                 }
 
                 // Save Location...
-                if (File.Exists(this.m_ConfigFile) && this.WindowState != FormWindowState.Minimized)
+                if (File.Exists(this.ConfigFile) && this.WindowState != FormWindowState.Minimized)
                 {
-                    m_PeterConfig.Application.Top = Top;
-                    m_PeterConfig.Application.Left = Left;
-                    m_PeterConfig.Application.Width = Width;
-                    m_PeterConfig.Application.Height = Height;
-                    m_PeterConfig.Application.SaveOnExit = m_SaveonExit;
+                    Config.Application.Top = Top;
+                    Config.Application.Left = Left;
+                    Config.Application.Width = Width;
+                    Config.Application.Height = Height;
+                    Config.Application.SaveOnExit = m_SaveonExit;
                     SaveConfig();
                 }
 
@@ -2114,9 +2112,9 @@ namespace Peter
         public void SaveConfig()
         {
             var serializer = new XmlSerializer(typeof(Classes.Configuration.PeterConfig));
-            using (var fs = File.Create(m_ConfigFile))
+            using (var fs = File.Create(ConfigFile))
             {
-                serializer.Serialize(fs, m_PeterConfig);
+                serializer.Serialize(fs, Config);
             }
         }
 
@@ -2608,9 +2606,9 @@ namespace Peter
                 // Update Config file...
                 var inList = false;
                 var count = 0;
-                if (m_PeterConfig.RecentProjects.Project.Count == 1)
+                if (Config.RecentProjects.Project.Count == 1)
                 {
-                    foreach (var n in m_PeterConfig.RecentProjects.Project)
+                    foreach (var n in Config.RecentProjects.Project)
                     {
                         count++;
                         if (n.File == fileName)
@@ -2627,11 +2625,11 @@ namespace Peter
                         if (count == this.m_RecentProjectCount)
                         {
                             // Remove the First Node...
-                            m_PeterConfig.RecentProjects.Project.RemoveAt(0);
+                            Config.RecentProjects.Project.RemoveAt(0);
                         }
 
                         // Add the new project...
-                        m_PeterConfig.RecentProjects.Project.Add(new Classes.Configuration.Project
+                        Config.RecentProjects.Project.Add(new Classes.Configuration.Project
                         {
                             File = fileName,
                             Name = proj,
@@ -2653,7 +2651,7 @@ namespace Peter
             var tsmi = sender as ToolStripMenuItem;
             this.mnuProjectShow_Click(null, null);
             // Load a Project...
-            var proj = this.m_ProjMan.LoadFile(tsmi.Name);
+            this.m_ProjMan.LoadFile(tsmi.Name);
         }
 
         /// <summary>
@@ -2712,7 +2710,8 @@ namespace Peter
             {
                 Icon = Icon.FromHandle(((Bitmap)this.GetInternalImage("cmd")).GetHicon())
             };
-            this.AddDockContent(new CommandPrompt(), DockState.DockBottom);
+            //this.AddDockContent(new CommandPrompt(), DockState.DockBottom);
+            this.AddDockContent(cmd, DockState.DockBottom);
         }
 
         /// <summary>

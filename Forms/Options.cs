@@ -16,16 +16,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **************************************************************************************/
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
-using System.Text;
-using System.Windows.Forms;
 using System.Collections;
+using System.Drawing;
+using System.IO;
+using System.Windows.Forms;
 using System.Xml;
 using ICSharpCode.TextEditor.Document;
-using System.IO;
 
 namespace Peter
 {
@@ -34,141 +30,24 @@ namespace Peter
         public ArrayList m_OptionPanels;
         private readonly MainForm m_MainForm;
         private bool m_EditorChanged;
-        bool newscriptspath=false;
+        private bool newscriptspath = false;
         public Options(MainForm main)
         {
             InitializeComponent();
             this.m_MainForm = main;
-            this.m_OptionPanels = new ArrayList();
-            this.m_OptionPanels.Add(this.Allgemein);
-            this.m_OptionPanels.Add(this.Editor);
-            this.m_OptionPanels.Add(this.Gothic);
-
-            XmlDocument xDoc = new XmlDocument();
-            xDoc.Load(this.m_MainForm.ConfigFile);
-
-            XmlNodeList nodes = xDoc.GetElementsByTagName("SaveOnExit");
-            if (nodes.Count > 0)
+            this.m_OptionPanels = new ArrayList
             {
-                this.ckbSaveOnExt.Checked = Convert.ToBoolean(nodes[0].InnerText);
-            }
+                this.Allgemein,
+                this.Editor,
+                this.Gothic
+            };
+            var config = this.m_MainForm.Config;
+            ApplyConfig(config);
 
-            nodes = xDoc.GetElementsByTagName("RecentFileCount");
-            if (nodes.Count > 0)
-            {
-                this.nudRecentFile.Value = Convert.ToInt32(nodes[0].InnerText);
-            }
-
-            nodes = xDoc.GetElementsByTagName("RecentProjectCount");
-            if (nodes.Count > 0)
-            {
-                this.nudRecentProject.Value = Convert.ToInt32(nodes[0].InnerText);
-            }
-
-            nodes = xDoc.GetElementsByTagName("Editor");
-            if(nodes.Count > 0)
-            {
-                foreach (XmlNode node in nodes[0].ChildNodes)
-                {
-                    switch (node.Name.ToLower())
-                    {
-                        case "showeol":
-                            this.ckbShowEol.Checked = Convert.ToBoolean(node.InnerText);
-                            break;
-                        case "showinvalidlines":
-                            this.ckbShowInvalidLines.Checked = Convert.ToBoolean(node.InnerText);
-                            break;
-                        case "showspaces":
-                            this.ckbShowSpaces.Checked = Convert.ToBoolean(node.InnerText);
-                            break;
-                        case "showtabs":
-                            this.ckbShowTabs.Checked = Convert.ToBoolean(node.InnerText);
-                            break;
-                        case "showmatchbracket":
-                            this.ckbShowMatchingBracket.Checked = Convert.ToBoolean(node.InnerText);
-                            break;
-                        case "showlinenumbers":
-                            this.ckbShowLineNumbes.Checked = Convert.ToBoolean(node.InnerText);
-                            break;
-                        case "showhruler":
-                            this.ckbShowHRuler.Checked = Convert.ToBoolean(node.InnerText);
-                            break;
-                        case "showvruler":
-                            this.ckbShowVRuler.Checked = Convert.ToBoolean(node.InnerText);
-                            break;
-                        case "enablecodefolding":
-                            this.ckbEnableCodeFolding.Checked = Convert.ToBoolean(node.InnerText);
-                            break;
-                        case "converttabs":
-                            this.ckbConvertTabs.Checked = Convert.ToBoolean(node.InnerText);
-                            break;
-                        case "useantialias":
-                            this.ckbUseAntiAlias.Checked = Convert.ToBoolean(node.InnerText);
-                            break;
-                        case "allowcaretbeyondeol":
-                            this.ckbAllowCaretBeyondEol.Checked = Convert.ToBoolean(node.InnerText);
-                            break;
-                        case "highlightcurrentline":
-                            this.ckbHighlightCurrentLine.Checked= Convert.ToBoolean(node.InnerText);
-                            break;
-                        case "autoinsertbracket":
-                            this.ckbAutoInsertBracket.Checked = Convert.ToBoolean(node.InnerText);
-                            break;
-                        case "tabindent":
-                            this.nudTabIndent.Value = Convert.ToInt32(node.InnerText);
-                            break;
-                        case "verticalrulercol":
-                            this.nudVRuler.Value = Convert.ToInt32(node.InnerText);
-                            break;
-                        case "indentstyle":
-                            this.cmbIndentStyle.Text = node.InnerText;
-                            break;
-                        case "bracketmatchingstyle":
-                            this.cmbBracketStyle.Text = node.InnerText;
-                            break;
-                        case "font":
-                            string[] font = node.InnerText.Split(';');
-                            Font f = new Font(font[0], Convert.ToSingle(font[1]));
-                            this.fontDialog1.Font = f;
-                            this.textEditorControl1.Font = f;
-                            break;
-                        case "scripts":
-                            this.TScriptsPatch.Text = node.InnerText;
-                            break;
-                        case "bilder":
-                            this.TBilderPatch.Text = node.InnerText;
-                            break;
-                        case "parser":                            
-                            this.ckbMessageBox.Checked = Convert.ToBoolean(node.InnerText);
-                            break;
-                        case "backup":
-                            this.ckbBackup.Checked = Convert.ToBoolean(node.InnerText);
-                            break;
-                        case "autocomplete":
-                            this.ckbAutoCompleteAuto.Checked = Convert.ToBoolean(node.InnerText);
-                            break;
-                        case "backupfolder":
-                            this.TBakPatch.Text=node.InnerText;
-                            break;
-                        case "backupeach":
-                            this.nBakMin.Value=Convert.ToInt32(node.InnerText);
-                            break;
-                        case "backupfolderonly":
-                            this.ckbInFolderOnly.Checked = Convert.ToBoolean(node.InnerText);
-                            break;
-                        case "autobrackets":
-                            this.ckbAutoBrackets.Checked = Convert.ToBoolean(node.InnerText);
-                            break;
-                    }
-                }
-
-               
-            }
             if (TBakPatch.Text != "")
             {
                 ckbInFolderOnly.Enabled = true;
                 nBakMin.Enabled = true;
-               
             }
             else
             {
@@ -249,6 +128,43 @@ namespace Peter
             this.m_EditorChanged = false;
         }
 
+        private void ApplyConfig(Classes.Configuration.PeterConfig config)
+        {
+            this.ckbSaveOnExt.Checked = config.Application.SaveOnExit;
+            this.nudRecentFile.Value = config.Application.RecentFileCount;
+            this.nudRecentProject.Value = config.Application.RecentProjectCount;
+
+            this.ckbShowEol.Checked = config.Editor.ShowEOL;
+            this.ckbShowInvalidLines.Checked = config.Editor.ShowInvalidLines;
+            this.ckbShowSpaces.Checked = config.Editor.ShowSpaces;
+            this.ckbShowTabs.Checked = config.Editor.ShowTabs;
+            this.ckbShowMatchingBracket.Checked = config.Editor.ShowMatchBracket;
+            this.ckbShowLineNumbes.Checked = config.Editor.ShowLineNumbers;
+            this.ckbShowHRuler.Checked = config.Editor.ShowHRuler;
+            this.ckbShowVRuler.Checked = config.Editor.ShowVRuler;
+            this.ckbEnableCodeFolding.Checked = config.Editor.EnableCodeFolding;
+            this.ckbConvertTabs.Checked = config.Editor.ConvertTabs;
+            this.ckbUseAntiAlias.Checked = config.Editor.UseAntiAlias;
+            this.ckbAllowCaretBeyondEol.Checked = config.Editor.AllowCaretBeyondEOL;
+            this.ckbHighlightCurrentLine.Checked = config.Editor.HighlightCurrentLine;
+            this.ckbAutoInsertBracket.Checked = config.Editor.AutoInsertBracket;
+            this.nudTabIndent.Value = config.Editor.TabIndent;
+            this.nudVRuler.Value = config.Editor.VerticalRulerCol;
+            this.cmbIndentStyle.Text = config.Editor.IndentStyle;
+            this.cmbBracketStyle.Text = config.Editor.BracketMatchingStyle;
+            this.fontDialog1.Font = this.textEditorControl1.Font = config.Editor.FontInstance;
+
+            this.TScriptsPatch.Text = config.Editor.Scripts;
+            this.TBilderPatch.Text = config.Editor.Bilder;
+            this.ckbMessageBox.Checked = config.Editor.Parser;
+            this.ckbBackup.Checked = config.Editor.Backup;
+            this.TBakPatch.Text = config.Editor.Backupfolder;
+            this.nBakMin.Value = config.Editor.Backupeach;
+            this.ckbInFolderOnly.Checked = config.Editor.Backupfolderonly;
+            this.ckbAutoCompleteAuto.Checked = config.Editor.Autocomplete;
+            this.ckbAutoBrackets.Checked = config.Editor.Autobrackets;
+        }
+
         /// <summary>
         /// Adds an Option panel...
         /// </summary>
@@ -256,10 +172,10 @@ namespace Peter
         public void AddOptionPanel(Control panel, Image image)
         {
             this.m_OptionPanels.Add(panel);
-            ListViewItem lvi = new ListViewItem(panel.Name);
+            var lvi = new ListViewItem(panel.Name);
             if (image != null)
             {
-                int index = this.imgMain.Images.Add(image, Color.Transparent);
+                var index = this.imgMain.Images.Add(image, Color.Transparent);
                 lvi.ImageIndex = index;
             }
             this.lstMain.Items.Add(lvi);
@@ -267,23 +183,22 @@ namespace Peter
 
         private void lstMain_SelectedIndexChanged(object sender, EventArgs e)
         {
-           
+
             if (this.lstMain.SelectedItems.Count == 1)
             {
-               for (int a = 0; a < this.m_OptionPanels.Count; a++)
+                for (var a = 0; a < this.m_OptionPanels.Count; a++)
                 {
-                    Control ctrl = (Control)this.m_OptionPanels[a];
-                 
-                  if (ctrl.Name == lstMain.SelectedItems[0].Text)
-                  {
-                      this.splitContainer1.Panel2.Controls.Clear();
-                      ctrl.Dock = DockStyle.Fill;
-                      this.splitContainer1.Panel2.Controls.Add(ctrl);
-                      break;
-                  }
+                    var ctrl = (Control)this.m_OptionPanels[a];
+
+                    if (ctrl.Name == lstMain.SelectedItems[0].Text)
+                    {
+                        this.splitContainer1.Panel2.Controls.Clear();
+                        ctrl.Dock = DockStyle.Fill;
+                        this.splitContainer1.Panel2.Controls.Add(ctrl);
+                        break;
+                    }
                 }
             }
-           
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
@@ -301,130 +216,11 @@ namespace Peter
         {
             this.Cursor = Cursors.WaitCursor;
             this.m_MainForm.Trace("Übernehme allgemeine Einstellungen");
-            XmlDocument xDoc = new XmlDocument();
-            xDoc.Load(this.m_MainForm.ConfigFile);
 
-            XmlNodeList nodes = xDoc.GetElementsByTagName("SaveOnExit");
-            if (nodes.Count > 0)
-            {
-                nodes[0].InnerText = this.ckbSaveOnExt.Checked.ToString();
-            }
-
-            nodes = xDoc.GetElementsByTagName("RecentFileCount");
-            if (nodes.Count > 0)
-            {
-                nodes[0].InnerText = this.nudRecentFile.Value.ToString();
-            }
-
-            nodes = xDoc.GetElementsByTagName("RecentProjectCount");
-            if (nodes.Count > 0)
-            {
-                nodes[0].InnerText = this.nudRecentProject.Value.ToString();
-            }
-
-            if (this.m_EditorChanged)
-            {
-                this.m_MainForm.Trace("Übernehme Editor Einstellungen");
-                nodes = xDoc.GetElementsByTagName("Editor");
-                if (nodes.Count > 0)
-                {
-                    foreach (XmlNode node in nodes[0].ChildNodes)
-                    {
-                        switch (node.Name.ToLower())
-                        {
-                            case "showeol":
-                                node.InnerText = this.ckbShowEol.Checked.ToString();
-                                break;
-                            case "showinvalidlines":
-                                node.InnerText = this.ckbShowInvalidLines.Checked.ToString();
-                                break;
-                            case "showspaces":
-                                node.InnerText = this.ckbShowSpaces.Checked.ToString();
-                                break;
-                            case "showtabs":
-                                node.InnerText = this.ckbShowTabs.Checked.ToString();
-                                break;
-                            case "showmatchbracket":
-                                node.InnerText = this.ckbShowMatchingBracket.Checked.ToString();
-                                break;
-                            case "showlinenumbers":
-                                node.InnerText = this.ckbShowLineNumbes.Checked.ToString();
-                                break;
-                            case "showhruler":
-                                node.InnerText = this.ckbShowHRuler.Checked.ToString();
-                                break;
-                            case "showvruler":
-                                node.InnerText = this.ckbShowVRuler.Checked.ToString();
-                                break;
-                            case "enablecodefolding":
-                                node.InnerText = this.ckbEnableCodeFolding.Checked.ToString();
-                                break;
-                            case "converttabs":
-                                node.InnerText = this.ckbConvertTabs.Checked.ToString();
-                                break;
-                            case "useantialias":
-                                node.InnerText = this.ckbUseAntiAlias.Checked.ToString();
-                                break;
-                            case "allowcaretbeyondeol":
-                                node.InnerText = this.ckbAllowCaretBeyondEol.Checked.ToString();
-                                break;
-                            case "highlightcurrentline":
-                                node.InnerText = this.ckbHighlightCurrentLine.Checked.ToString();
-                                break;
-                            case "autoinsertbracket":
-                                node.InnerText = this.ckbAutoInsertBracket.Checked.ToString();
-                                break;
-                            case "tabindent":
-                                node.InnerText = this.nudTabIndent.Value.ToString();
-                                break;
-                            case "verticalrulercol":
-                                node.InnerText = this.nudVRuler.Value.ToString();
-                                break;
-                            case "indentstyle":
-                                node.InnerText = this.cmbIndentStyle.Text.ToString();
-                                break;
-                            case "bracketmatchingstyle":
-                                node.InnerText = this.cmbBracketStyle.Text.ToString();
-                                break;
-                            case "font":
-                                string font = this.textEditorControl1.Font.FontFamily.Name + ";" + textEditorControl1.Font.Size.ToString();
-                                node.InnerText = font;
-                                break;
-                            case "scripts":
-                                node.InnerText = this.TScriptsPatch.Text.ToString();
-                                break;
-                            case "bilder":
-                                node.InnerText = this.TBilderPatch.Text.ToString();
-                                break;
-                            case "parser":                               
-                                node.InnerText = this.ckbMessageBox.Checked.ToString();// == true ? "1" : "0";
-                                break;
-                            case "backup":
-                                node.InnerText = this.ckbBackup.Checked.ToString();// == true ? "1" : "0";
-                                break;
-                            case "autocomplete":
-                                node.InnerText = this.ckbAutoCompleteAuto.Checked.ToString();
-                                break;
-                            case "backupfolder":
-                                node.InnerText = this.TBakPatch.Text;
-                                break;
-                            case "backupeach":
-                                node.InnerText = this.nBakMin.Value.ToString();
-                                break;
-                            case "backupfolderonly":
-                                node.InnerText = this.ckbInFolderOnly.Checked.ToString();
-                                break;
-                            case "autobrackets":
-                                node.InnerText = this.ckbAutoBrackets.Checked.ToString();
-                                break;
-                        }
-                    }
-                }
-            }
-           
-            xDoc.Save(this.m_MainForm.ConfigFile);
-
+            var config = this.m_MainForm.Config;
+            UpdateConfig(config);
             this.m_MainForm.Trace("Übernehme Einstellungen");
+            this.m_MainForm.SaveConfig();
             this.m_MainForm.LoadConfigFile(true);
             this.Cursor = Cursors.Default;
             this.m_MainForm.Trace("");
@@ -436,7 +232,49 @@ namespace Peter
             }
         }
 
-        private void btnFont_Click(object sender, EventArgs e)
+        private void UpdateConfig(Classes.Configuration.PeterConfig config)
+        {
+            config.Application.SaveOnExit = this.ckbSaveOnExt.Checked;
+            config.Application.RecentFileCount = (int)this.nudRecentFile.Value;
+            config.Application.RecentProjectCount = (int)this.nudRecentProject.Value;
+            config.Application.SaveOnExit = this.ckbSaveOnExt.Checked;
+            var editorConfig = config.Editor;
+
+            if (this.m_EditorChanged)
+            {
+                this.m_MainForm.Trace("Übernehme Editor Einstellungen");
+                editorConfig.ShowEOL = this.ckbShowEol.Checked;
+                editorConfig.ShowInvalidLines = this.ckbShowInvalidLines.Checked;
+                editorConfig.ShowSpaces = this.ckbShowSpaces.Checked;
+                editorConfig.ShowTabs = this.ckbShowTabs.Checked;
+                editorConfig.ShowMatchBracket = this.ckbShowMatchingBracket.Checked;
+                editorConfig.ShowLineNumbers = this.ckbShowLineNumbes.Checked;
+                editorConfig.ShowHRuler = this.ckbShowHRuler.Checked;
+                editorConfig.ShowVRuler = this.ckbShowVRuler.Checked;
+                editorConfig.EnableCodeFolding = this.ckbEnableCodeFolding.Checked;
+                editorConfig.ConvertTabs = this.ckbConvertTabs.Checked;
+                editorConfig.UseAntiAlias = this.ckbUseAntiAlias.Checked;
+                editorConfig.AllowCaretBeyondEOL = this.ckbAllowCaretBeyondEol.Checked;
+                editorConfig.HighlightCurrentLine = this.ckbHighlightCurrentLine.Checked;
+                editorConfig.AutoInsertBracket = this.ckbAutoInsertBracket.Checked;
+                editorConfig.TabIndent = (int)this.nudTabIndent.Value;
+                editorConfig.VerticalRulerCol = (int)this.nudVRuler.Value;
+                editorConfig.IndentStyle = this.cmbIndentStyle.Text;
+                editorConfig.BracketMatchingStyle = this.cmbBracketStyle.Text;
+                editorConfig.Font = this.textEditorControl1.Font.FontFamily.Name + ";" + textEditorControl1.Font.Size.ToString();
+                editorConfig.Scripts = this.TScriptsPatch.Text;
+                editorConfig.Bilder = this.TBilderPatch.Text;
+                editorConfig.Parser = this.ckbMessageBox.Checked;
+                editorConfig.Backup = this.ckbBackup.Checked;
+                editorConfig.Backupeach = (int)this.nBakMin.Value;
+                editorConfig.Backupfolder = this.TBakPatch.Text;
+                editorConfig.Backupfolderonly = this.ckbInFolderOnly.Checked;
+                editorConfig.Autocomplete = this.ckbAutoCompleteAuto.Checked;
+                editorConfig.Autobrackets = this.ckbAutoBrackets.Checked;
+            }
+        }
+
+        private void BtnFont_Click(object sender, EventArgs e)
         {
             this.fontDialog1.Font = this.textEditorControl1.Font;
             if (this.fontDialog1.ShowDialog() == DialogResult.OK)
@@ -459,11 +297,6 @@ namespace Peter
             this.textEditorControl1.EnableFolding = this.ckbEnableCodeFolding.Checked;
             this.textEditorControl1.ConvertTabsToSpaces = this.ckbConvertTabs.Checked;
             this.textEditorControl1.UseAntiAliasFont = this.ckbUseAntiAlias.Checked; // #develop 2
-            /* // #develop 3
-            if (this.ckbUseAntiAlias.Checked)
-            {
-                this.textEditorControl1.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
-            }*/
             this.textEditorControl1.AllowCaretBeyondEOL = this.ckbAllowCaretBeyondEol.Checked;
             this.textEditorControl1.TextEditorProperties.AutoInsertCurlyBracket = this.ckbAutoInsertBracket.Checked;
             this.textEditorControl1.TabIndent = Convert.ToInt32(this.nudTabIndent.Value);
@@ -494,92 +327,7 @@ namespace Peter
             this.m_EditorChanged = true;
         }
 
-        private void ckbShowEol_CheckedChanged(object sender, EventArgs e)
-        {
-            this.UpdateEditor();
-        }
-
-        private void ckbShowInvalidLines_CheckedChanged(object sender, EventArgs e)
-        {
-            this.UpdateEditor();
-        }
-
-        private void ckbShowSpaces_CheckedChanged(object sender, EventArgs e)
-        {
-            this.UpdateEditor();
-        }
-
-        private void ckbShowTabs_CheckedChanged(object sender, EventArgs e)
-        {
-            this.UpdateEditor();
-        }
-
-        private void ckbShowMatchingBracket_CheckedChanged(object sender, EventArgs e)
-        {
-            this.UpdateEditor();
-        }
-
-        private void ckbShowLineNumbes_CheckedChanged(object sender, EventArgs e)
-        {
-            this.UpdateEditor();
-        }
-
-        private void ckbShowHRuler_CheckedChanged(object sender, EventArgs e)
-        {
-            this.UpdateEditor();
-        }
-
-        private void ckbShowVRuler_CheckedChanged(object sender, EventArgs e)
-        {
-            this.UpdateEditor();
-        }
-
-        private void ckbEnableCodeFolding_CheckedChanged(object sender, EventArgs e)
-        {
-            this.UpdateEditor();
-        }
-
-        private void ckbConvertTabs_CheckedChanged(object sender, EventArgs e)
-        {
-            this.UpdateEditor();
-        }
-
-        private void ckbUseAntiAlias_CheckedChanged(object sender, EventArgs e)
-        {
-            this.UpdateEditor();
-        }
-
-        private void ckbAllowCaretBeyondEol_CheckedChanged(object sender, EventArgs e)
-        {
-            this.UpdateEditor();
-        }
-
-        private void ckbHighlightCurrentLine_CheckedChanged(object sender, EventArgs e)
-        {
-            this.UpdateEditor();
-        }
-
-        private void ckbAutoInsertBracket_CheckedChanged(object sender, EventArgs e)
-        {
-            this.UpdateEditor();
-        }
-
-        private void nudTabIndent_ValueChanged(object sender, EventArgs e)
-        {
-            this.UpdateEditor();
-        }
-
-        private void nudVRuler_ValueChanged(object sender, EventArgs e)
-        {
-            this.UpdateEditor();
-        }
-
-        private void cmbIndentStyle_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            this.UpdateEditor();
-        }
-
-        private void cmbBracketStyle_SelectedIndexChanged(object sender, EventArgs e)
+        private void AnyOptionCheckbox_CheckedChanged(object sender, EventArgs e)
         {
             this.UpdateEditor();
         }
@@ -589,13 +337,13 @@ namespace Peter
             FBD = new FolderBrowserDialog();
             if (this.FBD.ShowDialog() == DialogResult.OK)
             {
-                string s=FBD.SelectedPath.ToLower();
+                var s = FBD.SelectedPath.ToLower();
                 if (Directory.Exists(s))
                 {
                     if (!s.ToLower().EndsWith("scripts"))
                     {
                         MessageBox.Show("Der angegebene Pfad sollte mit 'Scripts' enden, sofern Sie die Gothic-Originalscripte und Eintellungen unverändert vorliegen haben.", "Pfad zu den Scripten", MessageBoxButtons.OK, MessageBoxIcon.Information);
-               
+
                     }
                     this.TScriptsPatch.Text = s;
                     this.m_EditorChanged = true;
@@ -606,7 +354,7 @@ namespace Peter
                     MessageBox.Show("Der angegebene Pfad existiert nicht.", "Ungültiger Pfad", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                 }
             }
-            
+
         }
 
         private void BtBrowseBilder_Click(object sender, EventArgs e)
@@ -662,7 +410,7 @@ namespace Peter
             {
                 ckbInFolderOnly.Enabled = true;
                 nBakMin.Enabled = true;
-               
+
             }
             else
             {
@@ -678,6 +426,6 @@ namespace Peter
             this.m_EditorChanged = true;
         }
 
-        
+
     }
 }

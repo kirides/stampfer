@@ -240,7 +240,7 @@ namespace Peter
             this.tsbNew.Name = "tsbNew";
             this.tsbNew.Size = new System.Drawing.Size(23, 22);
             this.tsbNew.Text = "neu";
-            this.tsbNew.Click += new System.EventHandler(this.tsbNew_Click);
+            this.tsbNew.Click += new System.EventHandler(this.TsbNew_Click);
             // 
             // tsbOpen
             // 
@@ -250,7 +250,7 @@ namespace Peter
             this.tsbOpen.Name = "tsbOpen";
             this.tsbOpen.Size = new System.Drawing.Size(23, 22);
             this.tsbOpen.Text = "öffnen";
-            this.tsbOpen.Click += new System.EventHandler(this.tsbOpen_Click);
+            this.tsbOpen.Click += new System.EventHandler(this.TsbOpen_Click);
             // 
             // tsbSave
             // 
@@ -260,7 +260,7 @@ namespace Peter
             this.tsbSave.Name = "tsbSave";
             this.tsbSave.Size = new System.Drawing.Size(23, 22);
             this.tsbSave.Text = "speichern";
-            this.tsbSave.Click += new System.EventHandler(this.tsbSave_Click);
+            this.tsbSave.Click += new System.EventHandler(this.TsbSave_Click);
             // 
             // tsbSaveAll
             // 
@@ -270,7 +270,7 @@ namespace Peter
             this.tsbSaveAll.Name = "tsbSaveAll";
             this.tsbSaveAll.Size = new System.Drawing.Size(23, 22);
             this.tsbSaveAll.Text = "Alles speichern";
-            this.tsbSaveAll.Click += new System.EventHandler(this.tsbSaveAll_Click);
+            this.tsbSaveAll.Click += new System.EventHandler(this.TsbSaveAll_Click);
             // 
             // tsbPrint
             // 
@@ -280,7 +280,7 @@ namespace Peter
             this.tsbPrint.Name = "tsbPrint";
             this.tsbPrint.Size = new System.Drawing.Size(23, 22);
             this.tsbPrint.Text = "drucken";
-            this.tsbPrint.Click += new System.EventHandler(this.tsbPrint_Click);
+            this.tsbPrint.Click += new System.EventHandler(this.TsbPrint_Click);
             // 
             // toolStripSeparator1
             // 
@@ -295,7 +295,7 @@ namespace Peter
             this.tsbCut.Name = "tsbCut";
             this.tsbCut.Size = new System.Drawing.Size(23, 22);
             this.tsbCut.Text = "ausschneiden";
-            this.tsbCut.Click += new System.EventHandler(this.tsbCut_Click);
+            this.tsbCut.Click += new System.EventHandler(this.TsbCut_Click);
             // 
             // tsbCopy
             // 
@@ -305,7 +305,7 @@ namespace Peter
             this.tsbCopy.Name = "tsbCopy";
             this.tsbCopy.Size = new System.Drawing.Size(23, 22);
             this.tsbCopy.Text = "kopieren";
-            this.tsbCopy.Click += new System.EventHandler(this.tsbCopy_Click);
+            this.tsbCopy.Click += new System.EventHandler(this.TsbCopy_Click);
             // 
             // tsbPaste
             // 
@@ -315,7 +315,7 @@ namespace Peter
             this.tsbPaste.Name = "tsbPaste";
             this.tsbPaste.Size = new System.Drawing.Size(23, 22);
             this.tsbPaste.Text = "einfügen";
-            this.tsbPaste.Click += new System.EventHandler(this.tsbPaste_Click);
+            this.tsbPaste.Click += new System.EventHandler(this.TsbPaste_Click);
             // 
             // toolStripSeparator2
             // 
@@ -330,7 +330,7 @@ namespace Peter
             this.tsbUndo.Name = "tsbUndo";
             this.tsbUndo.Size = new System.Drawing.Size(23, 22);
             this.tsbUndo.Text = "rückgängig";
-            this.tsbUndo.Click += new System.EventHandler(this.tsbUndo_Click);
+            this.tsbUndo.Click += new System.EventHandler(this.TsbUndo_Click);
             // 
             // tsbRedo
             // 
@@ -340,7 +340,7 @@ namespace Peter
             this.tsbRedo.Name = "tsbRedo";
             this.tsbRedo.Size = new System.Drawing.Size(23, 22);
             this.tsbRedo.Text = "wiederholen";
-            this.tsbRedo.Click += new System.EventHandler(this.tsbRedo_Click);
+            this.tsbRedo.Click += new System.EventHandler(this.TsbRedo_Click);
             // 
             // toolStripSeparator3
             // 

@@ -110,7 +110,7 @@ namespace Peter
             this.tsbProperties.Name = "tsbProperties";
             this.tsbProperties.Size = new System.Drawing.Size(23, 22);
             this.tsbProperties.Text = "Eigenschaften";
-            this.tsbProperties.Click += new System.EventHandler(this.tsbProperties_Click);
+            this.tsbProperties.Click += new System.EventHandler(this.TsbProperties_Click);
             // 
             // toolStripSeparator1
             // 
@@ -127,7 +127,7 @@ namespace Peter
             this.tsbRefresh.Name = "tsbRefresh";
             this.tsbRefresh.Size = new System.Drawing.Size(23, 22);
             this.tsbRefresh.Text = "Aktualisieren";
-            this.tsbRefresh.Click += new System.EventHandler(this.tsbRefresh_Click);
+            this.tsbRefresh.Click += new System.EventHandler(this.TsbRefresh_Click);
             // 
             // tsbAddFolder
             // 
@@ -138,7 +138,7 @@ namespace Peter
             this.tsbAddFolder.Name = "tsbAddFolder";
             this.tsbAddFolder.Size = new System.Drawing.Size(23, 22);
             this.tsbAddFolder.Text = "Ordner hinzufügen";
-            this.tsbAddFolder.Click += new System.EventHandler(this.tsbAddFolder_Click);
+            this.tsbAddFolder.Click += new System.EventHandler(this.TsbAddFolder_Click);
             // 
             // tsbAddFile
             // 
@@ -165,7 +165,7 @@ namespace Peter
             this.tsbDelete.Name = "tsbDelete";
             this.tsbDelete.Size = new System.Drawing.Size(23, 22);
             this.tsbDelete.Text = "Löschen";
-            this.tsbDelete.Click += new System.EventHandler(this.tsbDelete_Click);
+            this.tsbDelete.Click += new System.EventHandler(this.TsbDelete_Click);
             // 
             // toolStripSeparator3
             // 
@@ -182,7 +182,7 @@ namespace Peter
             this.tsbOpenDir.Name = "tsbOpenDir";
             this.tsbOpenDir.Size = new System.Drawing.Size(23, 22);
             this.tsbOpenDir.Text = "Verzeichnis löschen";
-            this.tsbOpenDir.Click += new System.EventHandler(this.tsbOpenDir_Click);
+            this.tsbOpenDir.Click += new System.EventHandler(this.TsbOpenDir_Click);
             // 
             // ofdMain
             // 

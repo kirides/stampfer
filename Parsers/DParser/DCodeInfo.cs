@@ -1,8 +1,9 @@
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Peter.DParser
 {
-    internal struct TokenMatch
+    public struct TokenMatch
     {
         public string Value;
         public int Position;
@@ -16,33 +17,20 @@ namespace Peter.DParser
 
     public class DCodeInfo
     {
-        public DCodeInfo()
-        {
-            this.VarDeclarations = new ArrayList();
-            this.ConstDeclarations = new ArrayList();
-            this.Functions = new ArrayList();
-            this.Instances = new ArrayList();
-
-        }
-
         /// <summary>
         /// Gets or Sets the List of 'using ...' in the code...
         /// </summary>
-
-
-        public ArrayList VarDeclarations { get; set; }
-        public ArrayList ConstDeclarations { get; set; }
+        public List<TokenMatch> VarDeclarations { get; set; } = new List<TokenMatch>();
+        public List<TokenMatch> ConstDeclarations { get; set; } = new List<TokenMatch>();
 
         /// <summary>
         /// Gets or Sets the List of 'namespace ...' in the code...
         /// </summary>
-        public ArrayList Functions { get; set; }
+        public List<TokenMatch> Functions { get; set; } = new List<TokenMatch>();
 
         /// <summary>
         /// Gets or Sets the List of Fields in the code...
         /// </summary>
-        public ArrayList Instances { get; set; }
-
-
+        public List<TokenMatch> Instances { get; set; } = new List<TokenMatch>();
     }
 }
