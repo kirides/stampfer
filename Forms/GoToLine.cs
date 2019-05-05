@@ -28,7 +28,7 @@ namespace Peter
 {
     public partial class GoToLine : Form
     {
-        private MainForm frm;
+        private readonly MainForm frm;
         public GoToLine(MainForm fr)
         {
             InitializeComponent();

@@ -39,8 +39,8 @@ namespace Peter
 
     public partial class ProjectManager : DockContent, IPeterPluginTab
     {
-        private MainForm m_MainForm;
-        private TraceDelegate m_delTrace;
+        private readonly MainForm m_MainForm;
+        private readonly TraceDelegate m_delTrace;
 
         #region -= Constructor =-
 

@@ -22,8 +22,8 @@ namespace Peter
 {
     internal class cDFoldingStrategy : IFoldingStrategy
     {
-        private Regex lbrace = new Regex(@"{");
-        private Regex rbrace = new Regex(@"}");
+        private readonly Regex lbrace = new Regex(@"{");
+        private readonly Regex rbrace = new Regex(@"}");
 
         public List<FoldMarker> GenerateFoldMarkers(
             IDocument document, string fileName, object parseInformation)
@@ -211,8 +211,8 @@ namespace Peter
 
         private struct FoldStartMarker
         {
-            private string _name;
-            private string _prefix;
+            private readonly string _name;
+            private readonly string _prefix;
 
             public int Column { get; }
             public int LineNumber { get; }

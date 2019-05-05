@@ -31,7 +31,7 @@ namespace Peter
 {
     public partial class DialogCreator : DockContent, IPeterPluginTab
     {
-        MainForm MainF;
+        readonly MainForm MainF;
 
         private int DialogVariable=0;
 
@@ -47,7 +47,7 @@ namespace Peter
         public Regex r;
         public Quest quest;
         public Choice ActualChoice=null;
-        List<string> FuncNames = new List<string>();
+        readonly List<string> FuncNames = new List<string>();
 
         public DialogCreator(MainForm m)
         {

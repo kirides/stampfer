@@ -30,12 +30,11 @@ namespace Peter.Forms
 {
     public partial class FAddQuest : Form
     {
-        FQuest MainF;
-        
-        ArrayList Quests;
-        int mode = 0;
-        TreeNode t;
-        Quest Q;
+        readonly FQuest MainF;
+        readonly ArrayList Quests;
+        readonly int mode = 0;
+        readonly TreeNode t;
+        readonly Quest Q;
         public FAddQuest(TreeNode tn, ArrayList quests)
         {
             t = tn;

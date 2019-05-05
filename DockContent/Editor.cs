@@ -40,12 +40,12 @@ namespace Peter
         public FileSystemWatcher m_FSW;
         public LoadFileDelegate m_LoadFile;
         public CloseDelegate m_CloseDel;
-        private bool DialogMode = false;
+        private readonly bool DialogMode = false;
         public DialogCreator DiaC;
         public bool AutoCompleteAuto;
         public bool ignoreclose = false;
         private const int COOLDOWN = 2;
-        private Timer mytimer = new Timer();
+        private readonly Timer mytimer = new Timer();
         private int cooldowntimer = COOLDOWN;
 
         #region -= Constructor =-
@@ -485,7 +485,7 @@ namespace Peter
             return s;
         }
 
-        private Regex ifreg = new Regex(@"\sif(\s|\()", RegexOptions.IgnoreCase);
+        private readonly Regex ifreg = new Regex(@"\sif(\s|\()", RegexOptions.IgnoreCase);
         public bool IsAnIf()
         {
             var k = m_Editor.ActiveTextAreaControl.Caret.Offset;

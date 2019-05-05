@@ -29,12 +29,12 @@ namespace Peter
 {
     public partial class FighterGame : Form
     {
-        Timer t = new Timer();
+        readonly Timer t = new Timer();
         Fighter player;
-        List<BaseObject> objList = new List<BaseObject>();
-        List<BaseObject> objListRunTime = new List<BaseObject>();
-        Random r = new Random();
-        Stopwatch stopwatch = new Stopwatch();
+        readonly List<BaseObject> objList = new List<BaseObject>();
+        readonly List<BaseObject> objListRunTime = new List<BaseObject>();
+        readonly Random r = new Random();
+        readonly Stopwatch stopwatch = new Stopwatch();
         int Enemycount;
         int EnemyHPcount;
         int EnemyPowerCount;
@@ -364,8 +364,7 @@ namespace Peter
 
         }
 
-
-        Bullet[] _bullets = new Bullet[50];
+        readonly Bullet[] _bullets = new Bullet[50];
         public Ship(Rectangle rec, List<BaseObject> list, bool player)
             : base(rec, list)
         {
@@ -420,8 +419,8 @@ namespace Peter
 
     public class Fighter : Ship
     {
-        Points pt;
-        Life lf;
+        readonly Points pt;
+        readonly Life lf;
         protected int _pointCount = 0;
 
         public virtual int PointCount
@@ -806,8 +805,8 @@ namespace Peter
     }
     public class Background : BaseObject
     {
-        Particle[] layer1 = new Particle[50];
-        Particle[] layer2 = new Particle[100];
+        readonly Particle[] layer1 = new Particle[50];
+        readonly Particle[] layer2 = new Particle[100];
         public Background(Rectangle rec, List<BaseObject> list)
             : base(rec, list)
         {
@@ -905,7 +904,7 @@ namespace Peter
         /// <summary>
         /// Erforderliche Designervariable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private readonly System.ComponentModel.IContainer components = null;
 
         /// <summary>
         /// Verwendete Ressourcen bereinigen.

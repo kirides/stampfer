@@ -34,7 +34,7 @@ namespace Peter.JavaParser
         int fileLen;        // length of input stream (may change if the stream is no file)
         int bufPos;         // current position in buffer
         Stream stream;      // input stream (seekable)
-        bool isUserStream;  // was the stream opened by the user?
+        readonly bool isUserStream;  // was the stream opened by the user?
 
         public Buffer(Stream s, bool isUserStream)
         {

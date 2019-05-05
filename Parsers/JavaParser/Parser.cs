@@ -95,7 +95,7 @@ namespace Peter.JavaParser
         public class Modifiers
         {
             private long cur = 0L;
-            private Parser parser;
+            private readonly Parser parser;
 
             public Modifiers(Parser parser)
             {
@@ -173,7 +173,7 @@ namespace Peter.JavaParser
         class ExprInfo
         {
             private int kind = ExprKind.NONE;
-            private Parser parser;
+            private readonly Parser parser;
 
             public ExprInfo(Parser parser)
             {
@@ -202,7 +202,7 @@ namespace Peter.JavaParser
 
         /*---------------------------- token sets -----------------------------------*/
 
-        static int maxTerminals = 160;  // set size
+        static readonly int maxTerminals = 160;  // set size
 
         static BitArray newSet(int[] values)
         {
@@ -217,14 +217,14 @@ namespace Peter.JavaParser
             return s1;
         }
 
-        static int[] typeKWarr = {_byte, _short, _char, _int, _long, _float, _double, 
+        static readonly int[] typeKWarr = {_byte, _short, _char, _int, _long, _float, _double, 
                           _bool};
-        static int[] castFollowerArr = {_ident, _new, _super, _this, _void, _intLit,
+        static readonly int[] castFollowerArr = {_ident, _new, _super, _this, _void, _intLit,
                                 _floatLit, _charLit, _stringLit, _true, _false,
                                 _null, _lpar, _not, _tilde};
-        static int[] prefixArr = { _inc, _dec, _not, _tilde, _plus, _minus };
+        static readonly int[] prefixArr = { _inc, _dec, _not, _tilde, _plus, _minus };
 
-        static BitArray
+        static readonly BitArray
           typeKW = newSet(typeKWarr),
           castFollower = or(newSet(castFollowerArr), typeKW),
           prefix = newSet(prefixArr);
@@ -2161,7 +2161,7 @@ namespace Peter.JavaParser
             Expect(0);
         }
 
-        bool[,] set = {
+        readonly bool[,] set = {
 		{T,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x},
 		{x,x,x,x, x,x,x,x, x,T,x,x, T,x,x,x, x,x,x,T, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, T,x,x,T, T,T,T,T, x,x,x,x, x,x,x,x, T,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x},
 		{x,x,x,x, x,x,x,x, x,T,x,x, T,x,x,x, x,x,x,T, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,T, T,T,T,T, x,x,x,x, x,x,x,x, T,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x},

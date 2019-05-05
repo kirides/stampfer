@@ -33,11 +33,11 @@ namespace Peter
 
     public partial class ctrlFileExplorer : DockContent, PeterInterface.IPeterPluginTab
     {
-        private MainForm MainF;
-        private ExpandDelegate m_Expand;
+        private readonly MainForm MainF;
+        private readonly ExpandDelegate m_Expand;
         private string m_XML;
         private bool m_Folder;
-        ArrayList Extensions = new ArrayList();
+        readonly ArrayList Extensions = new ArrayList();
        
 
         public ctrlFileExplorer(MainForm f)

@@ -27,7 +27,7 @@ namespace Peter.Forms
 {
     public partial class FNPCSelect : Form
     {
-        DialogCreator DC;
+        readonly DialogCreator DC;
         public FNPCSelect(MainForm m, DialogCreator d)
         {
             DC = d;

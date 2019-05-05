@@ -31,22 +31,19 @@ namespace Peter
 {
     public partial class ctrlGothicInstances : DockContent, IPeterPluginTab
     {
-        private MainForm MainF;
-        private Regex NoSpaces = new Regex(@"  ");
-        private bool readfromfile = false;
-        private bool m_CanScroll;
-        //  private TextEditorControl m_Editor;
+        private readonly MainForm MainF;
+        private readonly Regex NoSpaces = new Regex(@"  ");
+        private readonly bool m_CanScroll;
 
-        private string ScriptsPath;
+        private readonly string ScriptsPath;
 
-        private TreeNode DialogTree = new TreeNode("Dialoge");
-        private TreeNode NPCTree = new TreeNode("NPCs");
-        private TreeNode ItemTree = new TreeNode("Items");
+        private readonly TreeNode DialogTree = new TreeNode("Dialoge");
+        private readonly TreeNode NPCTree = new TreeNode("NPCs");
+        private readonly TreeNode ItemTree = new TreeNode("Items");
 
-        private TreeNode FuncTree = new TreeNode("Funktionen");
-        private TreeNode VarTree = new TreeNode("Variablen");
+        private readonly TreeNode FuncTree = new TreeNode("Funktionen");
+        private readonly TreeNode VarTree = new TreeNode("Variablen");
         public TreeNode ConstTree = new TreeNode("Konstanten");
-
 
         public Dictionary<string, Instance> FuncList = new Dictionary<string, Instance>();
         public Dictionary<string, Instance> VarList = new Dictionary<string, Instance>();
@@ -54,14 +51,12 @@ namespace Peter
         public Dictionary<string, Instance> ItemList = new Dictionary<string, Instance>();
         public Dictionary<string, Instance> NPCList = new Dictionary<string, Instance>();
         public Dictionary<string, Instance> DialogList = new Dictionary<string, Instance>();
-
-        const int DIALOGIMG = 0;
-        const int NPCIMG = 1;
-        const int ITEMIMG = 2;
-        const int FUNCIMG = 3;
-        const int VARIMG = 4;
-        const int CONSTIMG = 5;
-
+        private const int DIALOGIMG = 0;
+        private const int NPCIMG = 1;
+        private const int ITEMIMG = 2;
+        private const int FUNCIMG = 3;
+        private const int VARIMG = 4;
+        private const int CONSTIMG = 5;
 
         public ctrlGothicInstances(MainForm m)
         {
@@ -84,22 +79,17 @@ namespace Peter
             DialogTree.ImageIndex = DIALOGIMG;
             DialogTree.SelectedImageIndex = DialogTree.ImageIndex;
 
-
             NPCTree.ImageIndex = NPCIMG;
             NPCTree.SelectedImageIndex = NPCTree.ImageIndex;
-
 
             ItemTree.ImageIndex = ITEMIMG;
             ItemTree.SelectedImageIndex = ItemTree.ImageIndex;
 
-
             FuncTree.ImageIndex = FUNCIMG;
             FuncTree.SelectedImageIndex = FuncTree.ImageIndex;
 
-
             VarTree.ImageIndex = VARIMG;
             VarTree.SelectedImageIndex = VarTree.ImageIndex;
-
 
             ConstTree.ImageIndex = CONSTIMG;
             ConstTree.SelectedImageIndex = ConstTree.ImageIndex;
@@ -118,10 +108,9 @@ namespace Peter
             treeMain.Nodes.Add(ConstTree);
             treeMain.BeforeExpand += new TreeViewCancelEventHandler(treeMain_BeforeExpand);
             treeMain.BeforeCollapse += new TreeViewCancelEventHandler(treeMain_BeforeCollapse);
-            //treeMain.TreeViewNodeSorter = new InstanceNodeSorter();
         }
 
-        void treeMain_BeforeCollapse(object sender, TreeViewCancelEventArgs e)
+        private void treeMain_BeforeCollapse(object sender, TreeViewCancelEventArgs e)
         {
             treeMain.BeginUpdate();
             if (e.Node.ImageIndex == DIALOGIMG)//Dialogtree
@@ -158,7 +147,7 @@ namespace Peter
             treeMain.EndUpdate();
         }
 
-        void treeMain_BeforeExpand(object sender, TreeViewCancelEventArgs e)
+        private void treeMain_BeforeExpand(object sender, TreeViewCancelEventArgs e)
         {
             treeMain.BeginUpdate();
             if (e.Node.ImageIndex == DIALOGIMG)//Dialogtree
@@ -191,13 +180,8 @@ namespace Peter
                 if (ConstList.Count == 0) { treeMain.EndUpdate(); return; }
                 UpdateConstTree();
             }
-
             treeMain.EndUpdate();
         }
-
-
-
-
 
         #region -= Helpers =-
 
@@ -207,7 +191,7 @@ namespace Peter
         /// <param name="sender">TreeView</param>
         /// <param name="e">TreeViewEventArgs</param>
 
-        void treeMain_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
+        private void treeMain_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
         {
 
             if (this.m_CanScroll)
@@ -216,7 +200,7 @@ namespace Peter
                 {
                     if (e.Node.Tag != null)
                     {
-                        string file = (e.Node.Tag.ToString());
+                        var file = (e.Node.Tag.ToString());
                         OpenFile(file, e.Node.Text);
                     }
                 }
@@ -227,10 +211,10 @@ namespace Peter
         {
             if (File.Exists(file))
             {
-                string searchstring = "";
+                var searchstring = "";
 
                 this.MainF.CreateEditor(file, Path.GetFileName(file));
-                foreach (char c in txt)
+                foreach (var c in txt)
                 {
                     if (c == '=' || c == '(')
                     {
@@ -408,7 +392,7 @@ namespace Peter
         private void tsbExpandAll_Click(object sender, EventArgs e)
         {
             this.treeMain.BeginUpdate();
-            for (int a = 0; a < this.treeMain.Nodes.Count; a++)
+            for (var a = 0; a < this.treeMain.Nodes.Count; a++)
             {
                 this.treeMain.Nodes[a].ExpandAll();
             }
@@ -418,7 +402,7 @@ namespace Peter
         private void tsbCollapseAll_Click(object sender, EventArgs e)
         {
             this.treeMain.BeginUpdate();
-            for (int a = 0; a < this.treeMain.Nodes.Count; a++)
+            for (var a = 0; a < this.treeMain.Nodes.Count; a++)
             {
                 this.treeMain.Nodes[a].Collapse();
             }
@@ -429,7 +413,6 @@ namespace Peter
 
         private void ClearArrays()
         {
-            //this.treeMain.Nodes.Clear();
             this.DialogTree.Nodes.Clear();
             this.NPCTree.Nodes.Clear();
             this.ItemTree.Nodes.Clear();
@@ -444,20 +427,19 @@ namespace Peter
             ConstList.Clear();
         }
 
-        Regex r = new Regex(@"((^)|(\s))instance ", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-        Regex r2 = new Regex(@"((^)|(\s))func ", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-        Regex r3 = new Regex(@"((^)|(\s))var ", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-        Regex r4 = new Regex(@"((^)|(\s))const ", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-
-        const int SB_LENGTH = 256;
+        private readonly Regex r = new Regex(@"((^)|(\s))instance ", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private readonly Regex r2 = new Regex(@"((^)|(\s))func ", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private readonly Regex r3 = new Regex(@"((^)|(\s))var ", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private readonly Regex r4 = new Regex(@"((^)|(\s))const ", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private const int SB_LENGTH = 256;
         public int GetItems(string path)
         {
-            string s = File.ReadAllText(path, Encoding.Default);
+            var s = File.ReadAllText(path, Encoding.Default);
 
-            MatchCollection m = r.Matches(s);
+            var m = r.Matches(s);
             StringBuilder sb1;
-            int i = 0;
-            int k = 0;
+            var i = 0;
+            var k = 0;
             foreach (Match match in m)
             {
                 sb1 = new StringBuilder(SB_LENGTH);
@@ -484,11 +466,11 @@ namespace Peter
         }
         public int GetNPCs(string path)
         {
-            string s = File.ReadAllText(path, Encoding.Default);
-            MatchCollection m = r.Matches(s);
+            var s = File.ReadAllText(path, Encoding.Default);
+            var m = r.Matches(s);
             StringBuilder sb1;
-            int i = 0;
-            int k = 0;
+            var i = 0;
+            var k = 0;
             foreach (Match match in m)
             {
                 sb1 = new StringBuilder(SB_LENGTH);
@@ -500,7 +482,6 @@ namespace Peter
                 }
                 k |= AddNPC(sb1.ToString(), path);
             }
-
             return k;
         }
         public int AddNPC(string sb1, string path)
@@ -516,34 +497,28 @@ namespace Peter
         }
         public int GetDias(string path)
         {
-            string s = File.ReadAllText(path, Encoding.Default);
-            MatchCollection m = r.Matches(s);
+            var s = File.ReadAllText(path, Encoding.Default);
+            var m = r.Matches(s);
             StringBuilder sb1;
-            int i = 0;
-            int k = 0;
+            var i = 0;
+            var k = 0;
             foreach (Match match in m)
             {
                 sb1 = new StringBuilder(SB_LENGTH);
                 i = match.Index + match.Length;
                 while ((i < s.Length) && (s[i] != '(') && (s[i] != ' ') && (s[i] != '\t'))
                 {
-
-
                     sb1.Append(s[i]);
-
                     i++;
                 }
                 k |= AddDia(sb1.ToString(), path);
             }
-
             return k;
         }
         public int AddDia(string sb1, string path)
         {
-            if (sb1.Length > 0
-                    && !DialogList.ContainsKey(sb1.ToString()))
+            if (sb1.Length > 0 && !DialogList.ContainsKey(sb1.ToString()))
             {
-
                 DialogList.Add(sb1, new Instance(sb1.ToString(), path));
                 return 8;
             }
@@ -551,15 +526,15 @@ namespace Peter
         }
         public int GetFuncs(string path)
         {
-            bool externals = Path.GetFileName(path).ToLower() == "externals.d";
-            string s = File.ReadAllText(path, Encoding.Default);
+            var externals = Path.GetFileName(path).ToLower() == "externals.d";
+            var s = File.ReadAllText(path, Encoding.Default);
             MatchCollection m;
             StringBuilder sb1;
             StringBuilder sb2;
-            int i = 0;
-            int k = 0;
+            var k = 0;
 
             m = r2.Matches(s);
+            int i;
             foreach (Match match in m)
             {
                 sb1 = new StringBuilder(SB_LENGTH * 2);
@@ -594,14 +569,12 @@ namespace Peter
             foreach (Match match in m)
             {
                 sb1 = new StringBuilder(512);
-
                 i = match.Index + match.Length;
                 while (s[i] != '\n' && s[i] != ')')
                 {
                     if (s[i] == ';')
                         break;
                     sb1.Append(s[i]);
-
                     i++;
                 }
                 k |= AddVar(sb1.ToString(), path);
@@ -611,11 +584,9 @@ namespace Peter
             foreach (Match match in m)
             {
                 sb1 = new StringBuilder(512);
-
                 i = match.Index + match.Length;
                 while (s[i] != ';' && s[i] != '\n')
                 {
-
                     if (s[i] == '=')
                     {
                         sb1.Append(" " + s[i] + " ");
@@ -625,7 +596,6 @@ namespace Peter
                     sb1.Append(s[i]);
                     i++;
                 }
-
                 k |= AddConst(sb1.ToString(), path);
             }
             return k;
@@ -635,17 +605,16 @@ namespace Peter
         {
             if (sb1.Length > 0)
             {
-                string tempstring = sb1.Trim().Replace('\t', ' ');
+                var tempstring = sb1.Trim().Replace('\t', ' ');
                 string tempstring2;
-                string temp = "";
                 if (tempstring.Length == 0) return 0;
                 tempstring = RemoveDoubleSpaces(tempstring);
                 try
                 {
-                    int y = tempstring.IndexOf(" ");
+                    var y = tempstring.IndexOf(" ");
                     if (y > 0)
                     {
-                        temp = tempstring.Substring(0, y);
+                        var temp = tempstring.Substring(0, y);
                         tempstring = temp.ToLower() + tempstring.Substring(y);
                     }
                 }
@@ -653,10 +622,8 @@ namespace Peter
                 tempstring2 = tempstring.ToLower();
                 if (tempstring2.StartsWith("void") || tempstring2.StartsWith("int") || tempstring2.StartsWith("c_npc") || tempstring2.StartsWith("c_item") || tempstring2.StartsWith("string"))
                 {
-
                     if (!FuncList.ContainsKey(tempstring))
                     {
-
                         FuncList.Add(tempstring, new Instance(tempstring, path));
                         return 4;
                     }
@@ -668,14 +635,13 @@ namespace Peter
         {
             if (sb1.Length > 0)
             {
-
-                string tempstring = sb1.Trim().Replace('\t', ' ');
+                var tempstring = sb1.Trim().Replace('\t', ' ');
                 string temp;
                 if (tempstring.Length == 0) return 0;
                 tempstring = RemoveDoubleSpaces(tempstring);
                 try
                 {
-                    int y = tempstring.IndexOf(" ");
+                    var y = tempstring.IndexOf(" ");
                     if (y > 0)
                     {
                         temp = tempstring.Substring(0, y);
@@ -686,7 +652,6 @@ namespace Peter
 
                 if (!VarList.ContainsKey(tempstring))
                 {
-
                     VarList.Add(tempstring, new Instance(tempstring, path));
                     return 2;
                 }
@@ -697,13 +662,13 @@ namespace Peter
         {
             if (sb1.Length > 0)
             {
-                string tempstring = sb1.Trim().Replace('\t', ' ');
+                var tempstring = sb1.Trim().Replace('\t', ' ');
                 string temp;
                 if (tempstring.Length == 0) return 0;
                 tempstring = RemoveDoubleSpaces(tempstring);
                 try
                 {
-                    int y = tempstring.IndexOf(" ");
+                    var y = tempstring.IndexOf(" ");
                     if (y > 0)
                     {
                         temp = tempstring.Substring(0, y);
@@ -713,7 +678,6 @@ namespace Peter
                 catch { }
                 if (!ConstList.ContainsKey(tempstring))
                 {
-
                     ConstList.Add(tempstring, new Instance(tempstring, path));
                     return 1;
                 }
@@ -734,7 +698,7 @@ namespace Peter
                 rgFilesg = dig.GetFiles("*.d", SearchOption.AllDirectories);
                 if (rgFilesg.Length > 0)
                 {
-                    foreach (FileInfo fi in rgFilesg)
+                    foreach (var fi in rgFilesg)
                     {
                         GetItems(fi.FullName);
                     }
@@ -746,7 +710,7 @@ namespace Peter
                 rgFilesg = dig.GetFiles("*.d", SearchOption.AllDirectories);
                 if (rgFilesg.Length > 0)
                 {
-                    foreach (FileInfo fi in rgFilesg)
+                    foreach (var fi in rgFilesg)
                     {
                         GetNPCs(fi.FullName);
                     }
@@ -758,7 +722,7 @@ namespace Peter
                 rgFilesg = dig.GetFiles("*.d", SearchOption.AllDirectories);
                 if (rgFilesg.Length > 0)
                 {
-                    foreach (FileInfo fi in rgFilesg)
+                    foreach (var fi in rgFilesg)
                     {
                         GetDias(fi.FullName);
                     }
@@ -771,7 +735,7 @@ namespace Peter
                 rgFilesg = dig.GetFiles("*.d", SearchOption.AllDirectories);
                 if (rgFilesg.Length > 0)
                 {
-                    foreach (FileInfo fi in rgFilesg)
+                    foreach (var fi in rgFilesg)
                     {
                         GetFuncs(fi.FullName);
                     }
@@ -815,14 +779,16 @@ namespace Peter
 
         private void UpdateConstTree()
         {
-            List<Instance> t = new List<Instance>();
+            var t = new List<Instance>();
             t.AddRange(ConstList.Values);
             t.Sort();
             this.ConstTree.Nodes.Clear();
-            foreach (Instance sl in t)
+            foreach (var sl in t)
             {
-                TreeNode node = new TreeNode(sl.ToString());
-                node.ImageIndex = CONSTIMG;
+                var node = new TreeNode(sl.ToString())
+                {
+                    ImageIndex = CONSTIMG
+                };
                 node.SelectedImageIndex = node.ImageIndex;
                 node.Tag = sl.File;
                 this.ConstTree.Nodes.Add(node);
@@ -831,14 +797,16 @@ namespace Peter
         }
         private void UpdateVarTree()
         {
-            List<Instance> t = new List<Instance>();
+            var t = new List<Instance>();
             t.AddRange(VarList.Values);
             t.Sort();
             this.VarTree.Nodes.Clear();
-            foreach (Instance sl in t)
+            foreach (var sl in t)
             {
-                TreeNode node = new TreeNode(sl.ToString());
-                node.ImageIndex = VARIMG;
+                var node = new TreeNode(sl.ToString())
+                {
+                    ImageIndex = VARIMG
+                };
                 node.SelectedImageIndex = node.ImageIndex;
                 node.Tag = sl.File;
                 this.VarTree.Nodes.Add(node);
@@ -847,14 +815,16 @@ namespace Peter
         }
         private void UpdateFuncTree()
         {
-            List<Instance> t = new List<Instance>();
+            var t = new List<Instance>();
             t.AddRange(FuncList.Values);
             t.Sort();
             this.FuncTree.Nodes.Clear();
-            foreach (Instance sl in t)
+            foreach (var sl in t)
             {
-                TreeNode node = new TreeNode(sl.ToString());
-                node.ImageIndex = FUNCIMG;
+                var node = new TreeNode(sl.ToString())
+                {
+                    ImageIndex = FUNCIMG
+                };
                 node.SelectedImageIndex = node.ImageIndex;
                 node.Tag = sl.File;
                 this.FuncTree.Nodes.Add(node);
@@ -863,14 +833,16 @@ namespace Peter
         }
         private void UpdateItemTree()
         {
-            List<Instance> t = new List<Instance>();
+            var t = new List<Instance>();
             t.AddRange(ItemList.Values);
             t.Sort();
             this.ItemTree.Nodes.Clear();
-            foreach (Instance sl in t)
+            foreach (var sl in t)
             {
-                TreeNode node = new TreeNode(sl.ToString());
-                node.ImageIndex = ITEMIMG;
+                var node = new TreeNode(sl.ToString())
+                {
+                    ImageIndex = ITEMIMG
+                };
                 node.SelectedImageIndex = node.ImageIndex;
                 node.Tag = sl.File;
                 this.ItemTree.Nodes.Add(node);
@@ -879,14 +851,16 @@ namespace Peter
         }
         private void UpdateNPCTree()
         {
-            List<Instance> t = new List<Instance>();
+            var t = new List<Instance>();
             t.AddRange(NPCList.Values);
             t.Sort();
             this.NPCTree.Nodes.Clear();
-            foreach (Instance sl in t)
+            foreach (var sl in t)
             {
-                TreeNode node = new TreeNode(sl.ToString());
-                node.ImageIndex = NPCIMG;
+                var node = new TreeNode(sl.ToString())
+                {
+                    ImageIndex = NPCIMG
+                };
                 node.SelectedImageIndex = node.ImageIndex;
                 node.Tag = sl.File;
                 this.NPCTree.Nodes.Add(node);
@@ -895,14 +869,16 @@ namespace Peter
         }
         private void UpdateDialogTree()
         {
-            List<Instance> t = new List<Instance>();
+            var t = new List<Instance>();
             t.AddRange(DialogList.Values);
             t.Sort();
             this.DialogTree.Nodes.Clear();
-            foreach (Instance sl in t)
+            foreach (var sl in t)
             {
-                TreeNode node = new TreeNode(sl.ToString());
-                node.ImageIndex = DIALOGIMG;
+                var node = new TreeNode(sl.ToString())
+                {
+                    ImageIndex = DIALOGIMG
+                };
                 node.SelectedImageIndex = node.ImageIndex;
                 node.Tag = sl.File;
                 this.DialogTree.Nodes.Add(node);
@@ -914,20 +890,20 @@ namespace Peter
         {
             ClearArrays();
 
-            if (File.Exists(this.ScriptsPath + FilePaths.DIALOGE) 
-                && File.Exists(this.ScriptsPath + FilePaths.ITEMS) 
-                && File.Exists(this.ScriptsPath + FilePaths.NPCS) 
-                && File.Exists(this.ScriptsPath + FilePaths.FUNC) 
-                && File.Exists(this.ScriptsPath + FilePaths.VARS) 
+            if (File.Exists(this.ScriptsPath + FilePaths.DIALOGE)
+                && File.Exists(this.ScriptsPath + FilePaths.ITEMS)
+                && File.Exists(this.ScriptsPath + FilePaths.NPCS)
+                && File.Exists(this.ScriptsPath + FilePaths.FUNC)
+                && File.Exists(this.ScriptsPath + FilePaths.VARS)
                 && File.Exists(this.ScriptsPath + FilePaths.CONSTS))
             {
                 try
                 {
                     this.MainF.Trace("Gothic-Bezeichner werden ausgelesen.");
-                    string line = "";
-                    string line2 = "";
+                    var line = "";
+                    var line2 = "";
 
-                    StreamReader sr = new StreamReader(this.ScriptsPath + FilePaths.DIALOGE, Encoding.Default);
+                    var sr = new StreamReader(this.ScriptsPath + FilePaths.DIALOGE, Encoding.Default);
                     while ((line = sr.ReadLine()) != null)
                     {
                         line2 = sr.ReadLine();
@@ -988,7 +964,6 @@ namespace Peter
                 {
                     GetInstancesToFile(true, true, true, true);
                 }
-                readfromfile = true;
             }
             else
             {
@@ -998,10 +973,10 @@ namespace Peter
         }
         public string RemoveDoubleSpaces(string s)
         {
-            string[] ts = s.Split(' ');
-            StringBuilder sb = new StringBuilder(s.Length);
+            var ts = s.Split(' ');
+            var sb = new StringBuilder(s.Length);
 
-            foreach (string st in ts)
+            foreach (var st in ts)
             {
                 s = st.Trim();
                 if (s.Length > 0)
@@ -1020,11 +995,11 @@ namespace Peter
                     this.MainF.m_AutoComplete.KW.Clear();
                     string s1, s2 = "";
 
-                    foreach (Instance i in VarList.Values)
+                    foreach (var i in VarList.Values)
                     {
                         s1 = i.Name;
                         ConvertVarForAutoComplete(ref s1, ref s2);
-                        Classes.KeyWord k = new Classes.KeyWord(s1, 4, s2, "Variable");
+                        var k = new Classes.KeyWord(s1, 4, s2, "Variable");
 
                         if (this.MainF.m_AutoComplete.KW.BinarySearch(k) >= 0)
                         {
@@ -1033,43 +1008,43 @@ namespace Peter
                         this.MainF.m_AutoComplete.KW.Add(k);
                     }
 
-                    foreach (Instance i in FuncList.Values)
+                    foreach (var i in FuncList.Values)
                     {
                         s1 = i.Name;
                         ConvertFuncForAutoComplete(ref s1, ref s2);
 
-                        Classes.KeyWord k = new Classes.KeyWord(s1, 3, s2, " ");
+                        var k = new Classes.KeyWord(s1, 3, s2, " ");
 
                         this.MainF.m_AutoComplete.KW.Add(k);
                     }
 
-                    foreach (Instance i in ConstList.Values)
+                    foreach (var i in ConstList.Values)
                     {
                         s1 = i.Name;
                         ConvertConstForAutoComplete(ref s1, ref s2);
 
-                        Classes.KeyWord k = new Classes.KeyWord(s1, 5, s2, "Konstante");
+                        var k = new Classes.KeyWord(s1, 5, s2, "Konstante");
                         if (this.MainF.m_AutoComplete.KW.BinarySearch(k) >= 0)
                         {
                             continue;
                         }
                         this.MainF.m_AutoComplete.KW.Add(k);
                     }
-                    foreach (Instance i in DialogList.Values)
+                    foreach (var i in DialogList.Values)
                     {
-                        Classes.KeyWord k = new Classes.KeyWord(i.Name, 0, "Dialog", " ");
+                        var k = new Classes.KeyWord(i.Name, 0, "Dialog", " ");
                         this.MainF.m_AutoComplete.KW.Add(k);
                     }
 
-                    foreach (Instance i in ItemList.Values)
+                    foreach (var i in ItemList.Values)
                     {
-                        Classes.KeyWord k = new Classes.KeyWord(i.Name, 2, "Item", " ");
+                        var k = new Classes.KeyWord(i.Name, 2, "Item", " ");
                         this.MainF.m_AutoComplete.KW.Add(k);
                     }
 
-                    foreach (Instance i in NPCList.Values)
+                    foreach (var i in NPCList.Values)
                     {
-                        Classes.KeyWord k = new Classes.KeyWord(i.Name, 1, "NPC", " ");
+                        var k = new Classes.KeyWord(i.Name, 1, "NPC", " ");
                         this.MainF.m_AutoComplete.KW.Add(k);
                     }
 
@@ -1082,7 +1057,7 @@ namespace Peter
         private string RemoveType(ref string ts, ref string t)
         {
 
-            int y = ts.IndexOf(" ");
+            var y = ts.IndexOf(" ");
             if (y > 0)
             {
                 t = ts.Substring(0, y);
@@ -1144,14 +1119,15 @@ namespace Peter
             }
         }
 
-        ArrayList TreeMatches = new ArrayList();
+        private readonly ArrayList TreeMatches = new ArrayList();
         private int currentMatch = 0;
         private void TxtSuchString_TextChanged(object sender, EventArgs e)
         {
             FindInTree(false);
 
         }
-        Regex rg;
+
+        private Regex rg;
         private void FindInTreeSub(TreeNode i, string Temp, bool mode)
         {
             int lokIndex;
@@ -1161,7 +1137,7 @@ namespace Peter
                 {
                     if (i.Text.ToLower().Contains(Temp))
                     {
-                        TreeNode tempnode = i.Parent;
+                        var tempnode = i.Parent;
                         lokIndex = i.Index;
                         while (tempnode.PrevNode != null)
                         {
@@ -1177,7 +1153,7 @@ namespace Peter
                 {
                     if (rg.IsMatch(i.Text.ToLower()))
                     {
-                        TreeNode tempnode = i.Parent;
+                        var tempnode = i.Parent;
                         lokIndex = i.Index;
                         while (tempnode.PrevNode != null)
                         {
@@ -1207,7 +1183,7 @@ namespace Peter
                 LbFound.Text = "0";
                 return;
             }
-            string Temp = TxtSuchString.Text.ToLower();
+            var Temp = TxtSuchString.Text.ToLower();
             try
             {
                 rg = new Regex(Temp);
@@ -1289,8 +1265,8 @@ namespace Peter
             {
                 if (treeMain.SelectedNode != null)
                 {
-                    int globIndex = treeMain.SelectedNode.Index;
-                    TreeNode tempnode = treeMain.SelectedNode.Parent;
+                    var globIndex = treeMain.SelectedNode.Index;
+                    var tempnode = treeMain.SelectedNode.Parent;
 
                     while (tempnode.PrevNode != null)
                     {
@@ -1308,7 +1284,7 @@ namespace Peter
                     {
                         z = currentMatch;
                     }
-                    for (int i = z; i > -1; i--)
+                    for (var i = z; i > -1; i--)
                     {
                         if (globIndex > Convert.ToInt32(((TreeNode)TreeMatches[i]).StateImageKey))
                         {
@@ -1322,7 +1298,7 @@ namespace Peter
                     }
 
                 }
-                TxtFoundIndex.Text = ((int)(currentMatch + 1)).ToString();
+                TxtFoundIndex.Text = (currentMatch + 1).ToString();
                 treeMain.SelectedNode = (TreeNode)TreeMatches[currentMatch];
                 treeMain.Focus();
 
@@ -1335,8 +1311,8 @@ namespace Peter
             {
                 if (treeMain.SelectedNode != null)
                 {
-                    int globIndex = treeMain.SelectedNode.Index;
-                    TreeNode tempnode = treeMain.SelectedNode.Parent;
+                    var globIndex = treeMain.SelectedNode.Index;
+                    var tempnode = treeMain.SelectedNode.Parent;
 
                     while (tempnode.PrevNode != null)
                     {
@@ -1355,7 +1331,7 @@ namespace Peter
                     {
                         z = currentMatch;
                     }
-                    for (int i = z; i < TreeMatches.Count; i++)
+                    for (var i = z; i < TreeMatches.Count; i++)
                     {
 
                         if (globIndex < Convert.ToInt32(((TreeNode)TreeMatches[i]).StateImageKey))
@@ -1370,13 +1346,14 @@ namespace Peter
                     }
 
                 }
-                TxtFoundIndex.Text = ((int)(currentMatch + 1)).ToString();
+                TxtFoundIndex.Text = (currentMatch + 1).ToString();
                 treeMain.SelectedNode = (TreeNode)TreeMatches[currentMatch];
                 treeMain.Focus();
 
             }
         }
-        Regex DigitOnly = new Regex(@"\d{1}");
+
+        private Regex DigitOnly = new Regex(@"\d{1}");
 
         private void TxtFoundIndex_KeyDown(object sender, KeyEventArgs e)
         {
@@ -1389,7 +1366,7 @@ namespace Peter
                     {
                         return;
                     }
-                    int FoundIndex = Convert.ToInt32(TxtFoundIndex.Text);
+                    var FoundIndex = Convert.ToInt32(TxtFoundIndex.Text);
                     if (FoundIndex < 1)
                     {
                         FoundIndex = 1;
@@ -1420,8 +1397,8 @@ namespace Peter
             {
                 if (e.Node != null)
                 {
-                    string Temp = "";
-                    string s2 = "";
+                    var Temp = "";
+                    var s2 = "";
                     Temp = e.Node.Text;
                     if (e.Node.Parent == FuncTree)
                     {
@@ -1514,13 +1491,13 @@ namespace Peter
         }
         int IComparable.CompareTo(object obj)
         {
-            Instance p = obj as Instance;
+            var p = obj as Instance;
             return CompareTo(p);
         }
 
         public int CompareTo(Instance other)
         {
-            return String.Compare(this.ToString(), other.ToString(), true);
+            return string.Compare(this.ToString(), other.ToString(), true);
         }
     }
 }

@@ -27,8 +27,8 @@ namespace Peter.Forms
 {
     public partial class FChoices : Form
     {
-        DialogCreator MainF;
-        bool EditMode;
+        readonly DialogCreator MainF;
+        readonly bool EditMode;
         string cont="";
         public FChoices(DialogCreator d, bool m)
         {

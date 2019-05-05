@@ -27,7 +27,7 @@ namespace Peter.Forms
 {
     public partial class FXP : Form
     {
-        FQuest MainF;
+        readonly FQuest MainF;
         public FXP(FQuest f)
         {
             MainF = f;

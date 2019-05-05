@@ -22,7 +22,7 @@ namespace Peter.OutlookGrid
     /// </summary>
     internal class DataSourceRowComparer : IComparer
     {
-        private IComparer baseComparer;
+        private readonly IComparer baseComparer;
         public DataSourceRowComparer(IComparer baseComparer)
         {
             this.baseComparer = baseComparer;

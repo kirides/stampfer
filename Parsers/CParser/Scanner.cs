@@ -34,7 +34,7 @@ namespace Peter.CParser
         private int fileLen;        // length of input stream (may change if the stream is no file)
         private int bufPos;         // current position in buffer
         private Stream stream;      // input stream (seekable)
-        private bool isUserStream;  // was the stream opened by the user?
+        private readonly bool isUserStream;  // was the stream opened by the user?
 
         public Buffer(Stream s, bool isUserStream)
         {

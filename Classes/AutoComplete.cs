@@ -37,7 +37,7 @@ namespace Peter.Classes
         const string FUNCDIR = "DialogCreator\\Funcs.txt";
         public List<KeyWord> KW = new List<KeyWord>();
         public List<KeyWord> MyItems = new List<KeyWord>();
-        ToolTip TT;
+        readonly ToolTip TT;
         public ListView2 listView1;
         const int ItemHeight = 16;
         public int LastItemIndex;
@@ -47,11 +47,11 @@ namespace Peter.Classes
         public Hashtable ShortFuncList = new Hashtable();
         public List<KeyWord> ShortFuncs = new List<KeyWord>();
         public List<KeyWord> Properties = new List<KeyWord>();
-        Hashtable DokuTable = new Hashtable();
+        readonly Hashtable DokuTable = new Hashtable();
        // private System.ComponentModel.IContainer components;
         public string Extension = ".d";
-        ImageList ImgList;
-        ToolStripStatusLabel Trace;
+        readonly ImageList ImgList;
+        readonly ToolStripStatusLabel Trace;
         public string ScriptsPath;
 
        

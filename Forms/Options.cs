@@ -32,7 +32,7 @@ namespace Peter
     public partial class Options : Form
     {
         public ArrayList m_OptionPanels;
-        private MainForm m_MainForm;
+        private readonly MainForm m_MainForm;
         private bool m_EditorChanged;
         bool newscriptspath=false;
         public Options(MainForm main)

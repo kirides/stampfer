@@ -27,8 +27,8 @@ namespace Peter.Forms
 {
     public partial class FBeklauen : Form
     {
-        DialogCreator MainF;
-        bool NPCismale = true;
+        readonly DialogCreator MainF;
+        readonly bool NPCismale = true;
         public FBeklauen(DialogCreator d)
         {
             MainF = d;

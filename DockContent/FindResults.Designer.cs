@@ -60,7 +60,6 @@ namespace Peter
             this.Tree.SelectedImageIndex = 0;
             this.Tree.Size = new System.Drawing.Size(292, 273);
             this.Tree.TabIndex = 0;
-            this.Tree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeMain_AfterSelect);
             // 
             // imgMain
             // 

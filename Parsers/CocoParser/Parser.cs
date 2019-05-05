@@ -767,7 +767,7 @@ namespace Peter.CocoParser
             Console.WriteLine(s);
         }
 
-        private static bool[,] set = {
+        private static readonly bool[,] set = {
     {T,T,x,T, x,T,x,T, T,x,x,T, T,T,T,x, x,x,T,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,T, x,x,x,x, x},
     {x,T,T,T, T,T,T,x, T,T,T,x, x,x,x,T, T,T,x,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, x},
     {x,x,x,x, x,x,x,x, x,x,x,T, T,T,T,x, x,x,T,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x},

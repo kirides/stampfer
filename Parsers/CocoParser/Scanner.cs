@@ -62,7 +62,7 @@ namespace Peter.CocoParser
         private const char CR = '\r';
         private const char LF = '\n';
         private const int noSym = 39;
-        private static short[] start = {
+        private static readonly short[] start = {
      30,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
       0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
       0,  0, 11,  0, 10,  0,  0,  5, 21, 22,  0, 15,  0, 16, 14,  0,

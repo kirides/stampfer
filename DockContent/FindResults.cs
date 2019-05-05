@@ -15,15 +15,11 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **************************************************************************************/
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
-using WeifenLuo.WinFormsUI.Docking;
 using PeterInterface;
+using WeifenLuo.WinFormsUI.Docking;
 
 namespace Peter
 {
@@ -31,9 +27,9 @@ namespace Peter
     {
         public FindResults()
         {
-            InitializeComponent(); 
-            System.Resources.ResourceManager mngr = new System.Resources.ResourceManager("Peter.InternalImages", this.GetType().Assembly);
-            this.Images.Images.Add("Next", (Image)mngr.GetObject("Next"));
+            InitializeComponent();
+            var mngr = new System.Resources.ResourceManager("Peter.InternalImages", this.GetType().Assembly);
+            this.Images?.Images?.Add("Next", (Image)mngr.GetObject("Next"));
             this.TabText = "Suchergebnisse";
         }
 
@@ -204,10 +200,5 @@ namespace Peter
         }
 
         #endregion
-
-        private void treeMain_AfterSelect(object sender, TreeViewEventArgs e)
-        {
-
-        }
     }
 }

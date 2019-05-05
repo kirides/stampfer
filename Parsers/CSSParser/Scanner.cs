@@ -22,13 +22,13 @@ namespace Peter.CSSParser
     {
         public const int EOF = char.MaxValue + 1;
         const int MAX_BUFFER_LENGTH = 64 * 1024; // 64KB
-        byte[] buf;         // input buffer
+        readonly byte[] buf;         // input buffer
         int bufStart;       // position of first byte in buffer relative to input stream
         int bufLen;         // length of buffer
-        int fileLen;        // length of input stream
+        readonly int fileLen;        // length of input stream
         int pos;            // current position in buffer
         Stream stream;      // input stream (seekable)
-        bool isUserStream;  // was the stream opened by the user?
+        readonly bool isUserStream;  // was the stream opened by the user?
 
         public Buffer(Stream s, bool isUserStream)
         {

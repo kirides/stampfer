@@ -34,7 +34,7 @@ namespace Peter
 
         #region -  Designer  -
 
-        private System.ComponentModel.Container components = null;
+        private readonly System.ComponentModel.Container components = null;
 
         /// <summary>
         /// Initialize the component with it's
@@ -131,8 +131,8 @@ namespace Peter
 
         private bool calledbykey = false;
         private State mButtonState = State.None;
-        private Timer mFadeIn = new Timer();
-        private Timer mFadeOut = new Timer();
+        private readonly Timer mFadeIn = new Timer();
+        private readonly Timer mFadeOut = new Timer();
         private int mGlowAlpha = 0;
 
         #endregion

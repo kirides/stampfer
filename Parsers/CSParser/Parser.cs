@@ -151,8 +151,7 @@ namespace Peter.CSParser
         public Token t;    // last recognized token
         public Token la;   // lookahead token
         int errDist = minErrDist;
-
-        ArrayList ccs = new ArrayList();
+        readonly ArrayList ccs = new ArrayList();
         public ArrayList exts = new ArrayList();
 
         public CSCodeInfo CodeInfo { get; } = new CSCodeInfo();
@@ -288,7 +287,7 @@ namespace Peter.CSParser
             return a;
         }
 
-        static BitArray
+        static readonly BitArray
           unaryOp = NewSet(_plus, _minus, _not, _tilde, _inc, _dec, _true, _false),
           typeKW = NewSet(_char, _bool, _object, _string, _sbyte, _byte, _short,
                          _ushort, _int, _uint, _long, _ulong, _float, _double, _decimal),
@@ -665,7 +664,7 @@ namespace Peter.CSParser
         class Modifiers
         {
             private Modifier cur = Modifier.none;
-            private Parser parser;
+            private readonly Parser parser;
 
             public Modifiers(Parser parser)
             {
@@ -4046,7 +4045,7 @@ namespace Peter.CSParser
             Expect(0);
         }
 
-        bool[,] set = {
+        readonly bool[,] set = {
 		{T,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x},
 		{x,x,x,x, x,x,T,x, x,x,x,x, x,x,x,x, T,x,x,x, x,T,x,x, x,T,x,x, T,x,x,x, x,x,x,x, x,x,x,x, T,T,x,x, x,T,T,x, x,x,x,T, x,T,T,T, T,x,x,x, T,x,x,x, T,x,T,x, x,x,x,x, x,x,x,x, T,x,x,T, x,T,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,T,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,T, x,x,x,x, x,x,x,x, x,x,x,x},
 		{x,x,x,x, x,x,T,x, x,x,x,x, x,x,x,x, T,x,x,x, x,T,x,x, x,T,x,x, T,x,x,x, x,x,x,x, x,x,x,x, T,T,x,x, x,x,T,x, x,x,x,T, x,T,T,T, T,x,x,x, T,x,x,x, T,x,T,x, x,x,x,x, x,x,x,x, T,x,x,T, x,T,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,T,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,T, x,x,x,x, x,x,x,x, x,x,x,x},

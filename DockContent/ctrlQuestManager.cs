@@ -34,15 +34,15 @@ namespace Peter
 {
     public partial class ctrlQuestManager : DockContent, IPeterPluginTab
     {
-        MainForm MainF;
+        readonly MainForm MainF;
 
         //  private TextEditorControl m_Editor;
 
         public string TEXT = "";
         public ArrayList Quests = new ArrayList();
-        Hashtable hs = new Hashtable();
-        ToolTip tt = new ToolTip();
-        Regex ToolTipRegex = new Regex("\n");
+        readonly Hashtable hs = new Hashtable();
+        readonly ToolTip tt = new ToolTip();
+        readonly Regex ToolTipRegex = new Regex("\n");
         public ctrlQuestManager(MainForm f)
         {
            

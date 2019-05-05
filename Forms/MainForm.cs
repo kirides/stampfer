@@ -64,7 +64,7 @@ namespace Peter
         public ctrlGothicInstances m_GothicStructure;
         private ctrlQuestManager m_QuestManager;
         public bool TabCloseBlock = false;
-        private SplashScreen ss = new SplashScreen(false);
+        private readonly SplashScreen ss = new SplashScreen(false);
         public Editor MyActiveEditor;
         public bool initialized = false;
         public string autocompletemenuauto = "Auto-Ergänzung > auto";

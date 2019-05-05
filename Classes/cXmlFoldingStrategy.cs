@@ -115,8 +115,8 @@ namespace Peter
 
         private struct FoldStartMarker
         {
-            private string _name;
-            private string _prefix;
+            private readonly string _name;
+            private readonly string _prefix;
 
             public int Column { get; }
             public int LineNumber { get; }

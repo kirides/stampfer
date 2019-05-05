@@ -601,8 +601,8 @@ namespace Peter
         private const int S_OK = 0;
         private const int S_FALSE = 1;
 
-        private static int cbMenuItemInfo = Marshal.SizeOf(typeof(MENUITEMINFO));
-        private static int cbInvokeCommand = Marshal.SizeOf(typeof(CMINVOKECOMMANDINFOEX));
+        private static readonly int cbMenuItemInfo = Marshal.SizeOf(typeof(MENUITEMINFO));
+        private static readonly int cbInvokeCommand = Marshal.SizeOf(typeof(CMINVOKECOMMANDINFOEX));
 
         #endregion
 

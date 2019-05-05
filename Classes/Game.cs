@@ -28,25 +28,24 @@ namespace Peter
 {
     public partial class Game : Form
     {
-        Timer t = new Timer();
-
-        List<Point> pixelup = new List<Point>();
-        List<Point> pixeldown = new List<Point>();
+        readonly Timer t = new Timer();
+        readonly List<Point> pixelup = new List<Point>();
+        readonly List<Point> pixeldown = new List<Point>();
         int ship = 0;
         int speed = 5;
         const int MOVESPEED = 4;
         int pos = 0;
         int size = 5;
-        Random r = new Random();
+        readonly Random r = new Random();
         bool up = false;
         int score = 0;
         int multi = 1;
         int scorecounter = 0;
         const int PWSIZE = 6;
         const int SCOREPOWERUP = 100;
-        List<Point> powerups = new List<Point>();
-        List<Point> badup = new List<Point>();
-        Stopwatch stopwatch = new Stopwatch();
+        readonly List<Point> powerups = new List<Point>();
+        readonly List<Point> badup = new List<Point>();
+        readonly Stopwatch stopwatch = new Stopwatch();
         public int Score
         {
             set
@@ -358,7 +357,7 @@ namespace Peter
         /// <summary>
         /// Erforderliche Designervariable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private readonly System.ComponentModel.IContainer components = null;
 
         /// <summary>
         /// Verwendete Ressourcen bereinigen.

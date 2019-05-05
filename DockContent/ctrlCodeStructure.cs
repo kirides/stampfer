@@ -32,7 +32,7 @@ namespace Peter
 {
     public partial class ctrlCodeStructure : DockContent, IPeterPluginTab
     {
-        MainForm MainF;
+        readonly MainForm MainF;
 
         //  private TextEditorControl m_Editor;
         private Editor m_Editor;

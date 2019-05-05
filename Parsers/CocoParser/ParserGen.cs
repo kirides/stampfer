@@ -24,7 +24,7 @@ namespace Peter.CocoParser
         private static StreamWriter gen; // generated parser source file
         private static TextWriter trace; // trace output stream
         private static StringWriter err; // generated parser error messages
-        private static ArrayList symSet = new ArrayList();
+        private static readonly ArrayList symSet = new ArrayList();
 
         private static void Indent(int n)
         {

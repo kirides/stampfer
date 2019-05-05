@@ -11,8 +11,7 @@ namespace Peter.VBParser
         string identStr = "";
 
         public TextWriter output;
-
-        StringCollection linePush = new StringCollection();
+        readonly StringCollection linePush = new StringCollection();
 
         public void Ident()
         {

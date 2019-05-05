@@ -28,9 +28,9 @@ namespace Peter.Forms
 {
     public partial class FOrdner : Form
     {
-        TreeNode t;
-        ContextMenuStrip cms;
-        bool editmode;
+        readonly TreeNode t;
+        readonly ContextMenuStrip cms;
+        readonly bool editmode;
         public FOrdner(TreeNode tn, ContextMenuStrip maincms, bool ed)
         {
             editmode = ed;

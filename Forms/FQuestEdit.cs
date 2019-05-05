@@ -30,9 +30,9 @@ namespace Peter.Forms
 {
     public partial class FQuestEdit : Form
     {
-        TreeNode t;
-        Quest quest;
-        ArrayList Quests;
+        readonly TreeNode t;
+        readonly Quest quest;
+        readonly ArrayList Quests;
         
         public FQuestEdit(TreeNode tn,ArrayList quests)
         {

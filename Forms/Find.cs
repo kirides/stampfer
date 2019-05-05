@@ -37,10 +37,10 @@ namespace Peter
         private const string OPEN_DOC = "In allen offenen Dateien";
         private const string BROWSE = "Durchsuchen...";
         private const string GOTHIC = "Im Gothic-Script-Verzeichnis...";
-        private ArrayList m_FindLocations;
-        private AddTreeNodeDelegate m_AddTreeNode;
-        private TraceDelegate m_Trace;
-        private MainForm m_MainForm;
+        private readonly ArrayList m_FindLocations;
+        private readonly AddTreeNodeDelegate m_AddTreeNode;
+        private readonly TraceDelegate m_Trace;
+        private readonly MainForm m_MainForm;
         private Thread m_thrdFind;
         private Thread m_thrdReplace;
 
