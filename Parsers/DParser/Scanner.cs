@@ -74,7 +74,11 @@ namespace Peter.DParser
 
         protected void Close()
         {
-            Dispose();
+            if (!isUserStream && stream != null)
+            {
+                stream.Close();
+                stream = null;
+            }
         }
 
         public virtual int Read()
@@ -185,7 +189,7 @@ namespace Peter.DParser
         {
             if (!isUserStream)
             {
-                ((IDisposable)this.stream).Dispose();
+                ((IDisposable)this.stream)?.Dispose();
             }
         }
     }
@@ -241,7 +245,7 @@ namespace Peter.DParser
     //-----------------------------------------------------------------------------------
     // Scanner
     //-----------------------------------------------------------------------------------
-    public class Scanner
+    public class Scanner : IDisposable
     {
         private const char EOL = '\n';
         private const int eofSym = 0; /* pdt */
@@ -258,7 +262,6 @@ namespace Peter.DParser
         private int line;         // line number of current character
         private int oldEols;      // EOLs that appeared in a comment;
         private static readonly Hashtable start; // maps first token character to start state
-        public Stream stream;
         private Token tokens;     // list of tokens already peeked (first token is a dummy)
         private Token pt;         // current peek token
 
@@ -309,8 +312,7 @@ namespace Peter.DParser
         {
             try
             {
-                stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-                buffer = new Buffer(stream, false);
+                buffer = new Buffer(new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read), false);
                 Init();
             }
             catch (IOException)
@@ -663,6 +665,10 @@ namespace Peter.DParser
         // make sure that peeking starts at the current scan position
         public void ResetPeek() { pt = tokens; }
 
+        public void Dispose()
+        {
+            ((IDisposable)this.buffer)?.Dispose();
+        }
     } // end Scanner
 
 }

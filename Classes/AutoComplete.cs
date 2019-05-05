@@ -498,18 +498,18 @@ namespace Peter.Classes
                 string line;
                 var mode = 0;
                 var i = 0;
+                var isloop = false;
+                var startloop = -1;
+                var endloop = -1;
+
+                var name = "";
                 using (var sr = new StreamReader(FUNCDIR, Encoding.Default))
                 {
                     while ((line = sr.ReadLine()) != null)
                     {
-                        var isloop = false;
-                        var startloop = -1;
-                        var endloop = -1;
-
-                        var name = "";
                         var parameterListe = new List<Parameter>();
 
-                        while (0 < line.Length)
+                        while (i < line.Length)
                         {
                             if (mode == 0)
                             {
@@ -538,7 +538,7 @@ namespace Peter.Classes
                         if (isloop)
                         {
                             i = 0;
-                            while (0 < line.Length)
+                            while (i < line.Length)
                             {
                                 if (line[0] == '|')
                                 {
@@ -560,7 +560,7 @@ namespace Peter.Classes
                             }
                         }
                         i = 0;
-                        while (0 < line.Length)
+                        while (i < line.Length)
                         {
 
                             if (line[0] == '#')

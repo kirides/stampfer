@@ -11,15 +11,19 @@ namespace Peter.DParser
     {
         public static void ParseToTree(MainForm MainF, bool errormeld, string fileName, ref List<Instance> lInstances, ref List<Instance> lFuncs, ref List<Instance> lVars, ref List<Instance> lConsts)
         {
-            Peter.DParser.Scanner scanner = new Peter.DParser.Scanner(fileName);
-            Peter.DParser.Parser parser = new Peter.DParser.Parser(scanner);
-            TextWriter errorString = new StringWriter(); 
-            parser.errors.errorStream = errorString;
-            parser.Parse();
-            scanner.buffer = null;
-            scanner.stream.Close();
-            scanner.stream.Dispose();
-            string ErrorAusgabe = errorString.ToString();
+            string ErrorAusgabe = "";
+            Peter.DParser.Parser parser;
+            //using (var fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
+            //using (var scanner = new Scanner(fs))
+            using (var scanner = new Scanner(fileName))
+            {
+                parser = new Parser(scanner);
+                TextWriter errorString = new StringWriter();
+                parser.errors.errorStream = errorString;
+                parser.Parse();
+                scanner.buffer = null;
+                ErrorAusgabe = errorString.ToString();
+            }
 
             if (ErrorAusgabe.Length > 0)
             {
