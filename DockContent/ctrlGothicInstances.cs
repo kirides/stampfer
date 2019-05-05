@@ -23,6 +23,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using PeterInterface;
 using WeifenLuo.WinFormsUI.Docking;
@@ -72,7 +73,6 @@ namespace Peter
             {
                 this.treeMain.BeginUpdate();
                 ReadInstancesFromFile();
-
                 this.treeMain.EndUpdate();
             }
 
@@ -427,99 +427,58 @@ namespace Peter
             ConstList.Clear();
         }
 
-        private readonly Regex r = new Regex(@"((^)|(\s))instance ", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-        private readonly Regex r2 = new Regex(@"((^)|(\s))func ", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-        private readonly Regex r3 = new Regex(@"((^)|(\s))var ", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-        private readonly Regex r4 = new Regex(@"((^)|(\s))const ", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly Regex rxInstance = new Regex(@"((^)|(\s))instance ", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly Regex rxFunc = new Regex(@"((^)|(\s))func ", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly Regex rxVar = new Regex(@"((^)|(\s))var ", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly Regex rxConst = new Regex(@"((^)|(\s))const ", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         private const int SB_LENGTH = 256;
-        public int GetItems(string path)
+
+        private int GetAndAddInstances(string path, Func<string, string, int> onMatch)
         {
             var s = File.ReadAllText(path, Encoding.Default);
-
-            var m = r.Matches(s);
-            StringBuilder sb1;
+            var m = rxInstance.Matches(s);
+            var sb1 = new StringBuilder(SB_LENGTH);
             var i = 0;
             var k = 0;
             foreach (Match match in m)
             {
-                sb1 = new StringBuilder(SB_LENGTH);
                 i = match.Index + match.Length;
                 while ((i < s.Length) && (s[i] != '(') && (s[i] != ' ') && (s[i] != '\t'))
                 {
                     sb1.Append(s[i]);
-
                     i++;
                 }
-                k |= AddItem(sb1.ToString(), path);
+                k |= onMatch(sb1.ToString(), path);
+                sb1.Clear();
             }
             return k;
         }
-        public int AddItem(string sb1, string path)
+        public int GetItems(string path) => GetAndAddInstances(path, AddItem);
+        public int AddItem(string value, string path)
         {
-            if (sb1.Length > 0
-                    && !ItemList.ContainsKey(sb1.ToString()))
+            if (value.Length > 0 && !ItemList.ContainsKey(value))
             {
-                ItemList.Add(sb1, new Instance(sb1.ToString(), path));
+                ItemList.Add(value, new Instance(value, path));
                 return 32;
             }
             return 0;
         }
-        public int GetNPCs(string path)
+        public int GetNPCs(string path) => GetAndAddInstances(path, AddNPC);
+        public int AddNPC(string value, string path)
         {
-            var s = File.ReadAllText(path, Encoding.Default);
-            var m = r.Matches(s);
-            StringBuilder sb1;
-            var i = 0;
-            var k = 0;
-            foreach (Match match in m)
+            if (value.Length > 0 && !NPCList.ContainsKey(value))
             {
-                sb1 = new StringBuilder(SB_LENGTH);
-                i = match.Index + match.Length;
-                while ((i < s.Length) && (s[i] != '(') && (s[i] != ' ') && (s[i] != '\t'))
-                {
-                    sb1.Append(s[i]);
-                    i++;
-                }
-                k |= AddNPC(sb1.ToString(), path);
-            }
-            return k;
-        }
-        public int AddNPC(string sb1, string path)
-        {
-            if (sb1.Length > 0
-                    && !NPCList.ContainsKey(sb1.ToString()))
-            {
-
-                NPCList.Add(sb1, new Instance(sb1.ToString(), path));
+                NPCList.Add(value, new Instance(value, path));
                 return 16;
             }
             return 0;
         }
-        public int GetDias(string path)
+        public int GetDias(string path) => GetAndAddInstances(path, AddDia);
+        public int AddDia(string value, string path)
         {
-            var s = File.ReadAllText(path, Encoding.Default);
-            var m = r.Matches(s);
-            StringBuilder sb1;
-            var i = 0;
-            var k = 0;
-            foreach (Match match in m)
+            if (value.Length > 0 && !DialogList.ContainsKey(value))
             {
-                sb1 = new StringBuilder(SB_LENGTH);
-                i = match.Index + match.Length;
-                while ((i < s.Length) && (s[i] != '(') && (s[i] != ' ') && (s[i] != '\t'))
-                {
-                    sb1.Append(s[i]);
-                    i++;
-                }
-                k |= AddDia(sb1.ToString(), path);
-            }
-            return k;
-        }
-        public int AddDia(string sb1, string path)
-        {
-            if (sb1.Length > 0 && !DialogList.ContainsKey(sb1.ToString()))
-            {
-                DialogList.Add(sb1, new Instance(sb1.ToString(), path));
+                DialogList.Add(value, new Instance(value, path));
                 return 8;
             }
             return 0;
@@ -528,17 +487,12 @@ namespace Peter
         {
             var externals = Path.GetFileName(path).ToLower() == "externals.d";
             var s = File.ReadAllText(path, Encoding.Default);
-            MatchCollection m;
-            StringBuilder sb1;
-            StringBuilder sb2;
             var k = 0;
-
-            m = r2.Matches(s);
             int i;
-            foreach (Match match in m)
+
+            var sb1 = new StringBuilder(SB_LENGTH * 2);
+            foreach (Match match in rxFunc.Matches(s))
             {
-                sb1 = new StringBuilder(SB_LENGTH * 2);
-                sb2 = new StringBuilder(SB_LENGTH * 2);
                 i = match.Index + match.Length;
                 while (s[i] != '{' && s[i] != '\n' && s[i] != '/')
                 {
@@ -561,14 +515,13 @@ namespace Peter
                     i++;
                 }
                 k |= AddFunc(sb1.ToString(), path);
+                sb1.Clear();
             }
 
             if (externals) return k;
 
-            m = r3.Matches(s);
-            foreach (Match match in m)
+            foreach (Match match in rxVar.Matches(s))
             {
-                sb1 = new StringBuilder(512);
                 i = match.Index + match.Length;
                 while (s[i] != '\n' && s[i] != ')')
                 {
@@ -578,12 +531,11 @@ namespace Peter
                     i++;
                 }
                 k |= AddVar(sb1.ToString(), path);
+                sb1.Clear();
             }
 
-            m = r4.Matches(s);
-            foreach (Match match in m)
+            foreach (Match match in rxConst.Matches(s))
             {
-                sb1 = new StringBuilder(512);
                 i = match.Index + match.Length;
                 while (s[i] != ';' && s[i] != '\n')
                 {
@@ -597,6 +549,7 @@ namespace Peter
                     i++;
                 }
                 k |= AddConst(sb1.ToString(), path);
+                sb1.Clear();
             }
             return k;
         }
@@ -684,89 +637,57 @@ namespace Peter
             }
             return 0;
         }
-        private void GetInstancesToFile(bool d, bool np, bool it, bool fu)
+        private void GetInstancesToFile(bool dialoge, bool npcs, bool items, bool functions)
         {
-            ClearTree(d, np, it, fu);
+            ClearTree(dialoge, npcs, items, functions);
 
             this.MainF.Trace("Gothic-Bezeichner werden aktualisert (kann einige Sekunden dauern).");
-            DirectoryInfo dig;// = new DirectoryInfo(Path.GetDirectoryName(this.ScriptsPath + @"\Content\Items\"));
-            FileInfo[] rgFilesg;// = dig.GetFiles("*.d", SearchOption.AllDirectories);
+            var handlers = new Dictionary<string, Func<string, int>>();
 
-            if (it)
-            {
-                dig = new DirectoryInfo(Path.GetDirectoryName(this.ScriptsPath + FilePaths.ContentItems));
-                rgFilesg = dig.GetFiles("*.d", SearchOption.AllDirectories);
-                if (rgFilesg.Length > 0)
-                {
-                    foreach (var fi in rgFilesg)
-                    {
-                        GetItems(fi.FullName);
-                    }
-                }
-            }
-            if (np)
-            {
-                dig = new DirectoryInfo(Path.GetDirectoryName(this.ScriptsPath + FilePaths.ContentNPC));
-                rgFilesg = dig.GetFiles("*.d", SearchOption.AllDirectories);
-                if (rgFilesg.Length > 0)
-                {
-                    foreach (var fi in rgFilesg)
-                    {
-                        GetNPCs(fi.FullName);
-                    }
-                }
-            }
-            if (d)
-            {
-                dig = new DirectoryInfo(Path.GetDirectoryName(this.ScriptsPath + FilePaths.ContentDialoge));
-                rgFilesg = dig.GetFiles("*.d", SearchOption.AllDirectories);
-                if (rgFilesg.Length > 0)
-                {
-                    foreach (var fi in rgFilesg)
-                    {
-                        GetDias(fi.FullName);
-                    }
-                }
-            }
+            if (items) handlers[FilePaths.ContentItems] = GetItems;
+            if (npcs) handlers[FilePaths.ContentNPC] = GetNPCs;
+            if (dialoge) handlers[FilePaths.ContentDialoge] = GetDias;
+            if (functions) handlers[FilePaths.ContentDir] = GetFuncs;
 
-            if (fu)
+            Task.Run(() =>
             {
-                dig = new DirectoryInfo(Path.GetDirectoryName(this.ScriptsPath + FilePaths.ContentDir));
-                rgFilesg = dig.GetFiles("*.d", SearchOption.AllDirectories);
-                if (rgFilesg.Length > 0)
+                foreach (var kvp in handlers)
                 {
-                    foreach (var fi in rgFilesg)
+                    var dir = Path.GetDirectoryName(this.ScriptsPath + kvp.Key);
+                    foreach (var file in Directory.GetFiles(dir, "*.d", SearchOption.AllDirectories))
                     {
-                        GetFuncs(fi.FullName);
+                        // execute handler
+                        kvp.Value(file);
                     }
                 }
-            }
-
-            this.MainF.Trace("Gothic-Bezeichner wurden erfolgreich aktualisert.");
-            SetAutoCompleteContent();
+                this.MainF.Trace("Gothic-Bezeichner wurden erfolgreich aktualisert.");
+            }).ContinueWith(t =>
+            {
+                SetAutoCompleteContent();
+            });
         }
 
-        private void ClearTree(bool d, bool np, bool it, bool fu)
+        private void ClearTree(bool dialoge, bool npcs, bool items, bool functions)
         {
-            if (d)
+            if (dialoge)
             {
                 DialogTree.Collapse();
                 DialogList.Clear();
             }
 
-            if (np)
+            if (npcs)
             {
                 NPCTree.Collapse();
                 NPCList.Clear();
             }
 
-            if (it)
+            if (items)
             {
                 ItemTree.Collapse();
                 ItemList.Clear();
             }
 
-            if (fu)
+            if (functions)
             {
                 FuncTree.Collapse();
                 VarTree.Collapse();

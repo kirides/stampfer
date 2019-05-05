@@ -45,7 +45,7 @@ namespace Peter
         private int m_RecentProjectCount;
         private int m_RecentFileCount;
         private bool m_SaveonExit;
-        public string m_ScriptsPath = @"E:\Spiele\Gothic II MDK\_work\Data\Scripts";
+        public string m_ScriptsPath;
         public string m_BilderPath;
         public bool m_ParserMessageBox;
         public string m_BackupFolder;
@@ -99,6 +99,10 @@ namespace Peter
             {
                 // Load Config File...
                 this.Config = LoadConfigFile(false);
+                if (!string.IsNullOrEmpty(Config.Editor.Scripts))
+                {
+                    m_ScriptsPath = Config.Editor.Scripts;
+                }
             }
 
             // Set Variabales...
@@ -1531,7 +1535,10 @@ namespace Peter
         /// <param name="text">Text to Write.</param>
         public void Trace(string text)
         {
-            this.sslMain.Text = text;
+            if (!InvokeRequired)
+                this.sslMain.Text = text;
+            else
+                this.Invoke((Action)(() => Trace(text)));
         }
 
         #endregion
@@ -3166,43 +3173,25 @@ namespace Peter
             initialized = false;
             if (m_GothicStructure != null)
             {
-                var newLine = Environment.NewLine;
-                var sw = new StreamWriter(this.m_ScriptsPath + FilePaths.ITEMS, false, Encoding.Default);
-                foreach (var sl in m_GothicStructure.ItemList.Values)
+                var handlers = new Dictionary<string, Dictionary<string, Instance>.ValueCollection>
                 {
-                    sw.WriteLine(sl.ToString() + newLine + sl.File);
-                }
-                sw.Dispose();
-                sw = new StreamWriter(this.m_ScriptsPath + FilePaths.NPCS, false, Encoding.Default);
-                foreach (var sl in m_GothicStructure.NPCList.Values)
+                    { FilePaths.ITEMS, m_GothicStructure.ItemList.Values },
+                    { FilePaths.NPCS, m_GothicStructure.NPCList.Values },
+                    { FilePaths.DIALOGE, m_GothicStructure.DialogList.Values },
+                    { FilePaths.FUNC, m_GothicStructure.FuncList.Values },
+                    { FilePaths.VARS, m_GothicStructure.VarList.Values },
+                    { FilePaths.CONSTS, m_GothicStructure.ConstList.Values },
+                };
+                foreach (var handler in handlers)
                 {
-                    sw.WriteLine(sl.ToString() + newLine + sl.File);
+                    using (var sw = new StreamWriter(this.m_ScriptsPath + handler.Key, false, Encoding.Default))
+                    {
+                        foreach (var instance in handler.Value)
+                        {
+                            sw.WriteLine(instance.ToString() + Environment.NewLine + instance.File);
+                        }
+                    }
                 }
-                sw.Dispose();
-                sw = new StreamWriter(this.m_ScriptsPath + FilePaths.DIALOGE, false, Encoding.Default);
-                foreach (var sl in m_GothicStructure.DialogList.Values)
-                {
-                    sw.WriteLine(sl.ToString() + newLine + sl.File);
-                }
-                sw.Dispose();
-                sw = new StreamWriter(this.m_ScriptsPath + FilePaths.FUNC, false, Encoding.Default);
-                foreach (var sl in m_GothicStructure.FuncList.Values)
-                {
-                    sw.WriteLine(sl.ToString() + newLine + sl.File);
-                }
-                sw.Dispose();
-                sw = new StreamWriter(this.m_ScriptsPath + FilePaths.VARS, false, Encoding.Default);
-                foreach (var sl in m_GothicStructure.VarList.Values)
-                {
-                    sw.WriteLine(sl.ToString() + newLine + sl.File);
-                }
-                sw.Dispose();
-                sw = new StreamWriter(this.m_ScriptsPath + FilePaths.CONSTS, false, Encoding.Default);
-                foreach (var sl in m_GothicStructure.ConstList.Values)
-                {
-                    sw.WriteLine(sl.ToString() + newLine + sl.File);
-                }
-                sw.Dispose();
             }
         }
 

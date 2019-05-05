@@ -29,7 +29,9 @@ namespace Peter.Classes
 {
     public class AutoComplete : Label
     {
-        private const string KEYWORDDATEI = "KeyWords\\KeyWords";
+        private const string KEYWORD_DATEIPFAD = "KeyWords";
+        private const string KEYWORDDATEI = "KeyWords";
+        private const string KEYWORDDATEI_PREFIX = "KeyWords.";
         private const string PROPDATEI = "KeyWords\\Properties";
         private const string FUNCDIR = "DialogCreator\\Funcs.txt";
         public List<KeyWord> KW = new List<KeyWord>();
@@ -44,7 +46,7 @@ namespace Peter.Classes
         public Hashtable ShortFuncList = new Hashtable();
         public List<KeyWord> ShortFuncs = new List<KeyWord>();
         public List<KeyWord> Properties = new List<KeyWord>();
-        private readonly Hashtable DokuTable = new Hashtable();
+        private readonly Dictionary<string, string> DokuTable = new Dictionary<string, string>();
         public string Extension = ".d";
         private readonly ImageList ImgList;
         private readonly ToolStripStatusLabel Trace;
@@ -146,13 +148,14 @@ namespace Peter.Classes
         {
             this.listView1.VirtualListSize = lenght;
         }
-        public void NewKeyWordFile(string s)
+        public void NewKeyWordFile(string extension)
         {
             KeyWords.Clear();
             TT.Hide(this);
-            if (File.Exists(KEYWORDDATEI + s))
+            var keywordFilePath = Path.Combine(KEYWORD_DATEIPFAD, KEYWORDDATEI + Extension);
+            if (File.Exists(keywordFilePath))
             {
-                Extension = s;
+                Extension = extension;
                 LastItemIndex = 0;
                 listView1_SelectedIndexChanged(null, new EventArgs());
             }
@@ -338,9 +341,9 @@ namespace Peter.Classes
             var key = (KeyWords[this.listView1.SelectedIndices[0]]);
             string s;
             s = key.Name.ToLower();
-            if (DokuTable[s] != null)
+            if (DokuTable.TryGetValue(s, out var text) && text != null)
             {
-                key.Text2 = Convert.ToString(DokuTable[s]);
+                key.Text2 = Convert.ToString(text);
             }
 
             TT.ToolTipTitle = (key).Text1;
@@ -415,30 +418,37 @@ namespace Peter.Classes
         }
         private void Read_KeyWords()
         {
-            //this.Items.Clear();
-            var Doku = new List<KeyWord>();
+            var doku = new List<KeyWord>();
             this.listView1.Clear();
             this.KeyWords.Clear();
             this.KW.Clear();
 
+            var keywordFilePath = Path.Combine(KEYWORD_DATEIPFAD, KEYWORDDATEI + Extension);
             if (Extension == ".d")
             {
-                var k = new KeyWord();
-                Doku.Clear();
-
-                if (File.Exists(KEYWORDDATEI + Extension))
+                doku.Clear();
+                if (File.Exists(keywordFilePath))
                 {
-                    using (var sr = new StreamReader(KEYWORDDATEI + Extension, Encoding.Default))
+                    using (var sr = new StreamReader(keywordFilePath, Encoding.Default))
                     {
                         string line;
                         while ((line = sr.ReadLine()) != null)
                         {
-                            k = Deconstruct_Line(line);
-                            //this.Items.Add(k);
-                            Doku.Add(k);
-
+                            var k = Deconstruct_Line(line);
+                            doku.Add(k);
                         }
-
+                    }
+                }
+                foreach (var keyWordFile in Directory.GetFiles(KEYWORD_DATEIPFAD, KEYWORDDATEI_PREFIX + '*' + Extension))
+                {
+                    using (var sr = new StreamReader(keyWordFile, Encoding.Default))
+                    {
+                        string line;
+                        while ((line = sr.ReadLine()) != null)
+                        {
+                            var k = Deconstruct_Line(line);
+                            doku.Add(k);
+                        }
                     }
                 }
                 if (File.Exists(Path.GetDirectoryName(Application.ExecutablePath) + "\\" + PROPDATEI + Extension))
@@ -448,7 +458,7 @@ namespace Peter.Classes
                         string line;
                         while ((line = sr.ReadLine()) != null)
                         {
-                            k = Deconstruct_Line(line);
+                            var k = Deconstruct_Line(line);
 
                             k.Type = 7;
                             Properties.Add(k);
@@ -457,38 +467,44 @@ namespace Peter.Classes
                 }
 
                 DokuTable.Clear();
-                foreach (var l in Doku)
+                foreach (var l in doku)
                 {
-                    try
-                    {
-                        DokuTable.Add(l.Name.ToLower(), l.Text1);
-                    }
-                    catch
-                    {
-                    }
+                    DokuTable[l.Name.ToLower()] = l.Text1;
                 }
 
                 ReadShortFunc();
             }
 
-            var k2 = new KeyWord();
-            if (File.Exists(Path.GetDirectoryName(Application.ExecutablePath) + "\\" + KEYWORDDATEI + Extension))
+            keywordFilePath = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), KEYWORD_DATEIPFAD, KEYWORDDATEI + Extension);
+            if (File.Exists(keywordFilePath))
             {
-                using (var sr = new StreamReader(Path.GetDirectoryName(Application.ExecutablePath) + "\\" + KEYWORDDATEI + Extension, Encoding.Default))
+                using (var sr = new StreamReader(keywordFilePath, Encoding.Default))
                 {
                     string line;
                     while ((line = sr.ReadLine()) != null)
                     {
-                        k2 = Deconstruct_Line(line);
+                        var k2 = Deconstruct_Line(line);
 
                         this.KW.Add(k2);
+                    }
+                }
+                foreach (var keyWordFile in Directory.GetFiles(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), KEYWORD_DATEIPFAD), KEYWORDDATEI_PREFIX + '*' + Extension))
+                {
+                    using (var sr = new StreamReader(keyWordFile, Encoding.Default))
+                    {
+                        string line;
+                        while ((line = sr.ReadLine()) != null)
+                        {
+                            var k = Deconstruct_Line(line);
+                            this.KW.Add(k);
+                        }
                     }
                 }
                 SetupListview(KeyWords.Count);
             }
             else
             {
-                MessageBox.Show("Die Datei " + Path.GetDirectoryName(Application.ExecutablePath) + "\\" + KEYWORDDATEI + Extension + " konnte nicht gefunden werden!", "Fehler!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Die Datei " + keywordFilePath + " konnte nicht gefunden werden!", "Fehler!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
         public void ReadShortFunc()
@@ -508,7 +524,6 @@ namespace Peter.Classes
                     while ((line = sr.ReadLine()) != null)
                     {
                         var parameterListe = new List<Parameter>();
-
                         while (i < line.Length)
                         {
                             if (mode == 0)
@@ -519,15 +534,11 @@ namespace Peter.Classes
                                 }
                                 else
                                 {
-
                                     mode = 1;
                                     if (0 < line.Length && line[0 + 1] == '@')
                                     {
                                         isloop = true;
-
                                     }
-
-
                                     line = line.Remove(0, name.Length + (isloop ? 2 : 1));
                                     i = 0;
                                     break;
@@ -549,14 +560,12 @@ namespace Peter.Classes
                                     else if (endloop == -1)
                                     {
                                         endloop = 0 - 1;
-
                                         line = line.Remove(startloop, 1);
                                         line = line.Remove(endloop, 1);
                                         break;
                                     }
                                 }
                                 i++;
-
                             }
                         }
                         i = 0;
