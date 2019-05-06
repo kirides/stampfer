@@ -296,7 +296,7 @@ namespace Peter
             this.textEditorControl1.ShowVRuler = this.ckbShowVRuler.Checked;
             this.textEditorControl1.EnableFolding = this.ckbEnableCodeFolding.Checked;
             this.textEditorControl1.ConvertTabsToSpaces = this.ckbConvertTabs.Checked;
-            this.textEditorControl1.UseAntiAliasFont = this.ckbUseAntiAlias.Checked; // #develop 2
+            //this.textEditorControl1.UseAntiAliasFont = this.ckbUseAntiAlias.Checked; // #develop 2
             this.textEditorControl1.AllowCaretBeyondEOL = this.ckbAllowCaretBeyondEol.Checked;
             this.textEditorControl1.TextEditorProperties.AutoInsertCurlyBracket = this.ckbAutoInsertBracket.Checked;
             this.textEditorControl1.TabIndent = Convert.ToInt32(this.nudTabIndent.Value);

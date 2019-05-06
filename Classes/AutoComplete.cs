@@ -85,13 +85,13 @@ namespace Peter.Classes
                 && currentEditor != null)
             {
                 currentEditor.InsertCompletion();
-                Hide();
+                HidePopup();
             }
         }
         public void MouseRemove()
         {
             currentEditor.m_Editor.Focus();
-            Hide();
+            HidePopup();
         }
 
         private void AutoComplete_SizeChanged(object sender, EventArgs e)
@@ -805,7 +805,7 @@ namespace Peter.Classes
             return s;
         }
 
-        public void Hide()
+        public void HidePopup()
         {
             this.Visible = false;
             try { _toolTip.Hide(this); }
@@ -813,7 +813,7 @@ namespace Peter.Classes
             M_AutoCompleteDa.Active = false;
             LastItemIndex = 0;
         }
-        public void Show(Editor e)
+        public void ShowPopup(Editor e)
         {
             currentEditor = e;
             UpdatePos(e);

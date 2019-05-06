@@ -47,6 +47,8 @@ namespace Peter
         private const int COOLDOWN = 2;
         private readonly Timer mytimer = new Timer();
         private int cooldowntimer = COOLDOWN;
+        private bool firstupdate = false;
+        private bool _createBackupCopy;
 
         #region -= Constructor =-
 
@@ -146,7 +148,7 @@ namespace Peter
         }
         protected override void OnLostFocus(EventArgs e)
         {
-            this.m_MainForm.m_AutoComplete.Hide();
+            this.m_MainForm.m_AutoComplete.HidePopup();
             base.OnLostFocus(e);
         }
 
@@ -200,7 +202,6 @@ namespace Peter
             return p;
         }
 
-        private bool firstupdate = false;
         private bool UpdateCompletion()
         {
             var p = GetBaseWord();
@@ -378,7 +379,7 @@ namespace Peter
 
                     if (IsAnIf())
                     {
-                        m_Editor.ActiveTextAreaControl.Caret.Position = new Point(0, m_Editor.ActiveTextAreaControl.Caret.Position.Y);
+                        m_Editor.ActiveTextAreaControl.Caret.Position = new TextLocation(0, m_Editor.ActiveTextAreaControl.Caret.Position.Y);
                         m_Editor.ActiveTextAreaControl.TextArea.Document.Insert(m_Editor.ActiveTextAreaControl.TextArea.Caret.Offset, s);
                         m_Editor.ActiveTextAreaControl.Caret.Position = this.m_Editor.Document.OffsetToPosition(m_Editor.ActiveTextAreaControl.Caret.Offset + s.Length);
                         s2 = "{\r\n" + s + "\t\r\n" + s + "}";
@@ -387,7 +388,7 @@ namespace Peter
                     }
                     else
                     {
-                        m_Editor.ActiveTextAreaControl.Caret.Position = new Point(0, m_Editor.ActiveTextAreaControl.Caret.Position.Y);
+                        m_Editor.ActiveTextAreaControl.Caret.Position = new TextLocation(0, m_Editor.ActiveTextAreaControl.Caret.Position.Y);
                         m_Editor.ActiveTextAreaControl.TextArea.Document.Insert(m_Editor.ActiveTextAreaControl.TextArea.Caret.Offset, s);
                         m_Editor.ActiveTextAreaControl.Caret.Position = this.m_Editor.Document.OffsetToPosition(m_Editor.ActiveTextAreaControl.Caret.Offset + s.Length);
                         s2 = "{\r\n" + s + "\t\r\n" + s + "};";
@@ -450,7 +451,7 @@ namespace Peter
                     else
                     {
                         m_Editor.ActiveTextAreaControl.TextArea.Document.Remove(m_Editor.ActiveTextAreaControl.TextArea.Caret.Offset - s2.Length, s2.Length);
-                        m_Editor.ActiveTextAreaControl.Caret.Position = new Point(0, m_Editor.ActiveTextAreaControl.Caret.Position.Y);
+                        m_Editor.ActiveTextAreaControl.Caret.Position = new TextLocation(0, m_Editor.ActiveTextAreaControl.Caret.Position.Y);
                         m_Editor.ActiveTextAreaControl.TextArea.Document.Insert(m_Editor.ActiveTextAreaControl.TextArea.Caret.Offset, s + "}");
                         m_Editor.ActiveTextAreaControl.Caret.Position = this.m_Editor.Document.OffsetToPosition(m_Editor.ActiveTextAreaControl.Caret.Offset + s.Length + 1);
                         m_Editor.Refresh();
@@ -504,7 +505,7 @@ namespace Peter
         public void RemoveAutoComplete()
         {
             this.Controls.Remove(this.m_MainForm.m_AutoComplete);
-            this.m_MainForm.m_AutoComplete.Hide();
+            this.m_MainForm.m_AutoComplete.HidePopup();
         }
         public void ShowAutoComplete()
         {
@@ -530,7 +531,7 @@ namespace Peter
                         this.m_MainForm.m_AutoComplete.NewKeyWordFile(ext);
                     }
                 }
-                this.m_MainForm.m_AutoComplete.Show(this);
+                this.m_MainForm.m_AutoComplete.ShowPopup(this);
             }
             else
             {
@@ -550,7 +551,7 @@ namespace Peter
                 {
                     this.DiaC.Controls.Add(this.m_MainForm.m_AutoComplete);
                 }
-                this.m_MainForm.m_AutoComplete.Show(this);
+                this.m_MainForm.m_AutoComplete.ShowPopup(this);
             }
             this.m_MainForm.m_AutoComplete.BringToFront();
         }
@@ -913,7 +914,7 @@ namespace Peter
         /// </summary>
         public void ToggleMark()
         {
-            this.m_Editor.Document.BookmarkManager.ToggleMarkAt(this.m_Editor.ActiveTextAreaControl.Caret.Line);
+            this.m_Editor.Document.BookmarkManager.ToggleMarkAt(new TextLocation(this.m_Editor.ActiveTextAreaControl.Caret.Column, this.m_Editor.ActiveTextAreaControl.Caret.Line));
             this.m_Editor.ActiveTextAreaControl.Invalidate(true);
         }
 
@@ -959,12 +960,13 @@ namespace Peter
             this.m_Editor.ShowHRuler = config.ShowHRuler;
             this.m_Editor.ShowVRuler = config.ShowVRuler;
             this.m_Editor.EnableFolding = config.EnableCodeFolding;
-            this.m_Editor.TextEditorProperties.CreateBackupCopy = config.Backup;
+            this._createBackupCopy = config.Backup;
             this.m_Editor.Font = config.FontInstance;
             this.m_Editor.ConvertTabsToSpaces = config.ConvertTabs;
             this.m_Editor.TabIndent = config.TabIndent;
             this.m_Editor.VRulerRow = config.VerticalRulerCol;
-            this.m_Editor.UseAntiAliasFont = config.UseAntiAlias; // #develop 2
+            // TODO: FIXME
+            //this.m_Editor.UseAntiAliasFont = config.UseAntiAlias; // #develop 2
             this.AutoCompleteAuto = config.Autocomplete;
             this.m_Editor.AllowCaretBeyondEOL = config.AllowCaretBeyondEOL;
             this.m_Editor.TextEditorProperties.AutoInsertCurlyBracket = config.AutoInsertBracket;
@@ -1185,7 +1187,7 @@ namespace Peter
                 else
                 {
                     //Backup
-                    if (this.m_Editor.TextEditorProperties.CreateBackupCopy)
+                    if (this._createBackupCopy)
                     {
                         try
                         {
@@ -1211,7 +1213,7 @@ namespace Peter
                                         File.Copy(filePath, backupName);
                                     }
                                 }
-                                catch//ta
+                                catch
                                 {
                                 }
 
@@ -1428,7 +1430,7 @@ namespace Peter
             foreach (Match m in mc)
             {
                 var line = this.m_Editor.Document.GetLineNumberForOffset(m.Index);
-                this.m_Editor.Document.BookmarkManager.AddMark(new Bookmark(this.m_Editor.Document, line));
+                this.m_Editor.Document.BookmarkManager.AddMark(new Bookmark(this.m_Editor.Document, new TextLocation(0, line)));
             }
             this.m_Editor.ActiveTextAreaControl.Invalidate(true);
             this.m_Editor.ActiveTextAreaControl.TextArea.Focus();
@@ -1696,8 +1698,10 @@ namespace Peter
                         break;
                     }
                 }
-                this.m_Editor.ActiveTextAreaControl.SelectionManager.SetSelection(new Point(this.m_Editor.ActiveTextAreaControl.SelectionManager.SelectionCollection[0].StartPosition.X - leer,
-                    this.m_Editor.ActiveTextAreaControl.SelectionManager.SelectionCollection[0].StartPosition.Y), new Point(this.m_Editor.ActiveTextAreaControl.SelectionManager.SelectionCollection[0].EndPosition.X,
+                this.m_Editor.ActiveTextAreaControl.SelectionManager.SetSelection(
+                        new TextLocation(this.m_Editor.ActiveTextAreaControl.SelectionManager.SelectionCollection[0].StartPosition.X - leer,
+                    this.m_Editor.ActiveTextAreaControl.SelectionManager.SelectionCollection[0].StartPosition.Y), 
+                        new TextLocation(this.m_Editor.ActiveTextAreaControl.SelectionManager.SelectionCollection[0].EndPosition.X,
                     this.m_Editor.ActiveTextAreaControl.SelectionManager.SelectionCollection[0].EndPosition.Y));
                 this.m_Editor.Document.Insert(this.m_Editor.ActiveTextAreaControl.SelectionManager.SelectionCollection[0].Offset, s1);
 
