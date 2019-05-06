@@ -883,7 +883,8 @@ namespace Peter
         private void LoadHighlighting()
         {
             var path = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), SCHEME_FOLDER);
-            if (Directory.Exists(path))
+            Directory.CreateDirectory(path);
+            if (Directory.Exists(path) && Directory.EnumerateFiles(path, "*.xshd").Any())
             {
                 HighlightingManager.Manager.AddSyntaxModeFileProvider(new FileSyntaxModeProvider(path));
 
@@ -901,7 +902,7 @@ namespace Peter
             }
             else
             {
-                MessageBox.Show("Highlighting Schemes können nicht geladen werden!", "Stampfer", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Highlighting Schemes können nicht geladen werden!\nEs sind keine Highlighter hinterlegt.", "Stampfer", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
