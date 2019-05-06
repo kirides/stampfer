@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -158,42 +159,43 @@ namespace Peter
             this.DockMain.ShowDocumentIcon = false;
 
             //Skin
-            this.DockMain.Skin.DockPaneStripSkin.DocumentGradient.ActiveTabGradient.LinearGradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
-            this.DockMain.Skin.DockPaneStripSkin.DocumentGradient.ActiveTabGradient.StartColor = Color.White;
-            this.DockMain.Skin.DockPaneStripSkin.DocumentGradient.ActiveTabGradient.EndColor = Color.FromArgb(215, 235, 255);
+            var skin = this.DockMain.Theme.Skin;
+            skin.DockPaneStripSkin.DocumentGradient.ActiveTabGradient.LinearGradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
+            skin.DockPaneStripSkin.DocumentGradient.ActiveTabGradient.StartColor = Color.White;
+            skin.DockPaneStripSkin.DocumentGradient.ActiveTabGradient.EndColor = Color.FromArgb(215, 235, 255);
 
-            this.DockMain.Skin.DockPaneStripSkin.DocumentGradient.InactiveTabGradient.LinearGradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
-            this.DockMain.Skin.DockPaneStripSkin.DocumentGradient.InactiveTabGradient.StartColor = Color.White;
-            this.DockMain.Skin.DockPaneStripSkin.DocumentGradient.InactiveTabGradient.EndColor = Color.FromArgb(152, 180, 210);
+            skin.DockPaneStripSkin.DocumentGradient.InactiveTabGradient.LinearGradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
+            skin.DockPaneStripSkin.DocumentGradient.InactiveTabGradient.StartColor = Color.White;
+            skin.DockPaneStripSkin.DocumentGradient.InactiveTabGradient.EndColor = Color.FromArgb(152, 180, 210);
 
-            this.DockMain.Skin.DockPaneStripSkin.DocumentGradient.DockStripGradient.LinearGradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
-            this.DockMain.Skin.DockPaneStripSkin.DocumentGradient.DockStripGradient.StartColor = Color.White;
-            this.DockMain.Skin.DockPaneStripSkin.DocumentGradient.DockStripGradient.EndColor = SystemColors.ControlDark;
+            skin.DockPaneStripSkin.DocumentGradient.DockStripGradient.LinearGradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
+            skin.DockPaneStripSkin.DocumentGradient.DockStripGradient.StartColor = Color.White;
+            skin.DockPaneStripSkin.DocumentGradient.DockStripGradient.EndColor = SystemColors.ControlDark;
 
-            this.DockMain.Skin.DockPaneStripSkin.ToolWindowGradient.ActiveCaptionGradient.LinearGradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
-            this.DockMain.Skin.DockPaneStripSkin.ToolWindowGradient.ActiveCaptionGradient.StartColor = Color.FromArgb(215, 235, 255);
-            this.DockMain.Skin.DockPaneStripSkin.ToolWindowGradient.ActiveCaptionGradient.EndColor = Color.White;
+            skin.DockPaneStripSkin.ToolWindowGradient.ActiveCaptionGradient.LinearGradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
+            skin.DockPaneStripSkin.ToolWindowGradient.ActiveCaptionGradient.StartColor = Color.FromArgb(215, 235, 255);
+            skin.DockPaneStripSkin.ToolWindowGradient.ActiveCaptionGradient.EndColor = Color.White;
 
-            this.DockMain.Skin.DockPaneStripSkin.ToolWindowGradient.InactiveCaptionGradient.LinearGradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
-            this.DockMain.Skin.DockPaneStripSkin.ToolWindowGradient.InactiveCaptionGradient.StartColor = Color.FromArgb(152, 180, 210);
-            this.DockMain.Skin.DockPaneStripSkin.ToolWindowGradient.InactiveCaptionGradient.EndColor = Color.White;
+            skin.DockPaneStripSkin.ToolWindowGradient.InactiveCaptionGradient.LinearGradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
+            skin.DockPaneStripSkin.ToolWindowGradient.InactiveCaptionGradient.StartColor = Color.FromArgb(152, 180, 210);
+            skin.DockPaneStripSkin.ToolWindowGradient.InactiveCaptionGradient.EndColor = Color.White;
 
-            this.DockMain.Skin.DockPaneStripSkin.ToolWindowGradient.DockStripGradient.LinearGradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
-            this.DockMain.Skin.DockPaneStripSkin.ToolWindowGradient.DockStripGradient.StartColor = SystemColors.ControlDark;
-            this.DockMain.Skin.DockPaneStripSkin.ToolWindowGradient.DockStripGradient.EndColor = Color.White;
+            skin.DockPaneStripSkin.ToolWindowGradient.DockStripGradient.LinearGradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
+            skin.DockPaneStripSkin.ToolWindowGradient.DockStripGradient.StartColor = SystemColors.ControlDark;
+            skin.DockPaneStripSkin.ToolWindowGradient.DockStripGradient.EndColor = Color.White;
 
-            this.DockMain.Skin.DockPaneStripSkin.ToolWindowGradient.ActiveTabGradient.LinearGradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
-            this.DockMain.Skin.DockPaneStripSkin.ToolWindowGradient.ActiveTabGradient.StartColor = Color.FromArgb(215, 235, 255);
-            this.DockMain.Skin.DockPaneStripSkin.ToolWindowGradient.ActiveTabGradient.EndColor = Color.White;
+            skin.DockPaneStripSkin.ToolWindowGradient.ActiveTabGradient.LinearGradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
+            skin.DockPaneStripSkin.ToolWindowGradient.ActiveTabGradient.StartColor = Color.FromArgb(215, 235, 255);
+            skin.DockPaneStripSkin.ToolWindowGradient.ActiveTabGradient.EndColor = Color.White;
 
-            this.DockMain.Skin.DockPaneStripSkin.ToolWindowGradient.InactiveTabGradient.LinearGradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
-            this.DockMain.Skin.DockPaneStripSkin.ToolWindowGradient.InactiveTabGradient.StartColor = Color.FromArgb(152, 180, 210);
-            this.DockMain.Skin.DockPaneStripSkin.ToolWindowGradient.InactiveTabGradient.EndColor = Color.White;
+            skin.DockPaneStripSkin.ToolWindowGradient.InactiveTabGradient.LinearGradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
+            skin.DockPaneStripSkin.ToolWindowGradient.InactiveTabGradient.StartColor = Color.FromArgb(152, 180, 210);
+            skin.DockPaneStripSkin.ToolWindowGradient.InactiveTabGradient.EndColor = Color.White;
 
-            this.DockMain.Skin.AutoHideStripSkin.TabGradient.LinearGradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
-            this.DockMain.Skin.AutoHideStripSkin.TabGradient.StartColor = Color.White;
-            this.DockMain.Skin.AutoHideStripSkin.TabGradient.EndColor = Color.FromArgb(152, 180, 210);
-            this.DockMain.Skin.AutoHideStripSkin.TabGradient.TextColor = SystemColors.ControlText;
+            skin.AutoHideStripSkin.TabGradient.LinearGradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
+            skin.AutoHideStripSkin.TabGradient.StartColor = Color.White;
+            skin.AutoHideStripSkin.TabGradient.EndColor = Color.FromArgb(152, 180, 210);
+            skin.AutoHideStripSkin.TabGradient.TextColor = SystemColors.ControlText;
 
             //Endskin
 
@@ -494,18 +496,12 @@ namespace Peter
         /// </summary>
         /// <param name="content">Content to Add.</param>
         /// <param name="state">State of Content</param>
-        public void AddDockContent(DockContent content, DockState state)
+        public void AddDockContent(IDockContent content, DockState state)
         {
-
             if (this.CheckContent(content))
             {
-
-
-
-                content.Show(this.DockMain, state);
-                content.TabPageContextMenuStrip = this.ctxTab;
-
-
+                content.DockHandler.Show(this.DockMain, state);
+                content.DockHandler.TabPageContextMenuStrip = this.ctxTab;
             }
         }
 
@@ -514,15 +510,13 @@ namespace Peter
         /// </summary>
         /// <param name="content">DockContent</param>
         /// <returns>True or False</returns>
-        private bool CheckContent(DockContent content)
+        private bool CheckContent(IDockContent content)
         {
-
             var types = content.GetType().GetInterfaces();
             foreach (var t in types)
             {
                 if (t == typeof(IPeterPluginTab))
                 {
-
                     return true;
                 }
             }
@@ -670,7 +664,7 @@ namespace Peter
         /// </summary>
         private void LoadPlugins()
         {
-            var pluginFolderPath = Path.GetDirectoryName(Application.ExecutablePath) + "\\" + PLUGIN_FOLDER;
+            var pluginFolderPath = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), PLUGIN_FOLDER);
             Directory.CreateDirectory(pluginFolderPath);
             var files = Directory.GetFiles(pluginFolderPath, "*.dll");
             foreach (var file in files)
@@ -888,7 +882,7 @@ namespace Peter
         /// </summary>
         private void LoadHighlighting()
         {
-            var path = Path.GetDirectoryName(Application.ExecutablePath) + "\\" + SCHEME_FOLDER;
+            var path = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), SCHEME_FOLDER);
             if (Directory.Exists(path))
             {
                 HighlightingManager.Manager.AddSyntaxModeFileProvider(new FileSyntaxModeProvider(path));
@@ -3169,18 +3163,19 @@ namespace Peter
             initialized = false;
             if (m_GothicStructure != null)
             {
-                var handlers = new Dictionary<string, Dictionary<string, Instance>.ValueCollection>
+                var handlers = new Dictionary<string, List<Instance>>
                 {
-                    { FilePaths.ITEMS, m_GothicStructure.ItemList.Values },
-                    { FilePaths.NPCS, m_GothicStructure.NPCList.Values },
-                    { FilePaths.DIALOGE, m_GothicStructure.DialogList.Values },
-                    { FilePaths.FUNC, m_GothicStructure.FuncList.Values },
-                    { FilePaths.VARS, m_GothicStructure.VarList.Values },
-                    { FilePaths.CONSTS, m_GothicStructure.ConstList.Values },
+                    { FilePaths.ITEMS, m_GothicStructure.ItemList.Values.ToList() },
+                    { FilePaths.NPCS, m_GothicStructure.NPCList.Values.ToList() },
+                    { FilePaths.DIALOGE, m_GothicStructure.DialogList.Values.ToList() },
+                    { FilePaths.FUNC, m_GothicStructure.FuncList.Values.ToList() },
+                    { FilePaths.VARS, m_GothicStructure.VarList.Values.ToList() },
+                    { FilePaths.CONSTS, m_GothicStructure.ConstList.Values.ToList() },
                 };
                 foreach (var handler in handlers)
                 {
-                    using (var sw = new StreamWriter(this.m_ScriptsPath + handler.Key, false, Encoding.Default))
+                    using (var fs = File.Create(this.m_ScriptsPath + handler.Key))
+                    using (var sw = new StreamWriter(fs, Encoding.Default))
                     {
                         foreach (var instance in handler.Value)
                         {
@@ -3202,7 +3197,7 @@ namespace Peter
             ((ToolStripTextBox)sender).Focus();
         }
 
-        void IPeterPluginHost.AddDockContent(DockContent content) { }
-        void IPeterPluginHost.AddDockContent(DockContent content, Rectangle floatingRec) { }
+        void IPeterPluginHost.AddDockContent(IDockContent content) { }
+        void IPeterPluginHost.AddDockContent(IDockContent content, Rectangle floatingRec) { }
     }
 }

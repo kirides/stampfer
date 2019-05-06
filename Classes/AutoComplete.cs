@@ -33,8 +33,9 @@ namespace Peter.Classes
         private const string KEYWORD_DATEIPFAD = "KeyWords";
         private const string KEYWORDDATEI = "KeyWords";
         private const string KEYWORDDATEI_PREFIX = "KeyWords.";
-        private const string PROPDATEI = "KeyWords\\Properties";
-        private const string FUNCDIR = "DialogCreator\\Funcs.txt";
+        private const string PROPDATEI = "Properties";
+        private const string DIALOG_FUNC_PATH = "DialogCreator";
+        private const string DIALOG_FUNC_DIR = "DialogCreator\\Funcs.txt";
         public List<KeyWord> KeyWordsList = new List<KeyWord>();
         public List<KeyWord> KeyWords = new List<KeyWord>();
         private readonly ToolTip _toolTip;
@@ -57,7 +58,7 @@ namespace Peter.Classes
         {
             listView1 = new AutoCompleteListView(this);
             _toolTip = new ToolTip();
-
+            CreateDirectories();
             ImgList = img;
             Trace = tlt;
             LastItemIndex = 0;
@@ -72,6 +73,23 @@ namespace Peter.Classes
             this.SetStyle(ControlStyles.DoubleBuffer, true);
             SetupListview(KeyWords.Count);
             Read_KeyWords();
+        }
+
+        private void CreateDirectories()
+        {
+            var keyWordPath = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), KEYWORD_DATEIPFAD);
+            var dialogPath = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), DIALOG_FUNC_PATH);
+            if (!Directory.Exists(keyWordPath))
+            {
+                Directory.CreateDirectory(keyWordPath);
+                File.WriteAllText(Path.Combine(keyWordPath, "KeyWords.d"), Peter.Properties.Resources.DefaultDaedalusKeyWords, Encoding.Default);
+                File.WriteAllText(Path.Combine(keyWordPath, "Properties.d"), Peter.Properties.Resources.DefaultDaedalusProperties, Encoding.Default);
+            }
+            if (!Directory.Exists(dialogPath))
+            {
+                Directory.CreateDirectory(dialogPath);
+                File.WriteAllText(Path.Combine(dialogPath, "Funcs.txt"), Peter.Properties.Resources.DefaultDialogCreatorFuncs, Encoding.Default);
+            }
         }
 
         public void SelectedChanged()
@@ -423,10 +441,11 @@ namespace Peter.Classes
                         }
                     }
                 }
-                
-                if (File.Exists(Path.GetDirectoryName(Application.ExecutablePath) + "\\" + PROPDATEI + Extension))
+
+                var propertiesFile = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), KEYWORD_DATEIPFAD, PROPDATEI + Extension);
+                if (File.Exists(propertiesFile))
                 {
-                    using (var sr = new StreamReader(Path.GetDirectoryName(Application.ExecutablePath) + "\\" + PROPDATEI + Extension, Encoding.Default))
+                    using (var sr = new StreamReader(propertiesFile, Encoding.Default))
                     {
                         string line;
                         while ((line = sr.ReadLine()) != null)
@@ -472,7 +491,7 @@ namespace Peter.Classes
         }
         public void ReadShortFunc()
         {
-            if (File.Exists(FUNCDIR))
+            if (File.Exists(DIALOG_FUNC_DIR))
             {
                 string line;
                 var mode = 0;
@@ -482,7 +501,7 @@ namespace Peter.Classes
                 var endloop = -1;
 
                 var name = "";
-                using (var sr = new StreamReader(FUNCDIR, Encoding.Default))
+                using (var sr = new StreamReader(DIALOG_FUNC_DIR, Encoding.Default))
                 {
                     while ((line = sr.ReadLine()) != null)
                     {

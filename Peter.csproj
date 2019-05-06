@@ -58,7 +58,7 @@
   <ItemGroup>
     <Reference Include="PeterInterface, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>libs\PeterInterface.dll</HintPath>
+      <HintPath>..\PeterInterface\bin\Release\PeterInterface.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -73,10 +73,6 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="WeifenLuo.WinFormsUI.Docking, Version=2.3.3372.30678, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>libs\WeifenLuo.WinFormsUI.Docking.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -414,7 +410,7 @@
       <DependentUpon>ProjectManager.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -456,6 +452,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Icons\Icon.ico" />
+    <None Include="Resources\KeyWords\KeyWords.d" />
+    <None Include="Resources\KeyWords\Properties.d" />
     <None Include="Resources\LegendHS.png" />
     <None Include="Resources\compareversionsHS.png" />
     <None Include="Resources\lock.GIF" />
@@ -465,6 +463,7 @@
     <None Include="Resources\minus.png" />
     <None Include="Resources\Hammer.png" />
     <None Include="Resources\tsbPrint.Image.png" />
+    <None Include="Resources\DialogCreator\Funcs.txt" />
     <Content Include="stampfers.ico" />
     <None Include="StampferSplash2.png" />
     <None Include="Resources\Funtionen.png" />
@@ -506,6 +505,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="DockPanelSuite">
+      <Version>3.0.6</Version>
+    </PackageReference>
     <PackageReference Include="ICSharpCode.TextEditor">
       <Version>3.2.1.6466</Version>
     </PackageReference>

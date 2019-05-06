@@ -22,7 +22,7 @@ namespace Peter.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace Peter.Properties {
         ///   Gibt die zwischengespeicherte ResourceManager-Instanz zurück, die von dieser Klasse verwendet wird.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Peter.Properties.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace Peter.Properties {
         ///   Ressourcenzuordnungen, die diese stark typisierte Ressourcenklasse verwenden.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace Peter.Properties {
         /// <summary>
         ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap analyze {
+        public static System.Drawing.Bitmap analyze {
             get {
                 object obj = ResourceManager.GetObject("analyze", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -73,7 +73,7 @@ namespace Peter.Properties {
         /// <summary>
         ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Comment {
+        public static System.Drawing.Bitmap Comment {
             get {
                 object obj = ResourceManager.GetObject("Comment", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -83,7 +83,7 @@ namespace Peter.Properties {
         /// <summary>
         ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Comment1 {
+        public static System.Drawing.Bitmap Comment1 {
             get {
                 object obj = ResourceManager.GetObject("Comment1", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -91,9 +91,80 @@ namespace Peter.Properties {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die ABSOLUTIONLEVEL_BL@Speichert die Anzahl der Straftatabzahlungen im Banditenlager@Wird z.B. dazu benutzt Kämpfe zu beenden, wenn Hero Strafe abbezahlt hat
+        ///ABSOLUTIONLEVEL_OldCamp@Speichert die Anzahl der Straftatabzahlungen in der Burg im Minental@Wird z.B. dazu benutzt Kämpfe zu beenden, wenn Hero Strafe abbezahlt hat
+        ///ABSOLUTIONLEVEL_City@Speichert die Anzahl der Straftatabzahlungen in der Stadt@Wird z.B. dazu benutzt Kämpfe zu beenden, wenn Hero Strafe abbezahlt hat
+        ///ABSOLUTIONLEVEL_Monastery@Speichert d [Rest der Zeichenfolge wurde abgeschnitten]&quot;; ähnelt.
+        /// </summary>
+        public static string DefaultDaedalusKeyWords {
+            get {
+                return ResourceManager.GetString("DefaultDaedalusKeyWords", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die C_NPC@NPCs
+        ///C_ITEM@Items
+        ///hero@Held
+        ///self@NPC
+        ///other@NPC
+        ///slf@lokaler NPC
+        ///oth@lokaler NPC
+        ///victim@Opfer
+        ///.aivar@int [100]
+        ///.attribute@int [ATR_INDEX_MAX]
+        ///.id@int
+        ///.name@string [5]
+        ///.canTurnDuringInvest@int
+        ///.canChangeTargetDuringInvest@int
+        ///.daily_routine@func
+        ///.damage@int [DAM_INDEX_MAX]
+        ///.damage_per_level@int
+        ///.damagetype@int
+        ///.effect@effect
+        ///.npcType@int
+        ///.flags@int
+        ///.HitChance@int [MAX_HITCHANCE]
+        ///.protection@int [PROT_INDEX_MAX]
+        ///.guild@int
+        ///.level@int
+        ///.mission@func [MAX_MISSIONS]
+        ///.fight_tactic@int [Rest der Zeichenfolge wurde abgeschnitten]&quot;; ähnelt.
+        /// </summary>
+        public static string DefaultDaedalusProperties {
+            get {
+                return ResourceManager.GetString("DefaultDaedalusProperties", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die italk@(Npc_IsInState (self,ZS_Talk))
+        ///if@if(#0)§{§§};
+        ///ife@if(#0)§{§§}§else§{§§};§
+        ///rt@return TRUE;
+        ///rf@return FALSE;
+        ///iknow@(Npc_KnowsInfo (other, #0))
+        ///cis@CreateInvItems (self, #0, #1);
+        ///cio@CreateInvItems (other, #0, #1);
+        ///gis@B_GiveInvItems (other, self, #0, #1);
+        ///gio@B_GiveInvItems (self, other, #0, #1);
+        ///gigs@B_GiveInvItems (other, self, Itmi_Gold, #0);
+        ///gigo@B_GiveInvItems (self, other, Itmi_Gold, #0);
+        ///e@AI_StopProcessInfos (self);
+        ///ihi@(Npc_HasItems (other, #0) &gt;=#1)
+        ///xp@B_GivePlayerXP (#0);
+        ///fscr [Rest der Zeichenfolge wurde abgeschnitten]&quot;; ähnelt.
+        /// </summary>
+        public static string DefaultDialogCreatorFuncs {
+            get {
+                return ResourceManager.GetString("DefaultDialogCreatorFuncs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Dialog {
+        public static System.Drawing.Bitmap Dialog {
             get {
                 object obj = ResourceManager.GetObject("Dialog", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -103,7 +174,7 @@ namespace Peter.Properties {
         /// <summary>
         ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap downarrow {
+        public static System.Drawing.Bitmap downarrow {
             get {
                 object obj = ResourceManager.GetObject("downarrow", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -113,7 +184,7 @@ namespace Peter.Properties {
         /// <summary>
         ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Funtionen {
+        public static System.Drawing.Bitmap Funtionen {
             get {
                 object obj = ResourceManager.GetObject("Funtionen", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -123,7 +194,7 @@ namespace Peter.Properties {
         /// <summary>
         ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Gothic {
+        public static System.Drawing.Bitmap Gothic {
             get {
                 object obj = ResourceManager.GetObject("Gothic", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -133,7 +204,7 @@ namespace Peter.Properties {
         /// <summary>
         ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap GoToNextHS {
+        public static System.Drawing.Bitmap GoToNextHS {
             get {
                 object obj = ResourceManager.GetObject("GoToNextHS", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -143,7 +214,7 @@ namespace Peter.Properties {
         /// <summary>
         ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Hammer {
+        public static System.Drawing.Bitmap Hammer {
             get {
                 object obj = ResourceManager.GetObject("Hammer", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -153,7 +224,7 @@ namespace Peter.Properties {
         /// <summary>
         ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Items {
+        public static System.Drawing.Bitmap Items {
             get {
                 object obj = ResourceManager.GetObject("Items", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -163,7 +234,7 @@ namespace Peter.Properties {
         /// <summary>
         ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Left {
+        public static System.Drawing.Bitmap Left {
             get {
                 object obj = ResourceManager.GetObject("Left", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -173,7 +244,7 @@ namespace Peter.Properties {
         /// <summary>
         ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap minus {
+        public static System.Drawing.Bitmap minus {
             get {
                 object obj = ResourceManager.GetObject("minus", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -183,7 +254,7 @@ namespace Peter.Properties {
         /// <summary>
         ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap NPC {
+        public static System.Drawing.Bitmap NPC {
             get {
                 object obj = ResourceManager.GetObject("NPC", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -193,7 +264,7 @@ namespace Peter.Properties {
         /// <summary>
         ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap plus {
+        public static System.Drawing.Bitmap plus {
             get {
                 object obj = ResourceManager.GetObject("plus", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -203,7 +274,7 @@ namespace Peter.Properties {
         /// <summary>
         ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap StampferSplash2 {
+        public static System.Drawing.Bitmap StampferSplash2 {
             get {
                 object obj = ResourceManager.GetObject("StampferSplash2", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -213,7 +284,7 @@ namespace Peter.Properties {
         /// <summary>
         ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap tsbPrint_Image {
+        public static System.Drawing.Bitmap tsbPrint_Image {
             get {
                 object obj = ResourceManager.GetObject("tsbPrint.Image", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
