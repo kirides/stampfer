@@ -96,16 +96,37 @@ namespace Peter
             this.m_EditorConfig = new Classes.Configuration.Editor();
 
             // Load Any Configuration from Config File...
-            if (File.Exists(this.ConfigFile))
+            if (!File.Exists(this.ConfigFile))
             {
-                // Load Config File...
-                this.Config = LoadConfigFile(false);
-                if (!string.IsNullOrEmpty(Config.Editor.Scripts))
+                var serializer = new XmlSerializer(typeof(Peter.Classes.Configuration.PeterConfig));
+                using (var fs = File.Create(this.ConfigFile))
                 {
-                    m_ScriptsPath = Config.Editor.Scripts;
+                    serializer.Serialize(fs, Classes.Configuration.PeterConfig.Default);
                 }
             }
-
+            // Load Config File...
+            this.Config = LoadConfigFile(false);
+            if (string.IsNullOrEmpty(Config.Editor.Scripts))
+            {
+                var fbd = new FolderBrowserDialog
+                {
+                    Description = @"Wähle dein Script-Verzeichnis aus. (z.B. C:\Gothic II\_work\Data\Scripts)",
+                    ShowNewFolderButton = false,
+                };
+                do
+                {
+                    if (fbd.ShowDialog() == DialogResult.OK)
+                    {
+                        Config.Editor.Scripts = fbd.SelectedPath;
+                        break;
+                    }
+                } while (MessageBox.Show("Es wurde kein Script-Verzeichnis ausgewählt", "Fehler", MessageBoxButtons.RetryCancel) == DialogResult.Retry);
+                if (string.IsNullOrEmpty(Config.Editor.Scripts))
+                {
+                    Environment.Exit(1);
+                }
+            }
+            m_ScriptsPath = Config.Editor.Scripts;
             // Set Variabales...
             this.m_NewCount = 0;
             this.m_Plugins = new cPluginCollection();
@@ -1347,25 +1368,12 @@ namespace Peter
                             {
                                 e.Show(this.DockMain);
                             }
-                            // MessageBox.Show(e.Text);
-
                         }
                         else
                         {
                             e.Show(addToContent.DockHandler.Pane, null);
-
                         }
-
                         e.Activate();
-
-                        // this.DockMain.ActiveContent.DockHandler.Activate();
-                        //MessageBox.Show(e.TabText);
-
-
-
-
-
-
                     }
                     else
                     {
@@ -1439,32 +1447,16 @@ namespace Peter
             this.mnuFileOpenRecent.DropDownItems.Add(tsmi);
 
             // Update Config file...
-            var inList = false;
-            var count = 0;
-            if (Config.RecentFiles.File.Count == 1)
+            if (Config.RecentFiles.File.Contains(filePath))
             {
-                foreach (var n in Config.RecentFiles.File)
-                {
-                    count++;
-                    if (n == this.ofdMain.FileName)
-                    {
-                        inList = true;
-                        break;
-                    }
-                }
-
-                if (!inList)
-                {
-                    if (count == this.m_RecentFileCount)
-                    {
-                        // Remove the First Node...
-                        Config.RecentFiles.File.RemoveAt(0);
-                    }
-
-                    Config.RecentFiles.File.Add(filePath);
-                    SaveConfig();
-                }
+                Config.RecentFiles.File.Remove(filePath);
             }
+            Config.RecentFiles.File.Add(filePath);
+            while (Config.RecentFiles.File.Count > Config.Application.RecentFileCount)
+            {
+                Config.RecentFiles.File.RemoveAt(0);
+            }
+            SaveConfig();
         }
 
         #endregion
@@ -2602,40 +2594,34 @@ namespace Peter
                 }
 
                 // Update Config file...
-                var inList = false;
-                var count = 0;
-                if (Config.RecentProjects.Project.Count == 1)
+                if (Config.RecentProjects.Project.Count > 0)
                 {
-                    foreach (var n in Config.RecentProjects.Project)
+                    var existing = Config.RecentProjects.Project.FirstOrDefault(x => x.File == fileName);
+                    if (existing is null)
                     {
-                        count++;
-                        if (n.File == fileName)
-                        {
-                            inList = true;
-                            break;
-                        }
-
-                        if (inList) break;
-                    }
-
-                    if (!inList)
-                    {
-                        if (count == this.m_RecentProjectCount)
-                        {
-                            // Remove the First Node...
-                            Config.RecentProjects.Project.RemoveAt(0);
-                        }
-
+                        Config.RecentProjects.Project.RemoveAt(0);
                         // Add the new project...
                         Config.RecentProjects.Project.Add(new Classes.Configuration.Project
                         {
                             File = fileName,
                             Name = proj,
                         });
-
-                        SaveConfig();
                     }
                 }
+                else
+                {
+                    // Add the new project...
+                    Config.RecentProjects.Project.Add(new Classes.Configuration.Project
+                    {
+                        File = fileName,
+                        Name = proj,
+                    });
+                }
+                while (Config.RecentProjects.Project.Count > Config.Application.RecentProjectCount)
+                {
+                    Config.RecentProjects.Project.RemoveAt(0);
+                }
+                SaveConfig();
             }
         }
 

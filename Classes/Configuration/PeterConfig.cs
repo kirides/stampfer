@@ -13,9 +13,9 @@ namespace Peter.Classes.Configuration
         [XmlElement(ElementName = "Left")]
         public int Left { get; set; }
         [XmlElement(ElementName = "Width")]
-        public int Width { get; set; }
+        public int Width { get; set; } = 800;
         [XmlElement(ElementName = "Height")]
-        public int Height { get; set; }
+        public int Height { get; set; } = 600;
         [XmlElement(ElementName = "RecentFileCount")]
         public int RecentFileCount { get; set; }
         [XmlElement(ElementName = "RecentProjectCount")]
@@ -135,6 +135,39 @@ namespace Peter.Classes.Configuration
     [XmlRoot(ElementName = "PeterConfig")]
     public class PeterConfig
     {
+        public static PeterConfig Default = new PeterConfig
+        {
+            Application = new Application
+            {
+                Width = 800,
+                Height = 600,
+                RecentFileCount = 10,
+                RecentProjectCount = 5
+            },
+            Editor = new Editor
+            {
+                Autobrackets = true,
+                Autocomplete = true,
+                HighlightCurrentLine = true,
+                ShowLineNumbers = true,
+                TabIndent = 4,
+                BracketMatchingStyle = "Nachher",
+                IndentStyle = "auto",
+                VerticalRulerCol = 90,
+                ShowMatchBracket = true,
+                AutoInsertBracket = true,
+                Backup = true,
+                ConvertTabs = true,
+                EnableCodeFolding = true,
+                Font = "Courier New;9,75",
+                Scripts = "",
+                Bilder = "",
+                Parser = false,
+                Backupfolder = "",
+            },
+            RecentFiles = new RecentFiles { File = new List<string>() },
+            RecentProjects = new RecentProjects { Project = new List<Project>() },
+        };
         [XmlElement(ElementName = "Application")]
         public Application Application { get; set; }
         [XmlElement(ElementName = "RecentProjects")]
