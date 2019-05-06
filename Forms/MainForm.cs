@@ -2376,16 +2376,12 @@ namespace Peter
             }
             return false;
         }
-        public bool FindText(Regex r, bool findUp)
+        public bool FindText(Regex regex, bool findUp)
         {
-            if (this.ActiveEditor != null)
+            var activeEditor = this.ActiveEditor;
+            if (activeEditor != null)
             {
-
-                // IPeterPluginTab tab = (IPeterPluginTab)this.ActiveContent;
-                //return tab.FindNext(r, findUp);
-                this.ActiveEditor.FindText(r);
-
-                return true;
+                return activeEditor.FindText(regex);
             }
             return false;
         }

@@ -123,6 +123,7 @@
     <Compile Include="DockContent\DialogCreator.Designer.cs">
       <DependentUpon>DialogCreator.cs</DependentUpon>
     </Compile>
+    <Compile Include="DockContent\Instance.cs" />
     <Compile Include="Forms\FAddQuest.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -91,30 +91,30 @@ namespace Peter
             this.m_Changed = false;
 
             // Delegates...
-            this.m_LoadFile = new LoadFileDelegate(this.DelReLoad);
-            this.m_CloseDel = new CloseDelegate(this.DelClose);
+            this.m_LoadFile = DelegateReload;
+            this.m_CloseDel = DelegateClose;
 
             // Drag N Drop...
             this.m_Editor.ActiveTextAreaControl.TextArea.AllowDrop = true;
-            this.m_Editor.ActiveTextAreaControl.TextArea.DragEnter += new System.Windows.Forms.DragEventHandler(TextArea_DragEnter);
-            this.m_Editor.ActiveTextAreaControl.TextArea.DragDrop += new System.Windows.Forms.DragEventHandler(TextArea_DragDrop);
-            this.m_Editor.ActiveTextAreaControl.TextArea.MouseDown += new MouseEventHandler(TextArea_MouseDown);
-            this.m_Editor.ActiveTextAreaControl.Caret.PositionChanged += new EventHandler(Caret_Change);
-            this.m_Editor.ActiveTextAreaControl.Caret.CaretModeChanged += new EventHandler(Caret_CaretModeChanged);
+            this.m_Editor.ActiveTextAreaControl.TextArea.DragEnter += TextArea_DragEnter;
+            this.m_Editor.ActiveTextAreaControl.TextArea.DragDrop += TextArea_DragDrop;
+            this.m_Editor.ActiveTextAreaControl.TextArea.MouseDown += TextArea_MouseDown;
+            this.m_Editor.ActiveTextAreaControl.Caret.PositionChanged += Caret_Change;
+            this.m_Editor.ActiveTextAreaControl.Caret.CaretModeChanged += Caret_CaretModeChanged;
 
-            this.m_Editor.ActiveTextAreaControl.TextArea.KeyDown += new System.Windows.Forms.KeyEventHandler(TextArea_KeyDown);
+            this.m_Editor.ActiveTextAreaControl.TextArea.KeyDown += TextArea_KeyDown;
 
-            this.m_Editor.ActiveTextAreaControl.TextArea.DoProcessDialogKey += new DialogKeyProcessor(TextArea_DoProcessDialogKey);
+            this.m_Editor.ActiveTextAreaControl.TextArea.DoProcessDialogKey += TextArea_DoProcessDialogKey;
 
             this.m_Editor.Document.DocumentChanged += new DocumentEventHandler(Document_DocumentChanged);
-            this.m_Editor.Document.UndoStack.ActionRedone += new EventHandler(UndoStack_ActionRedone);
-            this.m_Editor.Document.UndoStack.ActionUndone += new EventHandler(UndoStack_ActionRedone);
+            this.m_Editor.Document.UndoStack.ActionRedone += UndoStack_ActionRedone;
+            this.m_Editor.Document.UndoStack.ActionUndone += UndoStack_ActionRedone;
 
-            this.m_Editor.ActiveTextAreaControl.Document.DocumentChanged += new DocumentEventHandler(Document_DocumentChanged2);
+            this.m_Editor.ActiveTextAreaControl.Document.DocumentChanged += Document_DocumentChanged2;
 
             mytimer.Enabled = true;
             mytimer.Interval = 500;
-            mytimer.Tick += new EventHandler(mytimer_Tick);
+            mytimer.Tick += Mytimer_Tick;
         }
 
         private void Document_DocumentChanged2(object sender, DocumentEventArgs e)
@@ -122,7 +122,7 @@ namespace Peter
             cooldowntimer = COOLDOWN;
         }
 
-        private void mytimer_Tick(object sender, EventArgs e)
+        private void Mytimer_Tick(object sender, EventArgs e)
         {
             if (cooldowntimer > 0)
             {
@@ -893,7 +893,7 @@ namespace Peter
         /// <summary>
         /// Close Delegate Method...
         /// </summary>
-        private void DelClose()
+        private void DelegateClose()
         {
             if (ignoreclose) return;
             if (MessageBox.Show(this.m_MainForm, this.m_Editor.FileName + " wurde gelöscht. Soll die Datei geschlossen werden?",
@@ -908,7 +908,7 @@ namespace Peter
         /// Reload File Delegate...
         /// </summary>
         /// <param name="file">Path to File.</param>
-        private void DelReLoad(string file)
+        private void DelegateReload(string file)
         {
             if (MessageBox.Show(this.m_MainForm, this.m_Editor.FileName + " wurde geändert. Soll die Datei erneut geladen werden?",
                 "Stampfer", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
@@ -1529,23 +1529,15 @@ namespace Peter
         public bool FindText(Regex reg)
         {
             this.m_Host.Trace("Suche nach " + reg.ToString());
-            //Match m = null;
-            try
+            var mc = reg.Matches(this.m_Editor.Document.TextContent);
+            if (mc.Count > 0)
             {
-                var mc = reg.Matches(this.m_Editor.Document.TextContent);
-                if (mc.Count > 0)
-                {
-                    ScrollTo(mc[0].Index);
-                }
-            }
-            catch
-            {
+                ScrollTo(mc[0].Index);
             }
             return true;
         }
         private void CouldNotFind(Regex reg)
         {
-
             this.m_FindPos = -1;
             MessageBox.Show(this.m_MainForm, "Keine Ergebnisse '" + reg.ToString() + "' gefunden.", "Stampfer", MessageBoxButtons.OK, MessageBoxIcon.Information);
             this.m_Host.Trace("");
@@ -1694,8 +1686,8 @@ namespace Peter
         }
         public void Enclose(string s1, string s2)
         {
-            var Leer = 0;
-            var t = Convert.ToChar("\t");
+            const char tabChar = '\t';
+            var leer = 0;
             if (this.m_Editor.ActiveTextAreaControl.SelectionManager.SelectionCollection.Count < 1)
             {
                 this.m_Editor.Document.Insert(this.m_Editor.ActiveTextAreaControl.Caret.Offset, s1);
@@ -1708,16 +1700,16 @@ namespace Peter
 
                 for (var i = this.m_Editor.Document.LineSegmentCollection[this.m_Editor.ActiveTextAreaControl.SelectionManager.SelectionCollection[0].StartPosition.Y].Offset; i < this.m_Editor.ActiveTextAreaControl.SelectionManager.SelectionCollection[0].Offset; i++)
                 {
-                    if (this.m_Editor.Document.TextContent[i] == ' ' || this.m_Editor.Document.TextContent[i] == t)
+                    if (this.m_Editor.Document.TextContent[i] == ' ' || this.m_Editor.Document.TextContent[i] == tabChar)
                     {
-                        Leer++;
+                        leer++;
                     }
                     else
                     {
                         break;
                     }
                 }
-                this.m_Editor.ActiveTextAreaControl.SelectionManager.SetSelection(new Point(this.m_Editor.ActiveTextAreaControl.SelectionManager.SelectionCollection[0].StartPosition.X - Leer,
+                this.m_Editor.ActiveTextAreaControl.SelectionManager.SetSelection(new Point(this.m_Editor.ActiveTextAreaControl.SelectionManager.SelectionCollection[0].StartPosition.X - leer,
                     this.m_Editor.ActiveTextAreaControl.SelectionManager.SelectionCollection[0].StartPosition.Y), new Point(this.m_Editor.ActiveTextAreaControl.SelectionManager.SelectionCollection[0].EndPosition.X,
                     this.m_Editor.ActiveTextAreaControl.SelectionManager.SelectionCollection[0].EndPosition.Y));
                 this.m_Editor.Document.Insert(this.m_Editor.ActiveTextAreaControl.SelectionManager.SelectionCollection[0].Offset, s1);

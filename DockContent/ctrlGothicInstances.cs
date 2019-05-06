@@ -32,7 +32,7 @@ namespace Peter
 {
     public partial class ctrlGothicInstances : DockContent, IPeterPluginTab
     {
-        private readonly MainForm MainF;
+        private readonly MainForm mainForm;
         private readonly Regex NoSpaces = new Regex(@"  ");
         private readonly bool m_CanScroll;
 
@@ -62,7 +62,7 @@ namespace Peter
         public ctrlGothicInstances(MainForm m)
         {
 
-            this.MainF = m;
+            this.mainForm = m;
             InitializeComponent();
             this.ScriptsPath = m.m_ScriptsPath;
             this.m_CanScroll = true;
@@ -193,14 +193,13 @@ namespace Peter
 
         private void treeMain_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
         {
-
             if (this.m_CanScroll)
             {
                 if (e.Node.Parent != null)
                 {
                     if (e.Node.Tag != null)
                     {
-                        var file = (e.Node.Tag.ToString());
+                        var file = e.Node.Tag.ToString();
                         OpenFile(file, e.Node.Text);
                     }
                 }
@@ -209,47 +208,49 @@ namespace Peter
         }
         public void OpenFile(string file, string txt)
         {
-            if (File.Exists(file))
+            if (!File.Exists(file))
             {
-                var searchstring = "";
+                return;
+            }
 
-                this.MainF.CreateEditor(file, Path.GetFileName(file));
-                foreach (var c in txt)
+            var searchstring = "";
+
+            this.mainForm.CreateEditor(file, Path.GetFileName(file));
+            foreach (var c in txt)
+            {
+                if (c == '=' || c == '(')
                 {
-                    if (c == '=' || c == '(')
-                    {
-                        break;
-                    }
-                    searchstring += c.ToString();
+                    break;
                 }
-                if (txt.ToLower().StartsWith("void"))
-                {
-                    this.MainF.FindText(new Regex(@"void(\s)*" + RemoveType(ref searchstring, ref file), RegexOptions.IgnoreCase), true);
-                }
-                else if (txt.ToLower().StartsWith("int"))
-                {
-                    this.MainF.FindText(new Regex(@"int(\s)*" + RemoveType(ref searchstring, ref file), RegexOptions.IgnoreCase), true);
-                }
-                else if (txt.ToLower().StartsWith("string"))
-                {
-                    this.MainF.FindText(new Regex(@"string(\s)*" + RemoveType(ref searchstring, ref file), RegexOptions.IgnoreCase), true);
-                }
-                else if (txt.ToLower().StartsWith("c_npc"))
-                {
-                    this.MainF.FindText(new Regex(@"c_npc(\s)*" + RemoveType(ref searchstring, ref file), RegexOptions.IgnoreCase), true);
-                }
-                else if (txt.ToLower().StartsWith("c_item"))
-                {
-                    this.MainF.FindText(new Regex(@"c_item(\s)*" + RemoveType(ref searchstring, ref file), RegexOptions.IgnoreCase), true);
-                }
-                else if (txt.ToLower().StartsWith("float"))
-                {
-                    this.MainF.FindText(new Regex(@"float(\s)*" + RemoveType(ref searchstring, ref file), RegexOptions.IgnoreCase), true);
-                }
-                else
-                {
-                    this.MainF.FindText(new Regex(@"\s" + RemoveType(ref searchstring, ref file), RegexOptions.IgnoreCase), true);
-                }
+                searchstring += c.ToString();
+            }
+            if (txt.StartsWith("void", StringComparison.OrdinalIgnoreCase))
+            {
+                this.mainForm.FindText(new Regex(@"void(\s)*" + RemoveType(ref searchstring, ref file), RegexOptions.IgnoreCase), true);
+            }
+            else if (txt.StartsWith("int", StringComparison.OrdinalIgnoreCase))
+            {
+                this.mainForm.FindText(new Regex(@"int(\s)*" + RemoveType(ref searchstring, ref file), RegexOptions.IgnoreCase), true);
+            }
+            else if (txt.StartsWith("string", StringComparison.OrdinalIgnoreCase))
+            {
+                this.mainForm.FindText(new Regex(@"string(\s)*" + RemoveType(ref searchstring, ref file), RegexOptions.IgnoreCase), true);
+            }
+            else if (txt.StartsWith("c_npc", StringComparison.OrdinalIgnoreCase))
+            {
+                this.mainForm.FindText(new Regex(@"c_npc(\s)*" + RemoveType(ref searchstring, ref file), RegexOptions.IgnoreCase), true);
+            }
+            else if (txt.StartsWith("c_item", StringComparison.OrdinalIgnoreCase))
+            {
+                this.mainForm.FindText(new Regex(@"c_item(\s)*" + RemoveType(ref searchstring, ref file), RegexOptions.IgnoreCase), true);
+            }
+            else if (txt.StartsWith("float", StringComparison.OrdinalIgnoreCase))
+            {
+                this.mainForm.FindText(new Regex(@"float(\s)*" + RemoveType(ref searchstring, ref file), RegexOptions.IgnoreCase), true);
+            }
+            else
+            {
+                this.mainForm.FindText(new Regex(@"\s" + RemoveType(ref searchstring, ref file), RegexOptions.IgnoreCase), true);
             }
         }
 
@@ -562,16 +563,12 @@ namespace Peter
                 string tempstring2;
                 if (tempstring.Length == 0) return 0;
                 tempstring = RemoveDoubleSpaces(tempstring);
-                try
+                var y = tempstring.IndexOf(" ");
+                if (y > 0)
                 {
-                    var y = tempstring.IndexOf(" ");
-                    if (y > 0)
-                    {
-                        var temp = tempstring.Substring(0, y);
-                        tempstring = temp.ToLower() + tempstring.Substring(y);
-                    }
+                    var temp = tempstring.Substring(0, y);
+                    tempstring = temp.ToLower() + tempstring.Substring(y);
                 }
-                catch { }
                 tempstring2 = tempstring.ToLower();
                 if (tempstring2.StartsWith("void") || tempstring2.StartsWith("int") || tempstring2.StartsWith("c_npc") || tempstring2.StartsWith("c_item") || tempstring2.StartsWith("string"))
                 {
@@ -592,17 +589,12 @@ namespace Peter
                 string temp;
                 if (tempstring.Length == 0) return 0;
                 tempstring = RemoveDoubleSpaces(tempstring);
-                try
+                var y = tempstring.IndexOf(" ");
+                if (y > 0)
                 {
-                    var y = tempstring.IndexOf(" ");
-                    if (y > 0)
-                    {
-                        temp = tempstring.Substring(0, y);
-                        tempstring = temp.ToLower() + tempstring.Substring(y);
-                    }
+                    temp = tempstring.Substring(0, y);
+                    tempstring = temp.ToLower() + tempstring.Substring(y);
                 }
-                catch { }
-
                 if (!VarList.ContainsKey(tempstring))
                 {
                     VarList.Add(tempstring, new Instance(tempstring, path));
@@ -619,16 +611,12 @@ namespace Peter
                 string temp;
                 if (tempstring.Length == 0) return 0;
                 tempstring = RemoveDoubleSpaces(tempstring);
-                try
+                var y = tempstring.IndexOf(" ");
+                if (y > 0)
                 {
-                    var y = tempstring.IndexOf(" ");
-                    if (y > 0)
-                    {
-                        temp = tempstring.Substring(0, y);
-                        tempstring = temp.ToLower() + tempstring.Substring(y);
-                    }
+                    temp = tempstring.Substring(0, y);
+                    tempstring = temp.ToLower() + tempstring.Substring(y);
                 }
-                catch { }
                 if (!ConstList.ContainsKey(tempstring))
                 {
                     ConstList.Add(tempstring, new Instance(tempstring, path));
@@ -641,7 +629,7 @@ namespace Peter
         {
             ClearTree(dialoge, npcs, items, functions);
 
-            this.MainF.Trace("Gothic-Bezeichner werden aktualisert (kann einige Sekunden dauern).");
+            this.mainForm.Trace("Gothic-Bezeichner werden aktualisert (kann einige Sekunden dauern).");
             var handlers = new Dictionary<string, Func<string, int>>();
 
             if (items) handlers[FilePaths.ContentItems] = GetItems;
@@ -660,7 +648,7 @@ namespace Peter
                         kvp.Value(file);
                     }
                 }
-                this.MainF.Trace("Gothic-Bezeichner wurden erfolgreich aktualisert.");
+                this.mainForm.Trace("Gothic-Bezeichner wurden erfolgreich aktualisert.");
             }).ContinueWith(t =>
             {
                 SetAutoCompleteContent();
@@ -810,81 +798,31 @@ namespace Peter
         private void ReadInstancesFromFile()
         {
             ClearArrays();
-
-            if (File.Exists(this.ScriptsPath + FilePaths.DIALOGE)
-                && File.Exists(this.ScriptsPath + FilePaths.ITEMS)
-                && File.Exists(this.ScriptsPath + FilePaths.NPCS)
-                && File.Exists(this.ScriptsPath + FilePaths.FUNC)
-                && File.Exists(this.ScriptsPath + FilePaths.VARS)
-                && File.Exists(this.ScriptsPath + FilePaths.CONSTS))
+            var handlers = new Dictionary<string, Action<string, Instance>>
             {
-                try
+                { FilePaths.DIALOGE, DialogList.Add },
+                { FilePaths.NPCS, NPCList.Add },
+                { FilePaths.ITEMS, ItemList.Add },
+                { FilePaths.FUNC, FuncList.Add },
+                { FilePaths.VARS, VarList.Add },
+                { FilePaths.CONSTS, ConstList.Add },
+            };
+            if (handlers.Keys.All(path => File.Exists(Path.Combine(this.ScriptsPath, path))))
+            {
+                this.mainForm.Trace("Gothic-Bezeichner werden ausgelesen.");
+                foreach (var kvp in handlers)
                 {
-                    this.MainF.Trace("Gothic-Bezeichner werden ausgelesen.");
-                    var line = "";
-                    var line2 = "";
-
-                    var sr = new StreamReader(this.ScriptsPath + FilePaths.DIALOGE, Encoding.Default);
-                    while ((line = sr.ReadLine()) != null)
+                    var filePath = Path.Combine(this.ScriptsPath, kvp.Key);
+                    using (var sr = new StreamReader(filePath, Encoding.Default))
                     {
-                        line2 = sr.ReadLine();
-                        DialogList.Add(line, new Instance(line, line2));
-
-                    }
-                    sr.Close();
-
-                    sr = new StreamReader(this.ScriptsPath + FilePaths.NPCS, Encoding.Default);
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        line2 = sr.ReadLine();
-                        NPCList.Add(line, new Instance(line, line2));
-
-                    }
-                    sr.Close();
-
-                    sr = new StreamReader(this.ScriptsPath + FilePaths.ITEMS, Encoding.Default);
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        line2 = sr.ReadLine();
-                        ItemList.Add(line, new Instance(line, line2));
-                    }
-                    sr.Close();
-
-                    using (sr = new StreamReader(this.ScriptsPath + FilePaths.FUNC, Encoding.Default))
-                    {
-                        while ((line = sr.ReadLine()) != null)
+                        while (sr.ReadLine() is string line)
                         {
-                            line2 = sr.ReadLine();
-                            FuncList.Add(line, new Instance(line, line2));
-
+                            var line2 = sr.ReadLine();
+                            kvp.Value(line, new Instance(line, line2));
                         }
                     }
-
-                    sr = new StreamReader(this.ScriptsPath + FilePaths.VARS, Encoding.Default);
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        line2 = sr.ReadLine();
-                        VarList.Add(line, new Instance(line, line2));
-
-                    }
-                    sr.Close();
-
-                    sr = new StreamReader(this.ScriptsPath + FilePaths.CONSTS, Encoding.Default);
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        line2 = sr.ReadLine();
-                        ConstList.Add(line, new Instance(line, line2));
-
-                    }
-                    sr.Close();
-                    sr.Dispose();
-
-                    this.MainF.Trace("Gothic-Bezeichner erfolgreich ausgelesen.");
                 }
-                catch
-                {
-                    GetInstancesToFile(true, true, true, true);
-                }
+                this.mainForm.Trace("Gothic-Bezeichner erfolgreich ausgelesen.");
             }
             else
             {
@@ -894,26 +832,31 @@ namespace Peter
         }
         public string RemoveDoubleSpaces(string s)
         {
-            var ts = s.Split(' ');
             var sb = new StringBuilder(s.Length);
-
-            foreach (var st in ts)
+            var spaceCount = 0;
+            for (var i = 0; i < s.Length; i++)
             {
-                s = st.Trim();
-                if (s.Length > 0)
-                    sb.Append(s + " ");
+                if (s[i] == ' ')
+                {
+                    spaceCount++;
+                    if (spaceCount > 1) continue;
+                }
+                else
+                {
+                    spaceCount = 0;
+                }
+                sb.Append(s[i]);
             }
-            return sb.ToString().Remove(sb.Length - 1);
+            return sb.ToString();
         }
 
         public void SetAutoCompleteContent()
         {
-
-            if (this.MainF.m_AutoComplete != null)
+            if (this.mainForm.m_AutoComplete != null)
             {
-                if (this.MainF.m_AutoComplete.Extension == ".d")
+                if (this.mainForm.m_AutoComplete.Extension == ".d")
                 {
-                    this.MainF.m_AutoComplete.KW.Clear();
+                    this.mainForm.m_AutoComplete.KW.Clear();
                     string s1, s2 = "";
 
                     foreach (var i in VarList.Values)
@@ -922,21 +865,19 @@ namespace Peter
                         ConvertVarForAutoComplete(ref s1, ref s2);
                         var k = new Classes.KeyWord(s1, 4, s2, "Variable");
 
-                        if (this.MainF.m_AutoComplete.KW.BinarySearch(k) >= 0)
+                        if (this.mainForm.m_AutoComplete.KW.BinarySearch(k) >= 0)
                         {
                             continue;
                         }
-                        this.MainF.m_AutoComplete.KW.Add(k);
+                        this.mainForm.m_AutoComplete.KW.Add(k);
                     }
 
                     foreach (var i in FuncList.Values)
                     {
                         s1 = i.Name;
                         ConvertFuncForAutoComplete(ref s1, ref s2);
-
                         var k = new Classes.KeyWord(s1, 3, s2, " ");
-
-                        this.MainF.m_AutoComplete.KW.Add(k);
+                        this.mainForm.m_AutoComplete.KW.Add(k);
                     }
 
                     foreach (var i in ConstList.Values)
@@ -945,39 +886,38 @@ namespace Peter
                         ConvertConstForAutoComplete(ref s1, ref s2);
 
                         var k = new Classes.KeyWord(s1, 5, s2, "Konstante");
-                        if (this.MainF.m_AutoComplete.KW.BinarySearch(k) >= 0)
+                        if (this.mainForm.m_AutoComplete.KW.BinarySearch(k) >= 0)
                         {
                             continue;
                         }
-                        this.MainF.m_AutoComplete.KW.Add(k);
+                        this.mainForm.m_AutoComplete.KW.Add(k);
                     }
                     foreach (var i in DialogList.Values)
                     {
                         var k = new Classes.KeyWord(i.Name, 0, "Dialog", " ");
-                        this.MainF.m_AutoComplete.KW.Add(k);
+                        this.mainForm.m_AutoComplete.KW.Add(k);
                     }
 
                     foreach (var i in ItemList.Values)
                     {
                         var k = new Classes.KeyWord(i.Name, 2, "Item", " ");
-                        this.MainF.m_AutoComplete.KW.Add(k);
+                        this.mainForm.m_AutoComplete.KW.Add(k);
                     }
 
                     foreach (var i in NPCList.Values)
                     {
                         var k = new Classes.KeyWord(i.Name, 1, "NPC", " ");
-                        this.MainF.m_AutoComplete.KW.Add(k);
+                        this.mainForm.m_AutoComplete.KW.Add(k);
                     }
 
-                    this.MainF.m_AutoComplete.KW.AddRange(this.MainF.m_AutoComplete.Properties);
-                    this.MainF.m_AutoComplete.KW.AddRange(this.MainF.m_AutoComplete.ShortFuncs);
-                    this.MainF.m_AutoComplete.KW.Sort();
+                    this.mainForm.m_AutoComplete.KW.AddRange(this.mainForm.m_AutoComplete.Properties);
+                    this.mainForm.m_AutoComplete.KW.AddRange(this.mainForm.m_AutoComplete.ShortFuncs);
+                    this.mainForm.m_AutoComplete.KW.Sort();
                 }
             }
         }
         private string RemoveType(ref string ts, ref string t)
         {
-
             var y = ts.IndexOf(" ");
             if (y > 0)
             {
@@ -988,55 +928,40 @@ namespace Peter
         }
         public void ConvertFuncForAutoComplete(ref string s1, ref string s2)
         {
-            string[] sa;
-            try
+            if (!s1.Contains("("))
             {
-                if (!s1.Contains("("))
+                s1 = RemoveType(ref s1, ref s2);
+            }
+            else
+            {
+                var sa = s1.Split('(');
+                if (sa.Length > 1)
                 {
-                    s1 = RemoveType(ref s1, ref s2);
-                }
-                else
-                {
-                    sa = s1.Split('(');
                     sa[1] = "(" + sa[1];
                     s1 = RemoveType(ref sa[0], ref s2);
                     s2 = s2 + " " + sa[1];
                 }
             }
-            catch
-            {
-            }
         }
         public void ConvertVarForAutoComplete(ref string s1, ref string s2)
         {
-            try
-            {
-                RemoveType(ref s1, ref s2);
-            }
-            catch
-            {
-            }
+            RemoveType(ref s1, ref s2);
         }
         public void ConvertConstForAutoComplete(ref string s1, ref string s2)
         {
-            try
+            if (!s1.Contains('='))
             {
-                if (!s1.Contains('='))
+                s1 = RemoveType(ref s1, ref s2);
+            }
+            else
+            {
+                var sa = s1.Split('=');
+                if (sa.Length > 1)
                 {
-                    s1 = RemoveType(ref s1, ref s2);
-                }
-                else
-                {
-                    string[] sa;
-
-                    sa = s1.Split('=');
                     sa[1] = "=" + sa[1];
                     s1 = RemoveType(ref sa[0], ref s2).Trim();
                     s2 = s2 + " " + sa[1];
                 }
-            }
-            catch
-            {
             }
         }
 
@@ -1045,51 +970,42 @@ namespace Peter
         private void TxtSuchString_TextChanged(object sender, EventArgs e)
         {
             FindInTree(false);
-
         }
 
         private Regex rg;
         private void FindInTreeSub(TreeNode i, string Temp, bool mode)
         {
-            int lokIndex;
-            try
+            if (mode == false)
             {
-                if (mode == false)
+                if (i.Text.ToLower().Contains(Temp))
                 {
-                    if (i.Text.ToLower().Contains(Temp))
-                    {
-                        var tempnode = i.Parent;
-                        lokIndex = i.Index;
-                        while (tempnode.PrevNode != null)
-                        {
-                            lokIndex += tempnode.PrevNode.Nodes.Count;
-                            tempnode = tempnode.PrevNode;
-                        }
-                        i.StateImageKey = Convert.ToString(lokIndex);
-                        TreeMatches.Add(i);
-                        i.BackColor = Color.Yellow;
-                    }
-                }
-                else if (rg != null)
-                {
-                    if (rg.IsMatch(i.Text.ToLower()))
-                    {
-                        var tempnode = i.Parent;
-                        lokIndex = i.Index;
-                        while (tempnode.PrevNode != null)
-                        {
-                            lokIndex += tempnode.PrevNode.Nodes.Count;
-                            tempnode = tempnode.PrevNode;
-                        }
-                        i.StateImageKey = Convert.ToString(lokIndex);
-                        TreeMatches.Add(i);
-                        i.BackColor = Color.Yellow;
-                    }
+                    var lokIndex = GetNodeIndex(i);
+                    i.StateImageKey = lokIndex.ToString();
+                    TreeMatches.Add(i);
+                    i.BackColor = Color.Yellow;
                 }
             }
-            catch
+            else if (rg != null)
             {
+                if (rg.IsMatch(i.Text.ToLower()))
+                {
+                    var lokIndex = GetNodeIndex(i);
+                    i.StateImageKey = lokIndex.ToString();
+                    TreeMatches.Add(i);
+                    i.BackColor = Color.Yellow;
+                }
             }
+        }
+        private int GetNodeIndex(TreeNode node)
+        {
+            var tempnode = node.Parent;
+            var lokIndex = node.Index;
+            while (tempnode.PrevNode != null)
+            {
+                lokIndex += tempnode.PrevNode.Nodes.Count;
+                tempnode = tempnode.PrevNode;
+            }
+            return lokIndex;
         }
         private void FindInTree(bool mode)
         {
@@ -1105,6 +1021,7 @@ namespace Peter
                 return;
             }
             var Temp = TxtSuchString.Text.ToLower();
+            rg = null;
             try
             {
                 rg = new Regex(Temp);
@@ -1112,47 +1029,15 @@ namespace Peter
             catch
             {
             }
-            if (ItemTree.IsExpanded)
+            var trees = new[] { ItemTree, DialogTree, NPCTree, FuncTree, VarTree, ConstTree };
+            for (var i = 0; i < trees.Length; i++)
             {
-                foreach (TreeNode i in ItemTree.Nodes)
+                if (trees[i].IsExpanded)
                 {
-                    FindInTreeSub(i, Temp, mode);
-                }
-            }
-            if (DialogTree.IsExpanded)
-            {
-
-                foreach (TreeNode i in DialogTree.Nodes)
-                {
-                    FindInTreeSub(i, Temp, mode);
-                }
-            }
-            if (NPCTree.IsExpanded)
-            {
-                foreach (TreeNode i in NPCTree.Nodes)
-                {
-                    FindInTreeSub(i, Temp, mode);
-                }
-            }
-            if (FuncTree.IsExpanded)
-            {
-                foreach (TreeNode i in FuncTree.Nodes)
-                {
-                    FindInTreeSub(i, Temp, mode);
-                }
-            }
-            if (VarTree.IsExpanded)
-            {
-                foreach (TreeNode i in VarTree.Nodes)
-                {
-                    FindInTreeSub(i, Temp, mode);
-                }
-            }
-            if (ConstTree.IsExpanded)
-            {
-                foreach (TreeNode i in ConstTree.Nodes)
-                {
-                    FindInTreeSub(i, Temp, mode);
+                    foreach (TreeNode n in trees[i].Nodes)
+                    {
+                        FindInTreeSub(n, Temp, mode);
+                    }
                 }
             }
             if (TreeMatches.Count > 0)
@@ -1184,20 +1069,12 @@ namespace Peter
         {
             if (TreeMatches.Count > 0)
             {
-                if (treeMain.SelectedNode != null)
+                var selectedNode = treeMain.SelectedNode;
+                if (selectedNode != null)
                 {
-                    var globIndex = treeMain.SelectedNode.Index;
-                    var tempnode = treeMain.SelectedNode.Parent;
-
-                    while (tempnode.PrevNode != null)
-                    {
-
-                        globIndex += tempnode.PrevNode.Nodes.Count;
-                        tempnode = tempnode.PrevNode;
-                    }
-
+                    var globIndex = GetNodeIndex(selectedNode);
                     int z;
-                    if ((globIndex > Convert.ToInt32(((TreeNode)TreeMatches[currentMatch]).StateImageKey)))
+                    if (globIndex > Convert.ToInt32(((TreeNode)TreeMatches[currentMatch]).StateImageKey))
                     {
                         z = TreeMatches.Count - 1;
                     }
@@ -1217,12 +1094,10 @@ namespace Peter
                             currentMatch = TreeMatches.Count - 1;
                         }
                     }
-
                 }
                 TxtFoundIndex.Text = (currentMatch + 1).ToString();
                 treeMain.SelectedNode = (TreeNode)TreeMatches[currentMatch];
                 treeMain.Focus();
-
             }
         }
 
@@ -1230,23 +1105,15 @@ namespace Peter
         {
             if (TreeMatches.Count > 0)
             {
-                if (treeMain.SelectedNode != null)
+                var selectedNode = treeMain.SelectedNode;
+                if (selectedNode != null)
                 {
-                    var globIndex = treeMain.SelectedNode.Index;
-                    var tempnode = treeMain.SelectedNode.Parent;
-
-                    while (tempnode.PrevNode != null)
-                    {
-
-                        globIndex += tempnode.PrevNode.Nodes.Count;
-                        tempnode = tempnode.PrevNode;
-                    }
+                    var globIndex = GetNodeIndex(selectedNode);
 
                     int z;
-                    if ((globIndex < Convert.ToInt32(((TreeNode)TreeMatches[currentMatch]).StateImageKey)))
+                    if (globIndex < Convert.ToInt32(((TreeNode)TreeMatches[currentMatch]).StateImageKey))
                     {
                         z = 0;
-
                     }
                     else
                     {
@@ -1265,16 +1132,12 @@ namespace Peter
                             currentMatch = 0;
                         }
                     }
-
                 }
                 TxtFoundIndex.Text = (currentMatch + 1).ToString();
                 treeMain.SelectedNode = (TreeNode)TreeMatches[currentMatch];
                 treeMain.Focus();
-
             }
         }
-
-        private Regex DigitOnly = new Regex(@"\d{1}");
 
         private void TxtFoundIndex_KeyDown(object sender, KeyEventArgs e)
         {
@@ -1282,22 +1145,20 @@ namespace Peter
             {
                 if (TreeMatches.Count > 0)
                 {
-                    DigitOnly = new Regex(@"\d{" + TxtFoundIndex.Text.Length + "}");
-                    if (!DigitOnly.IsMatch(TxtFoundIndex.Text))
+                    if (!int.TryParse(TxtFoundIndex.Text, out var foundIndex))
                     {
                         return;
                     }
-                    var FoundIndex = Convert.ToInt32(TxtFoundIndex.Text);
-                    if (FoundIndex < 1)
+                    if (foundIndex < 1)
                     {
-                        FoundIndex = 1;
+                        foundIndex = 1;
                     }
-                    else if (FoundIndex > TreeMatches.Count)
+                    else if (foundIndex > TreeMatches.Count)
                     {
-                        FoundIndex = TreeMatches.Count;
+                        foundIndex = TreeMatches.Count;
                     }
-                    TxtFoundIndex.Text = FoundIndex.ToString();
-                    currentMatch = FoundIndex - 1;
+                    TxtFoundIndex.Text = foundIndex.ToString();
+                    currentMatch = foundIndex - 1;
                     treeMain.SelectedNode = (TreeNode)TreeMatches[currentMatch];
                     treeMain.Focus();
                 }
@@ -1318,9 +1179,8 @@ namespace Peter
             {
                 if (e.Node != null)
                 {
-                    var Temp = "";
                     var s2 = "";
-                    Temp = e.Node.Text;
+                    var Temp = e.Node.Text;
                     if (e.Node.Parent == FuncTree)
                     {
                         ConvertFuncForAutoComplete(ref Temp, ref s2);
@@ -1333,7 +1193,6 @@ namespace Peter
                     {
                         ConvertConstForAutoComplete(ref Temp, ref s2);
                     }
-
                     Clipboard.SetText(Temp);
                 }
             }
@@ -1345,7 +1204,6 @@ namespace Peter
             {
                 TxtSuchString.Text = Clipboard.GetText();
             }
-
             if (e.Control && e.Alt && e.KeyCode == Keys.D9)
             {
                 TxtSuchString.Text += "]";
@@ -1384,41 +1242,6 @@ namespace Peter
         private void BtRegex_Click(object sender, EventArgs e)
         {
             FindInTree(true);
-        }
-    }
-    [Serializable()]
-    public class Instance : IComparable, IComparable<Instance>
-    {
-        public string Name;
-        public string File;
-        public string Params;
-        public int Line;
-        public Instance(string s1, string s2)
-        {
-            Name = s1;
-            File = s2;
-
-        }
-
-        public Instance(string s1, int i1)
-        {
-            Name = s1;
-            Line = i1;
-
-        }
-        public override string ToString()
-        {
-            return Name;
-        }
-        int IComparable.CompareTo(object obj)
-        {
-            var p = obj as Instance;
-            return CompareTo(p);
-        }
-
-        public int CompareTo(Instance other)
-        {
-            return string.Compare(this.ToString(), other.ToString(), true);
         }
     }
 }
