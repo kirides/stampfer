@@ -322,7 +322,7 @@ namespace Peter
 
         private void MainForm_Deactivate(object sender, EventArgs e)
         {
-            m_AutoComplete.AHide();
+            m_AutoComplete.Hide();
         }
 
 

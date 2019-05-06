@@ -52,13 +52,7 @@ namespace Peter
 
         [DllImport("user32.dll")]
         public static extern short GetAsyncKeyState(int vKey);
-        [DllImport("user32.dll")]
-        public static extern int SendMessage(
-              int hWnd,      // handle to destination window
-              uint Msg,       // message
-              long wParam,  // first message parameter
-              long lParam   // second message parameter
-              );
+
         public Editor(string tabTitle, MainForm main)
         {
             Init(tabTitle, main);
@@ -75,7 +69,6 @@ namespace Peter
             this.TabText = tabTitle;
             this.m_FindPos = -1;
             this.m_MainForm = main;
-            // this.m_ToolTip = new cHtmlToolTip(this);
             this.Project = "";
 
             M_AutoCompleteDa.Active = false;
@@ -153,68 +146,73 @@ namespace Peter
         }
         protected override void OnLostFocus(EventArgs e)
         {
-            this.m_MainForm.m_AutoComplete.AHide();
+            this.m_MainForm.m_AutoComplete.Hide();
             base.OnLostFocus(e);
         }
 
-        public void InsertACText()
+        public void InsertCompletion()
         {
             var p = GetBaseWord();
+            var keyWords = this.m_MainForm.m_AutoComplete.KeyWords;
 
-            if (this.m_MainForm.m_AutoComplete.KeyWords.Count == 0) return;
-            if (this.m_MainForm.m_AutoComplete.KeyWords[this.m_MainForm.m_AutoComplete.listView1.SelectedIndices[0]] == null) return;
-            var s = this.m_MainForm.m_AutoComplete.KeyWords[this.m_MainForm.m_AutoComplete.listView1.SelectedIndices[0]].ToString();
-           
-            var saveoffset = this.m_Editor.ActiveTextAreaControl.Caret.Offset;
-            this.m_Editor.ActiveTextAreaControl.Document.Remove(p.X, saveoffset - p.X);
-            this.m_Editor.ActiveTextAreaControl.Caret.Position = this.m_Editor.Document.OffsetToPosition(this.m_Editor.ActiveTextAreaControl.Caret.Offset - (this.m_Editor.ActiveTextAreaControl.Caret.Offset - p.X));
-            this.m_Editor.ActiveTextAreaControl.Document.Insert(this.m_Editor.ActiveTextAreaControl.Caret.Offset, s);
-            if ((this.m_Editor.ActiveTextAreaControl.Caret.Offset + s.Length - (this.m_Editor.ActiveTextAreaControl.Caret.Offset - p.X)) <= this.m_Editor.ActiveTextAreaControl.Document.TextContent.Length)
+            if (keyWords.Count == 0) return;
+            if (keyWords[this.m_MainForm.m_AutoComplete.listView1.SelectedIndices[0]] == null) return;
+            var s = keyWords[this.m_MainForm.m_AutoComplete.listView1.SelectedIndices[0]].ToString();
+
+            var editor = this.m_Editor;
+            var activeTextArea = editor.ActiveTextAreaControl;
+            var editorDocument = editor.Document;
+
+            var saveoffset = activeTextArea.Caret.Offset;
+            activeTextArea.Document.Remove(p.X, saveoffset - p.X);
+            activeTextArea.Caret.Position = editorDocument.OffsetToPosition(activeTextArea.Caret.Offset - (activeTextArea.Caret.Offset - p.X));
+            activeTextArea.Document.Insert(activeTextArea.Caret.Offset, s);
+            if ((activeTextArea.Caret.Offset + s.Length - (activeTextArea.Caret.Offset - p.X)) <= activeTextArea.Document.TextContent.Length)
             {
-                this.m_Editor.ActiveTextAreaControl.Caret.Position = this.m_Editor.Document.OffsetToPosition(this.m_Editor.ActiveTextAreaControl.Caret.Offset + s.Length);
+                activeTextArea.Caret.Position = editorDocument.OffsetToPosition(activeTextArea.Caret.Offset + s.Length);
             }
             else
             {
-                this.m_Editor.ActiveTextAreaControl.Caret.Position = this.m_Editor.Document.OffsetToPosition(this.m_Editor.ActiveTextAreaControl.Document.TextContent.Length);
+                activeTextArea.Caret.Position = editorDocument.OffsetToPosition(activeTextArea.Document.TextContent.Length);
             }
         }
         private Point GetBaseWord()
         {
-            var Endpos = this.m_Editor.ActiveTextAreaControl.TextArea.Caret.Offset;
-
-            var Startpos = Endpos;
-
-
-            while (Startpos >= 1)
+            var endpos = this.m_Editor.ActiveTextAreaControl.TextArea.Caret.Offset;
+            var startpos = endpos;
+            var document = this.m_Editor.ActiveTextAreaControl.Document;
+            
+            while (startpos >= 1)
             {
-                if (!char.IsLetterOrDigit(this.m_Editor.ActiveTextAreaControl.Document.TextContent[Startpos - 1]) && this.m_Editor.ActiveTextAreaControl.Document.TextContent[Startpos - 1] != '_' && this.m_Editor.ActiveTextAreaControl.Document.TextContent[Startpos - 1] != '.' && this.m_Editor.ActiveTextAreaControl.Document.TextContent[Startpos - 1] != '#')
+                var chatAtStartMinusOne = document.GetCharAt(startpos - 1);
+                if (!char.IsLetterOrDigit(chatAtStartMinusOne) 
+                    && chatAtStartMinusOne != '_'
+                    && chatAtStartMinusOne != '.' 
+                    && chatAtStartMinusOne != '#')
                     break;
-
-                Startpos--;
-                if (this.m_Editor.ActiveTextAreaControl.Document.TextContent[Startpos] == '.' || this.m_Editor.ActiveTextAreaControl.Document.TextContent[Startpos] == '#')
+                startpos--;
+                if (document.GetCharAt(startpos) == '.' || document.GetCharAt(startpos) == '#')
                 {
                     break;
                 }
             }
-            var p = new Point(Startpos, Endpos - Startpos);
+            var p = new Point(startpos, endpos - startpos);
             return p;
         }
 
         private bool firstupdate = false;
-        private bool CreateACUpdtate()
+        private bool UpdateCompletion()
         {
             var p = GetBaseWord();
             var s = this.m_Editor.ActiveTextAreaControl.Document.TextContent.Substring(p.X, p.Y);
 
-            if (firstupdate == true && AutoCompleteAuto && (s.Trim() == ""))
+            if (firstupdate && AutoCompleteAuto && (s.Trim() == ""))
             {
-
                 RemoveAutoComplete();
             }
             this.m_MainForm.m_AutoComplete.UpdateContent(s);
-            if (firstupdate == true && AutoCompleteAuto && this.m_MainForm.m_AutoComplete.KeyWords.Count == 0)
+            if (firstupdate && AutoCompleteAuto && this.m_MainForm.m_AutoComplete.KeyWords.Count == 0)
             {
-
                 RemoveAutoComplete();
             }
             firstupdate = true;
@@ -231,7 +229,7 @@ namespace Peter
                 {
                     if (!((keyData == Keys.Space) && (AutoCompleteAuto)))
                     {
-                        InsertACText();
+                        InsertCompletion();
                     }
 
                     if (keyData != Keys.OemPeriod)
@@ -244,9 +242,9 @@ namespace Peter
                     RemoveAutoComplete();
                     return true;
                 }
-                else if (keyData == Keys.Enter)
+                else if (keyData == Keys.Enter || keyData == Keys.Tab)
                 {
-                    InsertACText();
+                    InsertCompletion();
                     RemoveAutoComplete();
                     return true;
                 }
@@ -339,7 +337,7 @@ namespace Peter
                 if (keyData == (Keys.Control | Keys.Space))
                 {
                     ShowAutoComplete();
-                    CreateACUpdtate();
+                    UpdateCompletion();
                     return true;
                 }
                 if (keyData == (Keys.Shift | Keys.Escape))
@@ -353,7 +351,7 @@ namespace Peter
                 if (keyData == Keys.Delete || keyData == Keys.Back)
                 {
                     ShowAutoComplete();
-                    CreateACUpdtate();
+                    UpdateCompletion();
                 }
             }
             if ((keyData == (Keys.Control | Keys.Alt | Keys.D7)))
@@ -468,24 +466,24 @@ namespace Peter
             i -= 1;
             while (i > 0)
             {
-                if (m_Editor.ActiveTextAreaControl.Document.TextContent[i/* - 1*/] == '\n')
+                if (m_Editor.ActiveTextAreaControl.Document.GetCharAt(i) == '\n')
                 {
                     break;
                 }
-                else if (!mode && !char.IsWhiteSpace(m_Editor.ActiveTextAreaControl.Document.TextContent[i]))
+                else if (!mode && !char.IsWhiteSpace(m_Editor.ActiveTextAreaControl.Document.GetCharAt(i)))
                 {
                     s += " ";
                 }
                 else
                 {
-                    s += m_Editor.ActiveTextAreaControl.Document.TextContent[i];
+                    s += m_Editor.ActiveTextAreaControl.Document.GetCharAt(i);
                 }
                 i--;
             }
             return s;
         }
 
-        private readonly Regex ifreg = new Regex(@"\sif(\s|\()", RegexOptions.IgnoreCase);
+        private readonly Regex rxIfExpr = new Regex(@"\sif(\s|\()", RegexOptions.IgnoreCase);
         public bool IsAnIf()
         {
             var k = m_Editor.ActiveTextAreaControl.Caret.Offset;
@@ -493,24 +491,20 @@ namespace Peter
 
             while (l > 0)
             {
-                if (m_Editor.ActiveTextAreaControl.Document.TextContent[l - 1] == '{' || m_Editor.ActiveTextAreaControl.Document.TextContent[l - 1] == '}')
+                if (m_Editor.ActiveTextAreaControl.Document.GetCharAt(l - 1) == '{' || m_Editor.ActiveTextAreaControl.Document.GetCharAt(l - 1) == '}')
                 {
                     break;
                 }
                 l--;
             }
-            var m = ifreg.Match(m_Editor.ActiveTextAreaControl.Document.TextContent, l, k - l);
-            if (m.Success)
-            {
-                return true;
-            }
-            return false;
+            var m = rxIfExpr.Match(m_Editor.ActiveTextAreaControl.Document.TextContent, l, k - l);
+            return m.Success;
         }
 
         public void RemoveAutoComplete()
         {
             this.Controls.Remove(this.m_MainForm.m_AutoComplete);
-            this.m_MainForm.m_AutoComplete.AHide();
+            this.m_MainForm.m_AutoComplete.Hide();
         }
         public void ShowAutoComplete()
         {
@@ -523,34 +517,27 @@ namespace Peter
                     {
                         this.Controls.Add(this.m_MainForm.m_AutoComplete);
                     }
-
                 }
-                else
+                else if (!this.DiaC.Controls.Contains(this.m_MainForm.m_AutoComplete))
                 {
-                    if (!this.DiaC.Controls.Contains(this.m_MainForm.m_AutoComplete))
-                    {
-                        this.DiaC.Controls.Add(this.m_MainForm.m_AutoComplete);
-                    }
-
+                    this.DiaC.Controls.Add(this.m_MainForm.m_AutoComplete);
                 }
                 if (!string.IsNullOrEmpty(this.FileName))
                 {
-
                     var ext = Path.GetExtension(this.m_Editor.FileName).ToLower();
                     if (ext != this.m_MainForm.m_AutoComplete.Extension.ToLower())
                     {
                         this.m_MainForm.m_AutoComplete.NewKeyWordFile(ext);
                     }
                 }
-                this.m_MainForm.m_AutoComplete.AShow(this);
+                this.m_MainForm.m_AutoComplete.Show(this);
             }
             else
             {
                 if (!string.IsNullOrEmpty(this.FileName))
                 {
-
-                    var ext = Path.GetExtension(this.m_Editor.FileName).ToLower();
-                    if (ext != this.m_MainForm.m_AutoComplete.Extension.ToLower())
+                    var ext = Path.GetExtension(this.m_Editor.FileName);
+                    if (!ext.Equals(this.m_MainForm.m_AutoComplete.Extension, StringComparison.OrdinalIgnoreCase))
                     {
                         this.m_MainForm.m_AutoComplete.NewKeyWordFile(ext);
                     }
@@ -563,7 +550,7 @@ namespace Peter
                 {
                     this.DiaC.Controls.Add(this.m_MainForm.m_AutoComplete);
                 }
-                this.m_MainForm.m_AutoComplete.AShow(this);
+                this.m_MainForm.m_AutoComplete.Show(this);
             }
             this.m_MainForm.m_AutoComplete.BringToFront();
         }
@@ -574,7 +561,7 @@ namespace Peter
 
         private void TextArea_KeyDown(object sender, KeyEventArgs e)
         {
-            if (M_AutoCompleteDa.Active == false && AutoCompleteAuto)
+            if (!M_AutoCompleteDa.Active && AutoCompleteAuto)
             {
                 if (!((e.KeyCode == Keys.A) || (e.KeyCode == Keys.B) || (e.KeyCode == Keys.C) || (e.KeyCode == Keys.D) || (e.KeyCode == Keys.E) ||
                 (e.KeyCode == Keys.F) || (e.KeyCode == Keys.G) || (e.KeyCode == Keys.H) || (e.KeyCode == Keys.I) || (e.KeyCode == Keys.J) ||
@@ -585,10 +572,10 @@ namespace Peter
                     return;
                 }
 
-                if ((!e.Control && (e.KeyCode != (Keys.Space)) && (!e.Alt) && (e.KeyCode != (Keys.LWin)) && (e.KeyCode != (Keys.RWin))))
+                if (!e.Control && (e.KeyCode != Keys.Space) && (!e.Alt) && (e.KeyCode != Keys.LWin) && (e.KeyCode != Keys.RWin))
                 {
                     ShowAutoComplete();
-                    CreateACUpdtate();
+                    UpdateCompletion();
                 }
             }
         }
@@ -604,9 +591,9 @@ namespace Peter
 
         private void Caret_Change(object sender, EventArgs e)
         {
-            if ((M_AutoCompleteDa.Active)/*&&(!AutoCompleteAuto)*/)
+            if (M_AutoCompleteDa.Active)
             {
-                CreateACUpdtate();
+                UpdateCompletion();
             }
             this.UpdateCaretPos();
         }

@@ -20,6 +20,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -34,10 +35,10 @@ namespace Peter.Classes
         private const string KEYWORDDATEI_PREFIX = "KeyWords.";
         private const string PROPDATEI = "KeyWords\\Properties";
         private const string FUNCDIR = "DialogCreator\\Funcs.txt";
-        public List<KeyWord> KW = new List<KeyWord>();
+        public List<KeyWord> KeyWordsList = new List<KeyWord>();
         public List<KeyWord> KeyWords = new List<KeyWord>();
-        private readonly ToolTip TT;
-        public ListView2 listView1;
+        private readonly ToolTip _toolTip;
+        public AutoCompleteListView listView1;
         private const int ItemHeight = 16;
         public int LastItemIndex;
 
@@ -52,23 +53,21 @@ namespace Peter.Classes
         private readonly ToolStripStatusLabel Trace;
         public string ScriptsPath;
 
-
         public AutoComplete(ImageList img, ToolStripStatusLabel tlt)
         {
-            listView1 = new ListView2(this);
-            TT = new ToolTip();
+            listView1 = new AutoCompleteListView(this);
+            _toolTip = new ToolTip();
 
             ImgList = img;
             Trace = tlt;
             LastItemIndex = 0;
-            TT.Hide(this);
+            _toolTip.Hide(this);
             M_AutoCompleteDa.Active = true;
             UpdateContent();
             this.Width = Sizes.Width;
-            this.Enter += new EventHandler(AutoComplete_Enter);
 
             this.Height = Sizes.Height;
-            this.SizeChanged += new EventHandler(AutoComplete_SizeChanged);
+            this.SizeChanged += AutoComplete_SizeChanged;
             this.DoubleBuffered = true;
             this.SetStyle(ControlStyles.DoubleBuffer, true);
             SetupListview(KeyWords.Count);
@@ -85,18 +84,14 @@ namespace Peter.Classes
             if (listView1.SelectedIndices.Count > 0
                 && currentEditor != null)
             {
-                currentEditor.InsertACText();
-                AHide();
+                currentEditor.InsertCompletion();
+                Hide();
             }
         }
         public void MouseRemove()
         {
             currentEditor.m_Editor.Focus();
-            AHide();
-        }
-
-        private void AutoComplete_Enter(object sender, EventArgs e)
-        {
+            Hide();
         }
 
         private void AutoComplete_SizeChanged(object sender, EventArgs e)
@@ -107,8 +102,7 @@ namespace Peter.Classes
             }
         }
 
-        private void listView_RetrieveVirtualItem(object sender,
-           RetrieveVirtualItemEventArgs e)
+        private void listView_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e)
         {
             var item = new ListViewItem(KeyWords[e.ItemIndex].ToString(), KeyWords[e.ItemIndex].Type);
             e.Item = item;
@@ -119,7 +113,7 @@ namespace Peter.Classes
             {
                 this.Controls.Remove(listView1);
             }
-            this.listView1 = new ListView2(this);
+            this.listView1 = new AutoCompleteListView(this);
             listView1.SmallImageList = ImgList;
 
             this.listView1.UseCompatibleStateImageBehavior = false;
@@ -151,13 +145,13 @@ namespace Peter.Classes
         public void NewKeyWordFile(string extension)
         {
             KeyWords.Clear();
-            TT.Hide(this);
+            _toolTip.Hide(this);
             var keywordFilePath = Path.Combine(KEYWORD_DATEIPFAD, KEYWORDDATEI + Extension);
             if (File.Exists(keywordFilePath))
             {
                 Extension = extension;
                 LastItemIndex = 0;
-                listView1_SelectedIndexChanged(null, new EventArgs());
+                listView1_SelectedIndexChanged(this, EventArgs.Empty);
             }
         }
         public void UpdatePos(Editor e)
@@ -177,7 +171,7 @@ namespace Peter.Classes
                     this.Left += e.DiaC.pInfo.Left + e.DiaC._grprInfo.Left;
                 }
             }
-            listView1_SelectedIndexChanged(null, new EventArgs());
+            listView1_SelectedIndexChanged(this, EventArgs.Empty);
         }
         public void UpdateSize()
         {
@@ -191,18 +185,16 @@ namespace Peter.Classes
             }
         }
 
-        private string ck;
         public int GetFistKeyWordMatch(int i1, int i2, string s)
         {
             var center = (i1 + i2) / 2;
-            if (((i2 - i1) > 3))
+            if ((i2 - i1) > 3)
             {
-                ck = KW[center].Name;
+                var ck = KeyWordsList[center].Name;
                 if (ck.Length > s.Length)
                 {
                     ck = ck.Substring(0, s.Length);
                 }
-
                 if (string.Compare(ck, s, true) > 0)//Wenn KW kleiner s
                 {
                     return GetFistKeyWordMatch(i1, center + 1, s);
@@ -220,7 +212,7 @@ namespace Peter.Classes
             {
                 for (var i = i1; i < i2; i++)
                 {
-                    if (KW[i].Name.ToLower().StartsWith(s.ToLower()))
+                    if (KeyWordsList[i].Name.StartsWith(s, StringComparison.OrdinalIgnoreCase))
                     {
                         return i;
                     }
@@ -236,8 +228,7 @@ namespace Peter.Classes
             var p3 = new Point(-1, -1);
             int l1;
 
-            //RekRuns = KW.Count;
-            l1 = GetFistKeyWordMatch(0, KW.Count - 1, s);
+            l1 = GetFistKeyWordMatch(0, KeyWordsList.Count - 1, s);
 
             if (l1 >= 0)
             {
@@ -252,22 +243,20 @@ namespace Peter.Classes
                         {
                             p3.X = p2.X;
                         }
-
                     }
                     p2.X = p3.X;
                 }
-                if (l1 < KW.Count - 1)
+                if (l1 < KeyWordsList.Count - 1)
                 {
                     p2.Y = p.Y;
-                    while (p2.Y >= 0 && p2.Y < KW.Count - 1)
+                    while (p2.Y >= 0 && p2.Y < KeyWordsList.Count - 1)
                     {
-                        p2.Y = GetFistKeyWordMatch(p2.Y + 1, KW.Count - 1, s);
+                        p2.Y = GetFistKeyWordMatch(p2.Y + 1, KeyWordsList.Count - 1, s);
 
                         if (p2.Y >= 0)
                         {
                             p3.Y = p2.Y;
                         }
-
                     }
                     p2.Y = p3.Y;
                 }
@@ -295,7 +284,7 @@ namespace Peter.Classes
             {
                 for (var z = StartEnd.X; z <= StartEnd.Y; z++)
                 {
-                    this.KeyWords.Add(KW[z]);
+                    this.KeyWords.Add(KeyWordsList[z]);
                 }
             }
             SetupListview2(KeyWords.Count);
@@ -313,7 +302,7 @@ namespace Peter.Classes
                 }
                 else
                 {
-                    TT.Hide(this);
+                    _toolTip.Hide(this);
                 }
             }
         }
@@ -325,7 +314,7 @@ namespace Peter.Classes
                 {
                     this.listView1.Items[0].Selected = true;
                     this.listView1.TopItem = listView1.Items[0];
-                    listView1_SelectedIndexChanged(null, new EventArgs());
+                    listView1_SelectedIndexChanged(this, EventArgs.Empty);
                 }
             }
         }
@@ -338,18 +327,18 @@ namespace Peter.Classes
                 return;
             }
 
-            var key = (KeyWords[this.listView1.SelectedIndices[0]]);
+            var keyWord = this.KeyWords[this.listView1.SelectedIndices[0]];
             string s;
-            s = key.Name.ToLower();
+            s = keyWord.Name.ToLower();
             if (DokuTable.TryGetValue(s, out var text) && text != null)
             {
-                key.Text2 = Convert.ToString(text);
+                keyWord.Text2 = Convert.ToString(text);
             }
 
-            TT.ToolTipTitle = (key).Text1;
+            _toolTip.ToolTipTitle = keyWord.Text1;
             if (this.Left + (this.Width / 2) < Screen.PrimaryScreen.WorkingArea.Width / 2)
             {
-                TT.Show((key).Text2, this, this.Width, listView1.Items[listView1.SelectedIndices[0]].Position.Y);
+                _toolTip.Show(keyWord.Text2, this, this.Width, listView1.Items[listView1.SelectedIndices[0]].Position.Y);
             }
             else
             {
@@ -361,16 +350,16 @@ namespace Peter.Classes
                 Templabel2.AutoSize = true;
 
                 Templabel.Font = new System.Drawing.Font(Templabel.Font, System.Drawing.FontStyle.Bold);
-                Templabel.Text = (key).Text1;
+                Templabel.Text = keyWord.Text1;
 
-                Templabel2.Text = (key).Text2;
+                Templabel2.Text = keyWord.Text2;
                 if (Templabel.Width > Templabel2.Width)
                 {
-                    TT.Show((key).Text2, this, -(Templabel.Width) - 25, listView1.Items[listView1.SelectedIndices[0]].Position.Y);
+                    _toolTip.Show((keyWord).Text2, this, -(Templabel.Width) - 25, listView1.Items[listView1.SelectedIndices[0]].Position.Y);
                 }
                 else
                 {
-                    TT.Show((key).Text2, this, -(Templabel2.Width) - 25, listView1.Items[listView1.SelectedIndices[0]].Position.Y);
+                    _toolTip.Show((keyWord).Text2, this, -(Templabel2.Width) - 25, listView1.Items[listView1.SelectedIndices[0]].Position.Y);
                 }
 
                 this.Controls.Remove(Templabel);
@@ -394,25 +383,18 @@ namespace Peter.Classes
         {
             var kw = new KeyWord();
             var s = l.Split('@');
-            try
+            kw.Name = s[0];
+            kw.Text2 = " ";
+            for (var i = 1; i < s.Length; i++)
             {
-                kw.Name = s[0];
-                //kw.Text1 = s[1];
-                kw.Text2 = " ";
-                for (var i = 1; i < s.Length; i++)
+                if (i == s.Length - 1)
                 {
-                    if (i == s.Length - 1)
-                    {
-                        kw.Text1 += s[i] + "";
-                    }
-                    else
-                    {
-                        kw.Text1 += s[i] + "\n";
-                    }
+                    kw.Text1 += s[i];
                 }
-            }
-            catch
-            {
+                else
+                {
+                    kw.Text1 += s[i] + "\n";
+                }
             }
             return kw;
         }
@@ -421,36 +403,27 @@ namespace Peter.Classes
             var doku = new List<KeyWord>();
             this.listView1.Clear();
             this.KeyWords.Clear();
-            this.KW.Clear();
+            this.KeyWordsList.Clear();
 
             var keywordFilePath = Path.Combine(KEYWORD_DATEIPFAD, KEYWORDDATEI + Extension);
             if (Extension == ".d")
             {
-                doku.Clear();
                 if (File.Exists(keywordFilePath))
                 {
-                    using (var sr = new StreamReader(keywordFilePath, Encoding.Default))
+                    foreach (var keyWordFile in new[] { keywordFilePath }.Concat(Directory.GetFiles(KEYWORD_DATEIPFAD, KEYWORDDATEI_PREFIX + '*' + Extension)))
                     {
-                        string line;
-                        while ((line = sr.ReadLine()) != null)
+                        using (var sr = new StreamReader(keyWordFile, Encoding.Default))
                         {
-                            var k = Deconstruct_Line(line);
-                            doku.Add(k);
+                            string line;
+                            while ((line = sr.ReadLine()) != null)
+                            {
+                                var k = Deconstruct_Line(line);
+                                doku.Add(k);
+                            }
                         }
                     }
                 }
-                foreach (var keyWordFile in Directory.GetFiles(KEYWORD_DATEIPFAD, KEYWORDDATEI_PREFIX + '*' + Extension))
-                {
-                    using (var sr = new StreamReader(keyWordFile, Encoding.Default))
-                    {
-                        string line;
-                        while ((line = sr.ReadLine()) != null)
-                        {
-                            var k = Deconstruct_Line(line);
-                            doku.Add(k);
-                        }
-                    }
-                }
+                
                 if (File.Exists(Path.GetDirectoryName(Application.ExecutablePath) + "\\" + PROPDATEI + Extension))
                 {
                     using (var sr = new StreamReader(Path.GetDirectoryName(Application.ExecutablePath) + "\\" + PROPDATEI + Extension, Encoding.Default))
@@ -478,17 +451,7 @@ namespace Peter.Classes
             keywordFilePath = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), KEYWORD_DATEIPFAD, KEYWORDDATEI + Extension);
             if (File.Exists(keywordFilePath))
             {
-                using (var sr = new StreamReader(keywordFilePath, Encoding.Default))
-                {
-                    string line;
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        var k2 = Deconstruct_Line(line);
-
-                        this.KW.Add(k2);
-                    }
-                }
-                foreach (var keyWordFile in Directory.GetFiles(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), KEYWORD_DATEIPFAD), KEYWORDDATEI_PREFIX + '*' + Extension))
+                foreach (var keyWordFile in new[] { keywordFilePath }.Concat(Directory.GetFiles(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), KEYWORD_DATEIPFAD), KEYWORDDATEI_PREFIX + '*' + Extension)))
                 {
                     using (var sr = new StreamReader(keyWordFile, Encoding.Default))
                     {
@@ -496,7 +459,7 @@ namespace Peter.Classes
                         while ((line = sr.ReadLine()) != null)
                         {
                             var k = Deconstruct_Line(line);
-                            this.KW.Add(k);
+                            this.KeyWordsList.Add(k);
                         }
                     }
                 }
@@ -842,15 +805,15 @@ namespace Peter.Classes
             return s;
         }
 
-        public void AHide()
+        public void Hide()
         {
             this.Visible = false;
-            try { TT.Hide(this); }
+            try { _toolTip.Hide(this); }
             catch { }
             M_AutoCompleteDa.Active = false;
             LastItemIndex = 0;
         }
-        public void AShow(Editor e)
+        public void Show(Editor e)
         {
             currentEditor = e;
             UpdatePos(e);
@@ -868,9 +831,9 @@ namespace Peter.Classes
         {
             var kwsave = new KWSave
             {
-                KW = new KeyWord[KW.Count]
+                KW = new KeyWord[KeyWordsList.Count]
             };
-            KW.CopyTo(kwsave.KW);
+            KeyWordsList.CopyTo(kwsave.KW);
             using (var myStream = new FileStream(ScriptsPath + Global.KW, FileMode.Create))
             {
                 var binFormatter = new BinaryFormatter();
@@ -905,10 +868,10 @@ namespace Peter.Classes
             return string.Compare(Name, p.Name, true);
         }
     }
-    public class ListView2 : ListView
+    public class AutoCompleteListView : ListView
     {
         public AutoComplete auto;
-        public ListView2(AutoComplete a)
+        public AutoCompleteListView(AutoComplete a)
         {
             auto = a;
             this.DoubleBuffered = true;

@@ -856,7 +856,7 @@ namespace Peter
             {
                 if (this.mainForm.m_AutoComplete.Extension == ".d")
                 {
-                    this.mainForm.m_AutoComplete.KW.Clear();
+                    this.mainForm.m_AutoComplete.KeyWordsList.Clear();
                     string s1, s2 = "";
 
                     foreach (var i in VarList.Values)
@@ -865,11 +865,11 @@ namespace Peter
                         ConvertVarForAutoComplete(ref s1, ref s2);
                         var k = new Classes.KeyWord(s1, 4, s2, "Variable");
 
-                        if (this.mainForm.m_AutoComplete.KW.BinarySearch(k) >= 0)
+                        if (this.mainForm.m_AutoComplete.KeyWordsList.BinarySearch(k) >= 0)
                         {
                             continue;
                         }
-                        this.mainForm.m_AutoComplete.KW.Add(k);
+                        this.mainForm.m_AutoComplete.KeyWordsList.Add(k);
                     }
 
                     foreach (var i in FuncList.Values)
@@ -877,7 +877,7 @@ namespace Peter
                         s1 = i.Name;
                         ConvertFuncForAutoComplete(ref s1, ref s2);
                         var k = new Classes.KeyWord(s1, 3, s2, " ");
-                        this.mainForm.m_AutoComplete.KW.Add(k);
+                        this.mainForm.m_AutoComplete.KeyWordsList.Add(k);
                     }
 
                     foreach (var i in ConstList.Values)
@@ -886,33 +886,33 @@ namespace Peter
                         ConvertConstForAutoComplete(ref s1, ref s2);
 
                         var k = new Classes.KeyWord(s1, 5, s2, "Konstante");
-                        if (this.mainForm.m_AutoComplete.KW.BinarySearch(k) >= 0)
+                        if (this.mainForm.m_AutoComplete.KeyWordsList.BinarySearch(k) >= 0)
                         {
                             continue;
                         }
-                        this.mainForm.m_AutoComplete.KW.Add(k);
+                        this.mainForm.m_AutoComplete.KeyWordsList.Add(k);
                     }
                     foreach (var i in DialogList.Values)
                     {
                         var k = new Classes.KeyWord(i.Name, 0, "Dialog", " ");
-                        this.mainForm.m_AutoComplete.KW.Add(k);
+                        this.mainForm.m_AutoComplete.KeyWordsList.Add(k);
                     }
 
                     foreach (var i in ItemList.Values)
                     {
                         var k = new Classes.KeyWord(i.Name, 2, "Item", " ");
-                        this.mainForm.m_AutoComplete.KW.Add(k);
+                        this.mainForm.m_AutoComplete.KeyWordsList.Add(k);
                     }
 
                     foreach (var i in NPCList.Values)
                     {
                         var k = new Classes.KeyWord(i.Name, 1, "NPC", " ");
-                        this.mainForm.m_AutoComplete.KW.Add(k);
+                        this.mainForm.m_AutoComplete.KeyWordsList.Add(k);
                     }
 
-                    this.mainForm.m_AutoComplete.KW.AddRange(this.mainForm.m_AutoComplete.Properties);
-                    this.mainForm.m_AutoComplete.KW.AddRange(this.mainForm.m_AutoComplete.ShortFuncs);
-                    this.mainForm.m_AutoComplete.KW.Sort();
+                    this.mainForm.m_AutoComplete.KeyWordsList.AddRange(this.mainForm.m_AutoComplete.Properties);
+                    this.mainForm.m_AutoComplete.KeyWordsList.AddRange(this.mainForm.m_AutoComplete.ShortFuncs);
+                    this.mainForm.m_AutoComplete.KeyWordsList.Sort();
                 }
             }
         }
