@@ -20,16 +20,16 @@ namespace Peter
 {
     internal static class FilePaths
     {
-        public const string ITEMS = @"\items.stf";
-        public const string DIALOGE = @"\dialoge.stf";
-        public const string NPCS = @"\npcs.stf";
-        public const string FUNC = @"\funcs.stf";
-        public const string VARS = @"\vars.stf";
-        public const string CONSTS = @"\consts.stf";
+        public const string ITEMS = @"items.stf";
+        public const string DIALOGE = @"dialoge.stf";
+        public const string NPCS = @"npcs.stf";
+        public const string FUNC = @"funcs.stf";
+        public const string VARS = @"vars.stf";
+        public const string CONSTS = @"consts.stf";
 
-        public const string ContentItems = @"\Content\Items\";
-        public const string ContentNPC = @"\Content\Story\NPC\";
-        public const string ContentDialoge = @"\Content\Story\Dialoge\";
-        public const string ContentDir = @"\Content\";
+        public const string ContentItems = @"Content\Items\";
+        public const string ContentNPC = @"Content\Story\NPC\";
+        public const string ContentDialoge = @"Content\Story\Dialoge\";
+        public const string ContentDir = @"Content\";
     }
 }

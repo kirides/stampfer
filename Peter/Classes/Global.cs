@@ -20,6 +20,6 @@ namespace Peter
 {
     public static class Global
     {
-        public const string KW = @"\keywords.stf";
+        public const string KW = @"keywords.stf";
     }
 }

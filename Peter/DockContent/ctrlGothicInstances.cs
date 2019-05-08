@@ -641,7 +641,7 @@ namespace Peter
             {
                 foreach (var kvp in handlers)
                 {
-                    var dir = Path.GetDirectoryName(this.ScriptsPath + kvp.Key);
+                    var dir = Path.Combine(this.ScriptsPath, kvp.Key);
                     foreach (var file in Directory.GetFiles(dir, "*.d", SearchOption.AllDirectories))
                     {
                         // execute handler

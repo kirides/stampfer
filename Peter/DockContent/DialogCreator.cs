@@ -587,7 +587,7 @@ namespace Peter
                     MainF.m_AutoComplete.TransformShortFunc(TransformOutputs(TransformChoices(ch.Content.Replace("\n", "\n\t")),ch)) + "\r\n};\r\n\r\n";
 
             }
-            string newfilepath=MainF.m_ScriptsPath+FilePaths.ContentDialoge+"DIA_" + npc_name + ".d";
+            string newfilepath=Path.Combine(MainF.m_ScriptsPath, FilePaths.ContentDialoge, "DIA_" + npc_name + ".d");
 
             FuncNames.Add("@" + DiaName);
             bool filenew=false;

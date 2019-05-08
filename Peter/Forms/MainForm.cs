@@ -3161,7 +3161,7 @@ namespace Peter
                 };
                 foreach (var handler in handlers)
                 {
-                    using (var fs = File.Create(this.m_ScriptsPath + handler.Key))
+                    using (var fs = File.Create(Path.Combine(this.m_ScriptsPath, handler.Key)))
                     using (var sw = new StreamWriter(fs, Encoding.Default))
                     {
                         foreach (var instance in handler.Value)

@@ -853,7 +853,7 @@ namespace Peter.Classes
                 KW = new KeyWord[KeyWordsList.Count]
             };
             KeyWordsList.CopyTo(kwsave.KW);
-            using (var myStream = new FileStream(ScriptsPath + Global.KW, FileMode.Create))
+            using (var myStream = new FileStream(Path.Combine(ScriptsPath, Global.KW), FileMode.Create))
             {
                 var binFormatter = new BinaryFormatter();
                 binFormatter.Serialize(myStream, kwsave);
