@@ -51,7 +51,6 @@ namespace Peter
             this.CanScroll = true;
             this.TabText = "Quest Manager";
             //this.treeMain.AfterSelect += new TreeViewEventHandler(treeMain_AfterSelect);
-            this.treeMain.NodeMouseDoubleClick += new TreeNodeMouseClickEventHandler(treeMain_NodeMouseDoubleClick);
             this.treeMain.NodeMouseClick += new TreeNodeMouseClickEventHandler(treeMain_NodeMouseClick);
             this.DoubleBuffered = true;
             this.SetStyle(ControlStyles.DoubleBuffer, true);
@@ -69,11 +68,6 @@ namespace Peter
             {
                 treeMain.SelectedNode = e.Node;
             }
-        }
-
-        void treeMain_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
-        {
-            
         }
 
         #region -= Helpers =-

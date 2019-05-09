@@ -52,16 +52,13 @@ namespace Peter
 
         #region -= Constructor =-
 
-        [DllImport("user32.dll")]
-        public static extern short GetAsyncKeyState(int vKey);
-
         public Editor(string tabTitle, MainForm main)
         {
             Init(tabTitle, main);
         }
         public Editor(string tabTitle, MainForm main, DialogCreator d)
+            : this(tabTitle, main)
         {
-            Init(tabTitle, main);
             DiaC = d;
             DialogMode = true;
         }
@@ -129,23 +126,6 @@ namespace Peter
             }
         }
 
-        protected override void OnEnter(EventArgs e)
-        {
-            if (!m_MainForm.TabCloseBlock)
-            {
-                if (GetAsyncKeyState(0x04) < 0)
-                {
-                    m_MainForm.TabCloseBlock = true;
-                    Close();
-                }
-            }
-            else
-            {
-                m_MainForm.TabCloseBlock = false;
-            }
-
-            base.OnEnter(e);
-        }
         protected override void OnLostFocus(EventArgs e)
         {
             this.m_MainForm.m_AutoComplete.HidePopup();
@@ -1132,10 +1112,12 @@ namespace Peter
             }
             RemoveAutoComplete();
             if (this.m_FSW != null)
+            {
                 this.m_FSW.EnableRaisingEvents = false;
+                this.m_FSW.Dispose();
+            }
             this.Close();
             this.m_MainForm.UpdateCaretPos(0, 0, 0, null);
-            this.Dispose(true);
             return true;
         }
 

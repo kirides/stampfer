@@ -1349,7 +1349,7 @@ namespace Peter
             // 
             // DockMain
             // 
-            this.DockMain.ActiveAutoHideContent = null;
+            //this.DockMain.ActiveAutoHideContent = null;
             this.DockMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.DockMain.DockBackColor = System.Drawing.SystemColors.Control;
             this.DockMain.Font = new System.Drawing.Font("Tahoma", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.World);
@@ -1358,7 +1358,6 @@ namespace Peter
             this.DockMain.Name = "DockMain";
             this.DockMain.Size = new System.Drawing.Size(1016, 670);
             this.DockMain.TabIndex = 5;
-            this.DockMain.Paint += new System.Windows.Forms.PaintEventHandler(this.DockMain_Paint);
             // 
             // ImgList
             // 

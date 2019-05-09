@@ -15,6 +15,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **************************************************************************************/
+using ICSharpCode.TextEditor.Document;
+using PeterInterface;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -27,8 +29,6 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Serialization;
-using ICSharpCode.TextEditor.Document;
-using PeterInterface;
 using WeifenLuo.WinFormsUI.Docking;
 
 namespace Peter
@@ -222,10 +222,7 @@ namespace Peter
 
 
             this.DockMain.ActiveContentChanged += new EventHandler(DockMain_ActiveContentChanged);
-
-            this.DockMain.ContentRemoved += new EventHandler<DockContentEventArgs>(DockMain_ContentRemoved);
-            this.DockMain.ActiveDocumentChanged += new EventHandler(DockMain_ActiveDocumentChanged);
-
+            this.DockMain.ContentRemoved += DockMain_ContentRemoved;
 
             // Drag N Drop...
             this.DockMain.AllowDrop = true;
@@ -261,22 +258,32 @@ namespace Peter
                 }
             }
             var edl = new List<Editor>();
-            try//TODO
+            var docs = DockMain.Documents;
+            if (docs != null)
             {
                 foreach (Editor ed in DockMain.Documents)
                 {
                     edl.Add(ed);
                 }
-                MyActiveEditor = edl[0];
+                if (docs.Any())
+                {
+                    MyActiveEditor = edl[0];
+                    if (edl.Count > 0) edl[edl.Count - 1].Focus();
+                }
             }
-            catch
-            {
-            }
-            if (edl.Count > 0) edl[edl.Count - 1].Focus();
 
             m_AutoComplete.ScriptsPath = m_ScriptsPath;
             Application.Idle += new EventHandler(OnIdle);
         }
+
+        public void OpenFilesInEditor(IEnumerable<string> files)
+        {
+            foreach (var f in files)
+            {
+                CreateEditor(f, Path.GetFileName(f), Common.GetFileIcon(f, false));
+            }
+        }
+
         protected void OnIdle(object sender, EventArgs e)
         {
             Application.Idle -= new EventHandler(OnIdle);
@@ -321,7 +328,6 @@ namespace Peter
             fl += @"\Tools";
             if (Directory.Exists(fl))
             {
-
                 var di = new DirectoryInfo(fl);
                 var finfo = new List<FileInfo>();
                 finfo.AddRange(di.GetFiles("*.lnk", SearchOption.AllDirectories));
@@ -767,8 +773,6 @@ namespace Peter
 
         private void DockMain_ActiveContentChanged(object sender, EventArgs e)
         {
-
-
             this.mnuHighlighting.Enabled = false;
             this.bookMarksToolStripMenuItem.Enabled = false;
             this.mnuCode.Enabled = false;
@@ -776,15 +780,11 @@ namespace Peter
             if (this.DockMain.ActiveContent != null)
             {
                 // Set the Active content...
-
-
                 this.ActiveContent = this.DockMain.ActiveContent;
 
-                //MessageBox.Show(m_ActiveContent.DockHandler.TabText);
-                if (this.DockMain.ActiveContent.GetType() == typeof(Editor))
+                if (this.DockMain.ActiveContent is Editor editor)
                 {
-                    MyActiveEditor = (Editor)(DockMain.ActiveContent);
-                    var edit = (Editor)this.DockMain.ActiveContent;
+                    MyActiveEditor = editor;
                     this.RemoveHighlightChecks();
                     this.mnuHighlighting.Enabled = true;
                     this.mnuCode.Enabled = true;
@@ -792,25 +792,19 @@ namespace Peter
                     for (var a = 0; a < this.mnuHighlighting.DropDown.Items.Count; a++)
                     {
                         var tsmi = (ToolStripMenuItem)this.mnuHighlighting.DropDown.Items[a];
-                        if (tsmi.Text == edit.Highlighting)
+                        if (tsmi.Text == editor.Highlighting)
                         {
                             tsmi.Checked = true;
                             break;
                         }
                     }
-
-
-                    edit.UpdateCaretPos();
-
-                    // this.m_CodeStructure.ActiveContentChanged(this.DockMain.ActiveContent);
-                    // this.m_CodeStructure.ActiveContentChanged(edit);
+                    editor.UpdateCaretPos();
                 }
                 else
                 {
                     if (this.DockMain.ActiveDocument == null || this.DockMain.ActiveDocument.GetType() != typeof(Editor))
                     {
                         this.UpdateCaretPos(0, 0, 0, null);
-
                     }
                 }
 
@@ -824,72 +818,40 @@ namespace Peter
             else
             {
                 this.UpdateCaretPos(0, 0, 0, null);
-
-
             }
             this.UpdateTitleBar();
-
         }
 
         public void UpdateTitleBar()
         {
-            if (this.ActiveContent != null)
+            if (this.ActiveContent is Editor editor)
             {
-                if (this.ActiveContent.GetType() == typeof(Editor))
+                this.Text = editor.TabText + " - Stampfer";
+                if (this.m_CodeStructure.TEXT != this.Text && "*" + this.m_CodeStructure.TEXT != this.Text)
                 {
-
-                    this.Text = ((DockContent)this.ActiveContent).TabText + " - Stampfer";
-                    if (this.m_CodeStructure.TEXT != this.Text && "*" + this.m_CodeStructure.TEXT != this.Text)
+                    try
                     {
-                        try
-                        {
-                            this.m_CodeStructure.TEXT = this.Text;
-                            this.m_CodeStructure.Clear();
-                            this.m_CodeStructure.ActiveContentChanged((Editor)this.ActiveContent, true);
-                        }
-                        catch
-                        {
-                        }
+                        this.m_CodeStructure.TEXT = this.Text;
+                        this.m_CodeStructure.Clear();
+                        this.m_CodeStructure.ActiveContentChanged(editor, true);
                     }
-
-
-                }
-                else if (this.DockMain.ActiveDocument == null || this.DockMain.ActiveDocument.GetType() != typeof(Editor))
-                {
-                    this.Text = "Stampfer";
+                    catch (Exception ex)
+                    {
+                        Log.Line(ex.Message);
+                    }
                 }
             }
             else
             {
                 this.Text = "Stampfer";
-
             }
-        }
-
-        private void DockMain_ActiveDocumentChanged(object sender, EventArgs e)
-        {
-            /*if (this.DockMain.ActiveDocument != null)
-            {
-                this.Text = ((DockContent)this.DockMain.ActiveDocument).TabText + " - Peter";
-            }*/
-            /* if (GetAsyncKeyState(0x04) < 0)
-             {
-                 if (this.DockMain.ActiveDocument != null)
-                 {
-                     ((DockContent)this.DockMain.ActiveDocument).Close();
-
-                 }
-             }*/
-
         }
 
         private void DockMain_ContentRemoved(object sender, DockContentEventArgs e)
         {
-            var type = e.Content.GetType().GetInterface("IPeterPluginTab", true);//.GetInterfaces();
-            if (type != null)
+            if (e?.Content is IPeterPluginTab tab)
             {
-
-                ((IPeterPluginTab)e.Content).CloseTab();
+                tab.CloseTab();
             }
             this.UpdateTitleBar();
         }
@@ -2058,9 +2020,8 @@ namespace Peter
         /// <param name="e">Cancel Events</param>
         protected override void OnClosing(CancelEventArgs e)
         {
-            for (var a = this.DockMain.Contents.Count - 1; a >= 0; a--)
+            foreach (IPeterPluginTab tab in DockMain.Contents.Reverse().ToList())
             {
-                var tab = (IPeterPluginTab)this.DockMain.Contents[a];
                 if (tab.AbleToSave && tab.NeedsSaving)
                 {
                     e.Cancel = !tab.CloseTab();
@@ -2100,7 +2061,6 @@ namespace Peter
             }
             m_AutoComplete.SaveKW();
             base.OnClosing(e);
-
         }
 
         public void SaveConfig()
@@ -2847,52 +2807,6 @@ namespace Peter
 
         #endregion
 
-        protected override void OnHandleCreated(EventArgs e)
-        {
-            base.OnHandleCreated(e);
-            var mainWindowHandle = this.Handle;
-            try
-            {
-                lock (this)
-                {
-                    var obj =
-                            (ISharedAssemblyInterface)Activator.GetObject
-                            (typeof(ISharedAssemblyInterface),
-                             "ipc://IPChannelName/SreeniRemoteObj");
-                    obj.SetHandle(mainWindowHandle);
-                }
-            }
-            catch (Exception)
-            {
-
-            }
-        }
-
-        protected override void WndProc(ref Message m)
-        {
-            switch (m.Msg)
-            {
-
-                case 10001:
-                    var obj =
-                       (ISharedAssemblyInterface)Activator.GetObject
-                       (typeof(ISharedAssemblyInterface),
-                        "ipc://IPChannelName/SreeniRemoteObj");
-
-                    var file = obj.Read();
-
-                    if (!string.IsNullOrEmpty(file))
-                    {
-                        if (File.Exists(file))
-                        {
-                            this.CreateEditor(file, Path.GetFileName(file), Common.GetFileIcon(file, false));
-                        }
-                    }
-                    break;
-            }
-            base.WndProc(ref m);
-        }
-
         /// <summary>
         /// Updates the Status Bar's Caret Info...
         /// </summary>
@@ -2916,11 +2830,6 @@ namespace Peter
                 this.sslInsert.Text = "Zeichen: " + offset.ToString();
                 this.sslColumn.Text = "Spalte: " + col.ToString();
             }
-        }
-
-        private void DockMain_Paint(object sender, PaintEventArgs e)
-        {
-
         }
 
         private void geheZuZeileToolStripMenuItem_Click(object sender, EventArgs e)

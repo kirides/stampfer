@@ -70,7 +70,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Runtime.Remoting" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
@@ -179,6 +179,7 @@
     <Compile Include="Forms\Ordner.Designer.cs">
       <DependentUpon>Ordner.cs</DependentUpon>
     </Compile>
+    <Compile Include="Http\HttpServer.cs" />
     <Compile Include="OutlookGrid\DataSourceManager.cs" />
     <Compile Include="OutlookGrid\OutlookGrid.cs">
       <SubType>Component</SubType>

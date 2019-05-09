@@ -15,64 +15,26 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **************************************************************************************/
+using Peter.Http;
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
+using System.Net.Http;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Runtime.Remoting;
 //channel
-using System.Runtime.Remoting.Channels;
-using System.Runtime.Remoting.Channels.Ipc;    //Importing IPC
+using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Peter
 {
-
-    public interface ISharedAssemblyInterface
-    {
-        void Write(string a);
-        void SetHandle(IntPtr h);
-        IntPtr GetHandle();
-        string Read();
-
-    }
-    public class MyRemoteObject : MarshalByRefObject,
-               ISharedAssemblyInterface
-    {
-        private string content = "";
-        private IntPtr handle = IntPtr.Zero;
-        public MyRemoteObject()
-        {
-
-        }
-        public override object InitializeLifetimeService()
-        {
-            return null;
-        }
-        public void Write(string a)
-        {
-            content = a;
-        }
-        public string Read()
-        {
-            return content;
-        }
-
-        public void SetHandle(IntPtr h)
-        {
-            handle = h;
-        }
-        public IntPtr GetHandle()
-        {
-            return handle;
-        }
-    }
     internal static class Program
     {
         private static Mutex mutex;
         private const int SW_RESTORE = 9;
-        private const int WM_COPYDATA = 0x4A;
 
         [DllImport("user32.dll")]
         private static extern int ShowWindow(IntPtr hWnd, int nCmdShow);
@@ -83,66 +45,28 @@ namespace Peter
         [DllImport("user32.dll")]
         private static extern int IsIconic(IntPtr hWnd);
 
-        [DllImport("user32.dll")]
-        private static extern int SendMessage(IntPtr hWnd, int wMsg, IntPtr wParam, IntPtr lParam);
-        [DllImport("user32.dll")]
-        private static extern int PostMessage(IntPtr hWnd, int wMsg, IntPtr wParam, IntPtr lParam);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
-
-        /// <summary>
-        /// SwitchToCurrentInstance
-        /// </summary>
-        private static bool ReadIPC(string data, ref IntPtr hWnd)
+        private static async Task SwitchToCurrentInstance(string[] args)
         {
             try
             {
-                var ipcCh = new IpcChannel("myClient");
-                ChannelServices.RegisterChannel(ipcCh, false);
-
-                var obj =
-                   (ISharedAssemblyInterface)Activator.GetObject
-                   (typeof(ISharedAssemblyInterface),
-                    "ipc://IPChannelName/SreeniRemoteObj");
-                obj.Write(data);
-                hWnd = obj.GetHandle();
-                ChannelServices.UnregisterChannel(ipcCh);
-                PostMessage(hWnd, 10001, IntPtr.Zero, IntPtr.Zero);
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-        private static void SwitchToCurrentInstance(string[] args)
-        {
-            var hWnd = IntPtr.Zero;// = /*(IntPtr)0x0FFFF;*/ GetCurrentInstanceWindowHandle();
-
-            // Send arguments...
-            if (args.Length > 0)
-            {
-                var data = args[0];
-
-                ReadIPC(data, ref hWnd);
-                Thread.Sleep(10);
-            }
-
-            // Restore window if minimised. Do not restore if already in
-            // normal or maximised window state, since we don't want to
-            // change the current state of the window.
-            if (hWnd != IntPtr.Zero)
-            {
-                if (IsIconic(hWnd) != 0)
+                var httpClient = new HttpClient();
+                var files = new List<string>();
+                foreach (var arg in args)
                 {
-                    ShowWindow(hWnd, SW_RESTORE);
+                    if (File.Exists(arg))
+                    {
+                        files.Add(arg);
+                    }
                 }
-
-                // Set foreground window.
-                SetForegroundWindow(hWnd);
+                if (files.Count != 0)
+                {
+                    await httpClient.PostAsync($"{listeningAddress}/openfile", new StringContent(string.Join("\n", files), Encoding.Unicode)).ConfigureAwait(false);
+                }
             }
-            Application.Exit();
+            catch (Exception ex)
+            {
+                Log.Line(ex.Message);
+            }
         }
 
         /// <summary>
@@ -151,10 +75,7 @@ namespace Peter
         /// <returns>returns true if already running</returns>
         private static bool IsAlreadyRunning()
         {
-
-            var strLoc = Assembly.GetExecutingAssembly().Location;
-            FileSystemInfo fileInfo = new FileInfo(strLoc);
-            var sExeName = fileInfo.Name;
+            var sExeName = Path.GetFileName(ExePath);
             bool bCreatedNew;
 
             mutex = new Mutex(true, "Global\\" + sExeName, out bCreatedNew);
@@ -165,45 +86,165 @@ namespace Peter
             return !bCreatedNew;
         }
 
+        private static HttpServer httpServer;
+        private static readonly string listeningAddress = "http://127.0.0.1:32105/";
+        private static CancellationTokenSource httpServerToken;
+        private static Task HttpServerListening;
+
+        public static readonly string ExePath = Assembly.GetEntryAssembly().Location;
+        public static readonly string ExeDirectoryPath = Path.GetDirectoryName(ExePath);
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
         /// 
+
+        private static MainForm MainForm;
+
         [STAThread]
         private static void Main(string[] args)
         {
             if (IsAlreadyRunning()/* && args.Length > 0*/)
             {
-                SwitchToCurrentInstance(args);
+                SwitchToCurrentInstance(args).GetAwaiter().GetResult();
+                Application.Exit();
             }
             else
             {
-                var ipcCh = new IpcChannel("IPChannelName");
-
-                ChannelServices.RegisterChannel(ipcCh, false);
-                RemotingConfiguration.RegisterWellKnownServiceType
-                   (typeof(MyRemoteObject),
-                           "SreeniRemoteObj",
-                           WellKnownObjectMode.Singleton);
-
+                Log.Start();
+                SetupIPC();
+                System.Runtime.ProfileOptimization.SetProfileRoot(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
+                System.Runtime.ProfileOptimization.StartProfile("startup.profile");
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
-                Application.Run(new MainForm(args));
+                try
+                {
+                    Application.Run(MainForm = new MainForm(args));
+                }
+                catch (Exception ex)
+                {
+                    Log.Line(ex.Message);
+                }
+                Log.Flush();
+            }
+        }
+
+        private static void SetupIPC()
+        {
+            httpServer = new HttpServer();
+            var router = new HttpRouter();
+            router.HandleRequest("/openfile", HttpOpenFile);
+            Application.ApplicationExit += ApplicationClosing;
+            httpServerToken = new CancellationTokenSource();
+            HttpServerListening = httpServer.ListenAsync(listeningAddress, router, httpServerToken.Token);
+        }
+
+        private static async Task HttpOpenFile(HttpContext arg)
+        {
+            try
+            {
+                var files = new List<string>();
+                using (var sr = new StreamReader(arg.Request.InputStream, Encoding.Unicode))
+                {
+                    while (await sr.ReadLineAsync() is string line)
+                    {
+                        if (File.Exists(line))
+                        {
+                            files.Add(line);
+                        }
+                    }
+                }
+
+                arg.Response.StatusCode = 200;
+                if (files.Count == 0)
+                {
+                    return;
+                }
+                MainForm.BeginInvoke((Action)(() =>
+                {
+                    MainForm.OpenFilesInEditor(files);
+
+                    if (IsIconic(MainForm.Handle) != 0)
+                    {
+                        ShowWindow(MainForm.Handle, SW_RESTORE);
+                    }
+                    // Set foreground window.
+                    SetForegroundWindow(MainForm.Handle);
+                }));
+            }
+            catch (Exception ex)
+            {
+                Log.Line(ex.Message);
+            }
+        }
+
+        private static void ApplicationClosing(object sender, EventArgs e)
+        {
+            try
+            {
+                httpServerToken.Cancel();
+                HttpServerListening.GetAwaiter().GetResult();
+            }
+            catch (Exception ex)
+            {
+                Log.Line(ex.Message);
             }
         }
     }
 
-    public struct CopyDataStruct
+    public static class Log
     {
-        public int dwData;
-        public int cbData;
-        public string lpData;
+        private static readonly ConcurrentQueue<string> lines = new ConcurrentQueue<string>();
+        private static Task LogTask;
+        private static CancellationTokenSource cts = new CancellationTokenSource();
 
-        public CopyDataStruct(string data)
+        private static Task StartLogging(CancellationToken token)
         {
-            this.lpData = data + "\0";
-            this.cbData = data.Length;
-            this.dwData = 0;
+            return Task.Run(() =>
+            {
+                WorkOnQueue(token);
+                Stop();
+            });
+        }
+        private static void WorkOnQueue(CancellationToken cancellationToken = default)
+        {
+            using (var fs = File.Open(Path.Combine(Program.ExeDirectoryPath, "stampfer.log"), FileMode.Append, FileAccess.Write, FileShare.ReadWrite))
+            using (var sw = new StreamWriter(fs, Encoding.UTF8))
+            {
+                while (!cancellationToken.IsCancellationRequested && lines.TryDequeue(out var line))
+                {
+                    sw.WriteLine(line);
+                }
+            }
+        }
+
+        private static void Resume()
+        {
+            if (LogTask is null)
+            {
+                Start();
+            }
+        }
+        public static void Flush()
+        {
+            Stop();
+            WorkOnQueue();
+        }
+        public static void Start()
+        {
+            Stop();
+            LogTask = StartLogging(cts.Token);
+        }
+        public static void Stop()
+        {
+            cts?.Cancel();
+            cts = new CancellationTokenSource();
+            LogTask = null;
+        }
+
+        public static void Line(string line)
+        {
+            lines.Enqueue(line);
+            Resume();
         }
     }
 }
