@@ -20,6 +20,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -58,14 +59,14 @@ namespace Peter
                         files.Add(arg);
                     }
                 }
-                if (files.Count != 0)
+                if (files.Count != 0 && File.Exists(IpcDat) && int.TryParse(File.ReadLines(IpcDat).First(), out int port))
                 {
-                    await httpClient.PostAsync($"{listeningAddress}/openfile", new StringContent(string.Join("\n", files), Encoding.Unicode)).ConfigureAwait(false);
+                    await httpClient.PostAsync($"http://127.0.0.1:{port}/openfile", new StringContent(string.Join("\n", files), Encoding.Unicode)).ConfigureAwait(false);
                 }
             }
             catch (Exception ex)
             {
-                Log.Line(ex.Message);
+                Log.Exception(ex);
             }
         }
 
@@ -87,12 +88,12 @@ namespace Peter
         }
 
         private static HttpServer httpServer;
-        private static readonly string listeningAddress = "http://127.0.0.1:32105/";
         private static CancellationTokenSource httpServerToken;
         private static Task HttpServerListening;
 
         public static readonly string ExePath = Assembly.GetEntryAssembly().Location;
         public static readonly string ExeDirectoryPath = Path.GetDirectoryName(ExePath);
+        private static readonly string IpcDat = Path.Combine(Path.GetTempPath(), "Stampfer.2462342.ipc");
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -110,6 +111,7 @@ namespace Peter
             }
             else
             {
+                CleanupTempFiles();
                 Log.Start();
                 SetupIPC();
                 System.Runtime.ProfileOptimization.SetProfileRoot(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
@@ -122,7 +124,7 @@ namespace Peter
                 }
                 catch (Exception ex)
                 {
-                    Log.Line(ex.Message);
+                    Log.Exception(ex);
                 }
                 Log.Flush();
             }
@@ -135,7 +137,8 @@ namespace Peter
             router.HandleRequest("/openfile", HttpOpenFile);
             Application.ApplicationExit += ApplicationClosing;
             httpServerToken = new CancellationTokenSource();
-            HttpServerListening = httpServer.ListenAsync(listeningAddress, router, httpServerToken.Token);
+            HttpServerListening = httpServer.ListenLocalAsync(router, httpServerToken.Token);
+            File.WriteAllText(IpcDat, httpServer.Port.ToString());
         }
 
         private static async Task HttpOpenFile(HttpContext arg)
@@ -173,20 +176,25 @@ namespace Peter
             }
             catch (Exception ex)
             {
-                Log.Line(ex.Message);
+                Log.Exception(ex);
             }
         }
+        private static void CleanupTempFiles()
+        {
+            if (File.Exists(IpcDat)) File.Delete(IpcDat);
 
+        }
         private static void ApplicationClosing(object sender, EventArgs e)
         {
             try
             {
                 httpServerToken.Cancel();
+                CleanupTempFiles();
                 HttpServerListening.GetAwaiter().GetResult();
             }
             catch (Exception ex)
             {
-                Log.Line(ex.Message);
+                Log.Exception(ex);
             }
         }
     }
@@ -241,9 +249,14 @@ namespace Peter
             LogTask = null;
         }
 
-        public static void Line(string line)
+        public static void Exception(Exception e)
         {
-            lines.Enqueue(line);
+            Line($"{e.Source}|{e.Message}", "ERROR");
+        }
+
+        private static void Line(string line, string type)
+        {
+            lines.Enqueue($"{DateTime.Now:yyyy-MM-dd HH:mm:ss}|{type}|{line}");
             Resume();
         }
     }

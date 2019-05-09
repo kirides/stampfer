@@ -170,7 +170,7 @@ namespace Peter
             return CreateDiffs(DataA, DataB);
         } // Diff
 
-
+        static readonly Regex rxWhitespaceToSpace = new Regex("\\s+", RegexOptions.Compiled);
         /// <summary>
         /// This function converts all textlines of the text into unique numbers for every unique textline
         /// so further work can work only with simple numbers.
@@ -202,7 +202,7 @@ namespace Peter
 
                 if (ignoreSpace)
                 {
-                    s = Regex.Replace(s, "\\s+", " ");            // TODO: optimization: faster blank removal.
+                    s = rxWhitespaceToSpace.Replace(s, " "); // TODO: optimization: faster blank removal.
                 }
 
                 if (ignoreCase)
