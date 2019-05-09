@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ namespace Peter.Http
     {
         private readonly HttpListener httpListener = new HttpListener();
         private readonly ConcurrentBag<Task> pending = new ConcurrentBag<Task>();
+        public int Port { get; private set; }
 
         public async Task ListenAsync(string host, HttpRouter router, CancellationToken token)
         {
@@ -35,6 +37,37 @@ namespace Peter.Http
                     { /* swallow cancellations */ }
                 }
             }
+        }
+
+        public Task ListenLocalAsync(HttpRouter router, CancellationToken token)
+        {
+            int port = -1;
+            for (int i = 0; i < 5; i++)
+            {
+                if (TryGetUnusedPort(out port))
+                {
+                    break;
+                }
+            }
+            if (port == -1)
+            {
+                throw new HttpListenerException(0, "Could not find an unused port");
+            }
+            return ListenAsync($"http://127.0.0.1:{port}/", router, token);
+        }
+
+        private static bool TryGetUnusedPort(out int port, int startingPort = 49152)
+        {
+            var listeners = IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpListeners();
+            port = -1;
+            for (var i = startingPort; i <= 65535; i++)
+            {
+                if (listeners.Any(x => x.Port == i)) continue;
+                port = i;
+                return true;
+            }
+
+            return false;
         }
 
         public void Stop() => httpListener.Stop();

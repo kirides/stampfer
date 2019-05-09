@@ -837,7 +837,7 @@ namespace Peter
                     }
                     catch (Exception ex)
                     {
-                        Log.Line(ex.Message);
+                        Log.Exception(ex);
                     }
                 }
             }
