@@ -1,9 +1,10 @@
 
 using System;
+using System.Collections.Generic;
 
 namespace DaedalusLib.Parser
 {
-    public enum Kinds : byte
+    public enum Kinds : int
     {
         EOF = 0,
         Identifier = 1,
@@ -18,7 +19,7 @@ namespace DaedalusLib.Parser
         Const = 10,
         Instance = 11,
         If = 12,
-        Else= 13,
+        Else = 13,
         Prototype = 14,
         Return = 15,
         CItem = 16,
@@ -30,34 +31,72 @@ namespace DaedalusLib.Parser
         CSpell = 22,
         Function = 23,
         Class = 24,
+
+        Assign = 25,
+        BraceOpen = 26,
+        Comma = 27,
+        BraceClose = 28,
+        Semicolon = 29,
+        BracketOpen = 30,
+        BracketClose = 31,
+        ParenOpen = 32,
+        ParenClose = 33,
+        AssignMul = 34,
+        AssignDiv = 35,
+        AssignMod = 36,
+        AssignAdd = 37,
+        AssignSub = 38,
+        AssignAnd = 39,
+        AssignXOr = 40,
+        AssignOr = 41,
+        AssignShiftLeft = 42,
+        AssignShiftRight = 43,
+        Or = 44,
+        And = 45,
+        BitOr = 46,
+        BitXOr = 47,
+        BitAnd = 48,
+        NotEquals = 49,
+        Equals = 50,
+        LesserEquals = 51,
+        Lesser = 52,
+        GreaterEquals = 53,
+        Greater = 54,
+        ShiftLeft = 55,
+        ShiftRight = 56,
+        Add = 57,
+        Sub = 58,
+        Mul = 59,
+        Div = 60,
+        Mod = 61,
+        Incr = 62,
+        Decr = 63,
+        BitNot = 64,
+        Not = 65,
+        Dot = 66,
+
+        Unknown = 67,
+
+        ErrInvalidBlock = 68,
+        ErrInvalidDeclaration = 69,
+        ErrInvalidFunction = 70,
+        ErrInvalidInstance = 71,
+        ErrInvalidPrototype = 72,
+        ErrInvalidClass = 73,
+        ErrInvalidConstantDeclaration = 74,
+        ErrInvalidVariableDeclaration = 75,
+        ErrInvalidTypeDeclaration = 76,
+        ErrInvalidType = 77,
+        ErrInvalidClassName = 78,
+        ErrInvalidBlocKBody = 79,
+        ErrInvalidStatement = 80,
+        ErrInvalidIfStatement = 81,
+        ErrInvalidAssignment = 82,
+        ErrInvalidOperator = 83,
+        ErrInvalidExpression = 84,
     }
     public class DaedalusParser
     {
-        private const int _EOF = 0;
-        private const int _identifier = 1;
-        private const int _integervalue = 2;
-        private const int _floatnumber = 3;
-        private const int _stringvalue = 4;
-        private const int _int = 5;
-        private const int _string = 6;
-        private const int _float = 7;
-        private const int _void = 8;
-        private const int KIND_VAR = 9;
-        private const int KIND_CONST = 10;
-        private const int KIND_INSTANCE = 11;
-        private const int _if = 12;
-        private const int _else = 13;
-        private const int KIND_PROTOTYPE = 14;
-        private const int _return = 15;
-        private const int _citem = 16;
-        private const int _cnpc = 17;
-        private const int _cmission = 18;
-        private const int _cfocus = 19;
-        private const int _cinfo = 20;
-        private const int _citemreact = 21;
-        private const int _cspell = 22;
-        private const int KIND_FUNCTION = 23;
-        private const int KIND_CLASS = 24;
         private const int KIND_MAXKIND = 67;
         private const bool T = true;
         private const bool x = false;
@@ -79,9 +118,9 @@ namespace DaedalusLib.Parser
             errors = new Errors();
         }
 
-        private void SynErr(int n)
+        private void SynErr(Kinds kind)
         {
-            if (errDist >= minErrDist) errors.SynErr(la.line, la.col, n);
+            if (errDist >= minErrDist) errors.SynErr(la.line, la.col, kind);
             errDist = 0;
         }
 
@@ -93,7 +132,7 @@ namespace DaedalusLib.Parser
 
         private void Get()
         {
-            for (;;)
+            for (; ; )
             {
                 t = la;
                 la = scanner.Scan();
@@ -103,9 +142,9 @@ namespace DaedalusLib.Parser
             }
         }
 
-        private void Expect(int n)
+        private void Expect(Kinds kind)
         {
-            if (la.kind == n) Get(); else { SynErr(n); }
+            if (la.Kind == kind) Get(); else { SynErr(kind); }
         }
 
         private bool StartOf(int s)
@@ -123,97 +162,97 @@ namespace DaedalusLib.Parser
 
         private void Block()
         {
-            if (la.kind == KIND_VAR || la.kind == KIND_CONST)
+            var kind = la.Kind;
+            if (kind == Kinds.Var || kind == Kinds.Const)
             {
                 Declaration();
             }
-            else if (la.kind == KIND_FUNCTION)
+            else if (kind == Kinds.Function)
             {
                 Function();
             }
-            else if (la.kind == KIND_INSTANCE)
+            else if (kind == Kinds.Instance)
             {
                 Instance();
             }
-            else if (la.kind == KIND_PROTOTYPE)
+            else if (kind == Kinds.Prototype)
             {
                 Prototype();
             }
-            else if (la.kind == KIND_CLASS)
+            else if (kind == Kinds.Class)
             {
                 Class();
             }
-            else SynErr(68);
+            else SynErr(Kinds.ErrInvalidBlock);
         }
 
         private void Declaration()
         {
-            if (la.kind == KIND_CONST)
+            if (la.Kind == Kinds.Const)
             {
                 ConstDecl();
             }
-            else if (la.kind == KIND_VAR)
+            else if (la.Kind == Kinds.Var)
             {
                 VarDecl();
             }
-            else SynErr(69);
+            else SynErr(Kinds.ErrInvalidDeclaration);
         }
 
         private void Function()
         {
-            Expect(23);
+            Expect(Kinds.Function);
             if (StartOf(2))
             {
                 this.m_Current = la.val.ToLower() + " ";
                 Type();
             }
-            else if (la.kind == 8)
+            else if (la.Kind == Kinds.Void)
             {
                 this.m_Current = la.val.ToLower() + " ";
                 Get();
             }
-            else SynErr(70);
+            else SynErr(Kinds.ErrInvalidFunction);
             this.m_CurrentPos = la.pos;
             this.m_Current += la.val + " ";
-            Expect(1);
+            Expect(Kinds.Identifier);
             this.m_Current += la.val;
-            Expect(32);
+            Expect(Kinds.ParenOpen);
             //this.m_Current += la.val;
-            if (la.kind == KIND_VAR)
+            if (la.Kind == Kinds.Var)
             {
                 Parameter();
 
-                while (la.kind == 27)
+                while (la.Kind == Kinds.Comma)
                 {
                     Get();
                     Parameter();
-
                 }
             }
             var tm = new TokenMatch
             {
                 Position = this.m_CurrentPos
             };
-            //this.m_Current += la.val;
+
             m_Current = m_Current.Trim();
             if (!m_Current.EndsWith(")"))
                 m_Current += ")";
 
             tm.Value = this.m_Current;
             this.m_CodeInfo.Functions.Add(tm);
-            Expect(33);
-            Expect(26);
+            Expect(Kinds.ParenClose);
+            Expect(Kinds.BraceOpen);
             while (StartOf(3))
             {
                 Body();
             }
-            Expect(28);
-            Expect(29);
+            Expect(Kinds.BraceClose);
+            Expect(Kinds.Semicolon);
         }
 
         private void Instance()
         {
-            Expect(11);
+            Expect(Kinds.Instance);
             var tm = new TokenMatch
             {
                 Position = la.pos
@@ -221,14 +260,14 @@ namespace DaedalusLib.Parser
             this.m_Current = la.val;
             tm.Value = this.m_Current;
             this.m_CodeInfo.Instances.Add(tm);
-            Expect(1);
-            while (la.kind == 27)
+            Expect(Kinds.Identifier);
+            while (la.Kind == Kinds.Comma)
             {
                 Get();
-                Expect(1);
+                Expect(Kinds.Identifier);
             }
-            Expect(32);
-            if (la.kind == 1)
+            Expect(Kinds.ParenOpen);
+            if (la.Kind == Kinds.Identifier)
             {
                 Get();
             }
@@ -236,26 +275,26 @@ namespace DaedalusLib.Parser
             {
                 Classname();
             }
-            else SynErr(71);
-            Expect(33);
-            if (la.kind == 26)
+            else SynErr(Kinds.ErrInvalidInstance);
+            Expect(Kinds.ParenClose);
+            if (la.Kind == Kinds.BraceOpen)
             {
                 Get();
                 while (StartOf(3))
                 {
                     Body();
                 }
-                Expect(28);
+                Expect(Kinds.BraceClose);
             }
-            Expect(29);
+            Expect(Kinds.Semicolon);
         }
 
         private void Prototype()
         {
-            Expect(14);
-            Expect(1);
-            Expect(32);
-            if (la.kind == 1)
+            Expect(Kinds.Prototype);
+            Expect(Kinds.Identifier);
+            Expect(Kinds.ParenOpen);
+            if (la.Kind == Kinds.Identifier)
             {
                 Get();
             }
@@ -263,21 +302,21 @@ namespace DaedalusLib.Parser
             {
                 Classname();
             }
-            else SynErr(72);
-            Expect(33);
-            Expect(26);
+            else SynErr(Kinds.ErrInvalidPrototype);
+            Expect(Kinds.ParenClose);
+            Expect(Kinds.BraceOpen);
             while (StartOf(3))
             {
                 Body();
             }
-            Expect(28);
-            Expect(29);
+            Expect(Kinds.BraceClose);
+            Expect(Kinds.Semicolon);
         }
 
         private void Class()
         {
-            Expect(24);
-            if (la.kind == 1)
+            Expect(Kinds.Class);
+            if (la.Kind == Kinds.Identifier)
             {
                 Get();
             }
@@ -285,24 +324,24 @@ namespace DaedalusLib.Parser
             {
                 Classname();
             }
-            else SynErr(73);
-            Expect(26);
+            else SynErr(Kinds.ErrInvalidClass);
+            Expect(Kinds.BraceOpen);
             while (StartOf(3))
             {
                 Body();
             }
-            Expect(28);
-            Expect(29);
+            Expect(Kinds.BraceClose);
+            Expect(Kinds.Semicolon);
         }
 
         private void ConstDecl()
         {
-            Expect(KIND_CONST);
+            Expect(Kinds.Const);
             this.m_Current = "@" + la.val.ToLower() + " ";
             m_CurrentPos = la.pos;
             TypeDecl();
 
-            Expect(25);
+            Expect(Kinds.Assign);
             this.m_Current += (" = " + la.val);
 
             if (StartOf(5))
@@ -310,31 +349,26 @@ namespace DaedalusLib.Parser
                 Expression();
 
             }
-            else if (la.kind == 26)
+            else if (la.Kind == Kinds.BraceOpen)
             {
                 Get();
                 Expression();
 
-                while (la.kind == 27)
+                while (la.Kind == Kinds.Comma)
                 {
                     Get();
                     Expression();
                 }
-                Expect(28);
-
-
+                Expect(Kinds.BraceClose);
             }
-            else SynErr(74);
+            else SynErr(Kinds.ErrInvalidConstantDeclaration);
 
-
-            Expect(29);
+            Expect(Kinds.Semicolon);
 
             this.m_Current = this.m_Current.Remove(0, 1);
             var tm = new TokenMatch
             {
                 Position = m_CurrentPos,
-                //this.m_Current += la.val;
-
                 Value = this.m_Current
             };
             this.m_CodeInfo.ConstDeclarations.Add(tm);
@@ -342,30 +376,30 @@ namespace DaedalusLib.Parser
 
         private void VarDecl()
         {
-            Expect(KIND_VAR);
+            Expect(Kinds.Var);
             this.m_Current = la.val.ToLower() + " ";
             TypeDecl();
-            if (la.kind == 25)
+            if (la.Kind == Kinds.Assign)
             {
                 Get();
                 if (StartOf(5))
                 {
                     Expression();
                 }
-                else if (la.kind == 26)
+                else if (la.Kind == Kinds.BraceOpen)
                 {
                     Get();
                     Expression();
-                    while (la.kind == 27)
+                    while (la.Kind == Kinds.Comma)
                     {
                         Get();
                         Expression();
                     }
-                    Expect(28);
+                    Expect(Kinds.BraceClose);
                 }
-                else SynErr(75);
+                else SynErr(Kinds.ErrInvalidVariableDeclaration);
             }
-            Expect(29);
+            Expect(Kinds.Semicolon);
 
             var tm = new TokenMatch
             {
@@ -379,32 +413,28 @@ namespace DaedalusLib.Parser
         {
             Type();
             this.m_Current += la.val;
-            Expect(1);
-            while (la.kind == 27)
+            Expect(Kinds.Identifier);
+            while (la.Kind == Kinds.Comma)
             {
                 Get();
-                Expect(1);
+                Expect(Kinds.Identifier);
             }
-            if (la.kind == 30)
+            if (la.Kind == Kinds.BracketOpen)
             {
                 Get();
-                if (la.kind == 2)
+                if (la.Kind == Kinds.IntegerValue || la.Kind == Kinds.Identifier)
                 {
                     Get();
                 }
-                else if (la.kind == 1)
-                {
-                    Get();
-                }
-                else SynErr(76);
-                Expect(31);
+                else SynErr(Kinds.ErrInvalidTypeDeclaration);
+                Expect(Kinds.BracketClose);
             }
         }
 
         private void Expression()
         {
             AndExpr();
-            while (la.kind == 44)
+            while (la.Kind == Kinds.Or)
             {
                 Get();
                 AndExpr();
@@ -413,49 +443,49 @@ namespace DaedalusLib.Parser
 
         private void Type()
         {
-            switch (la.kind)
+            switch (la.Kind)
             {
-                case 5:
-                case 6:
-                case 7:
-                case 17:
-                case 16:
-                case 18:
-                case 20:
-                case 22:
-                case 19:
-                case 21:
-                case 23:
+                case Kinds.Int:
+                case Kinds.String:
+                case Kinds.Float:
+                case Kinds.CNpc:
+                case Kinds.CItem:
+                case Kinds.CMission:
+                case Kinds.CInfo:
+                case Kinds.CSpell:
+                case Kinds.CFocus:
+                case Kinds.CItemReact:
+                case Kinds.Function:
                     {
                         Get();
                         break;
                     }
-                default: SynErr(77); break;
+                default: SynErr(Kinds.ErrInvalidType); break;
             }
         }
 
         private void Classname()
         {
-            switch (la.kind)
+            switch (la.Kind)
             {
-                case 17:
-                case 16:
-                case 18:
-                case 20:
-                case 22:
-                case 19:
-                case 21:
+                case Kinds.CNpc:
+                case Kinds.CItem:
+                case Kinds.CMission:
+                case Kinds.CInfo:
+                case Kinds.CSpell:
+                case Kinds.CFocus:
+                case Kinds.CItemReact:
                     {
                         Get();
                         break;
                     }
-                default: SynErr(78); break;
+                default: SynErr(Kinds.ErrInvalidClassName); break;
             }
         }
 
         private void Body()
         {
-            if (la.kind == 9 || la.kind == 10)
+            if (la.Kind == Kinds.Var || la.Kind == Kinds.Const)
             {
                 Declaration();
             }
@@ -463,30 +493,30 @@ namespace DaedalusLib.Parser
             {
                 Statement();
             }
-            else SynErr(79);
+            else SynErr(Kinds.ErrInvalidBlocKBody);
         }
 
         private void Parameter()
         {
             this.m_Current += la.val;
-            Expect(9);
+            Expect(Kinds.Var);
             this.m_Current += " " + la.val;
             Type();
             this.m_Current += " " + la.val;
-            Expect(1);
+            Expect(Kinds.Identifier);
             this.m_Current += la.val + " ";
         }
 
         private void Statement()
         {
-            if (la.kind == 12)
+            if (la.Kind == Kinds.If)
             {
                 IfStatement();
-                while (la.kind == 12)
+                while (la.Kind == Kinds.If)
                 {
                     IfStatement();
                 }
-                Expect(29);
+                Expect(Kinds.Semicolon);
             }
             else if (StartOf(5))
             {
@@ -496,84 +526,84 @@ namespace DaedalusLib.Parser
                     Assign();
                     Expression();
                 }
-                Expect(29);
+                Expect(Kinds.Semicolon);
             }
-            else if (la.kind == 15)
+            else if (la.Kind == Kinds.Return)
             {
                 Get();
                 if (StartOf(5))
                 {
                     Expression();
                 }
-                Expect(29);
+                Expect(Kinds.Semicolon);
             }
-            else SynErr(80);
+            else SynErr(Kinds.ErrInvalidStatement);
         }
 
         private void IfStatement()
         {
-            Expect(12);
+            Expect(Kinds.If);
             Expression();
-            Expect(26);
+            Expect(Kinds.BraceOpen);
             while (StartOf(3))
             {
                 Body();
             }
-            Expect(28);
-            while (la.kind == 13)
+            Expect(Kinds.BraceClose);
+            while (la.Kind == Kinds.Else)
             {
                 Get();
-                if (la.kind == 12)
+                if (la.Kind == Kinds.If)
                 {
                     Get();
                     Expression();
-                    Expect(26);
+                    Expect(Kinds.BraceOpen);
                     while (StartOf(3))
                     {
                         Body();
                     }
-                    Expect(28);
+                    Expect(Kinds.BraceClose);
                 }
-                else if (la.kind == 26)
+                else if (la.Kind == Kinds.BraceOpen)
                 {
                     Get();
                     while (StartOf(3))
                     {
                         Body();
                     }
-                    Expect(28);
+                    Expect(Kinds.BraceClose);
                 }
-                else SynErr(81);
+                else SynErr(Kinds.ErrInvalidIfStatement);
             }
         }
 
         private void Assign()
         {
-            switch (la.kind)
+            switch (la.Kind)
             {
-                case 25:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
+                case Kinds.Assign:
+                case Kinds.AssignMul:
+                case Kinds.AssignDiv:
+                case Kinds.AssignMod:
+                case Kinds.AssignAdd:
+                case Kinds.AssignSub:
+                case Kinds.AssignAnd:
+                case Kinds.AssignXOr:
+                case Kinds.AssignOr:
+                case Kinds.AssignShiftLeft:
+                case Kinds.AssignShiftRight:
                     {
                         Get();
                         break;
                     }
-                default: SynErr(82); break;
+                default: SynErr(Kinds.ErrInvalidAssignment); break;
             }
         }
 
         private void AndExpr()
         {
             BitOrExpr();
-            while (la.kind == 45)
+            while (la.Kind == Kinds.And)
             {
                 Get();
                 BitOrExpr();
@@ -583,7 +613,7 @@ namespace DaedalusLib.Parser
         private void BitOrExpr()
         {
             BitXorExpr();
-            while (la.kind == 46)
+            while (la.Kind == Kinds.BitOr)
             {
                 Get();
                 BitXorExpr();
@@ -593,7 +623,7 @@ namespace DaedalusLib.Parser
         private void BitXorExpr()
         {
             BitAndExpr();
-            while (la.kind == 47)
+            while (la.Kind == Kinds.BitXOr)
             {
                 Get();
                 BitAndExpr();
@@ -603,7 +633,7 @@ namespace DaedalusLib.Parser
         private void BitAndExpr()
         {
             CondExpr();
-            while (la.kind == 48)
+            while (la.Kind == Kinds.BitAnd)
             {
                 Get();
                 CondExpr();
@@ -615,14 +645,14 @@ namespace DaedalusLib.Parser
             ShiftExpr();
             while (StartOf(8))
             {
-                switch (la.kind)
+                switch (la.Kind)
                 {
-                    case 49:
-                    case 50:
-                    case 51:
-                    case 52:
-                    case 53:
-                    case 54:
+                    case Kinds.NotEquals:
+                    case Kinds.Equals:
+                    case Kinds.LesserEquals:
+                    case Kinds.Lesser:
+                    case Kinds.GreaterEquals:
+                    case Kinds.Greater:
                         {
                             Get();
                             break;
@@ -635,7 +665,7 @@ namespace DaedalusLib.Parser
         private void ShiftExpr()
         {
             AddExpr();
-            while (la.kind == 55 || la.kind == 56)
+            while (la.Kind == Kinds.ShiftLeft || la.Kind == Kinds.ShiftRight)
             {
                 Get();
                 AddExpr();
@@ -645,7 +675,7 @@ namespace DaedalusLib.Parser
         private void AddExpr()
         {
             MulExpr();
-            while (la.kind == 57 || la.kind == 58)
+            while (la.Kind == Kinds.Add || la.Kind == Kinds.Sub)
             {
                 Get();
                 MulExpr();
@@ -655,7 +685,7 @@ namespace DaedalusLib.Parser
         private void MulExpr()
         {
             CastExpr();
-            while (la.kind == 59 || la.kind == 60 || la.kind == 61)
+            while (la.Kind == Kinds.Mul || la.Kind == Kinds.Div || la.Kind == Kinds.Mod)
             {
                 Get();
                 CastExpr();
@@ -673,7 +703,7 @@ namespace DaedalusLib.Parser
             {
                 PostFixExp();
             }
-            else if (la.kind == 62 || la.kind == 63)
+            else if (la.Kind == Kinds.Incr || la.Kind == Kinds.Decr)
             {
                 Get();
                 UnaryExp();
@@ -683,7 +713,7 @@ namespace DaedalusLib.Parser
                 Get();
                 CastExpr();
             }
-            else SynErr(83);
+            else SynErr(Kinds.ErrInvalidOperator);
         }
 
         private void PostFixExp()
@@ -691,25 +721,25 @@ namespace DaedalusLib.Parser
             Primary();
             while (StartOf(11))
             {
-                if (la.kind == 30)
+                if (la.Kind == Kinds.BracketOpen)
                 {
                     Get();
                     Expression();
-                    Expect(31);
+                    Expect(Kinds.BracketClose);
                 }
-                else if (la.kind == 32)
+                else if (la.Kind == Kinds.ParenOpen)
                 {
                     Get();
                     if (StartOf(5))
                     {
                         ActualParameters();
                     }
-                    Expect(33);
+                    Expect(Kinds.ParenClose);
                 }
-                else if (la.kind == 66)
+                else if (la.Kind == Kinds.Dot)
                 {
                     Get();
-                    Expect(1);
+                    Expect(Kinds.Identifier);
                 }
                 else
                 {
@@ -720,21 +750,21 @@ namespace DaedalusLib.Parser
 
         private void Primary()
         {
-            switch (la.kind)
+            switch (la.Kind)
             {
-                case 1:
-                case 2:
-                case 3:
-                case 4:
+                case Kinds.Identifier:
+                case Kinds.IntegerValue:
+                case Kinds.FloatValue:
+                case Kinds.StringValue:
                     Get();
                     break;
-                case 32:
+                case Kinds.ParenOpen:
                     Get();
                     Expression();
-                    Expect(33);
+                    Expect(Kinds.ParenClose);
                     break;
                 default:
-                    SynErr(84);
+                    SynErr(Kinds.ErrInvalidExpression);
                     break;
             }
         }
@@ -742,7 +772,7 @@ namespace DaedalusLib.Parser
         private void ActualParameters()
         {
             Expression();
-            while (la.kind == 27)
+            while (la.Kind == Kinds.Comma)
             {
                 Get();
                 Expression();
@@ -784,98 +814,110 @@ namespace DaedalusLib.Parser
         public int count = 0;                                    // number of errors detected
         public System.IO.TextWriter errorStream = Console.Out;   // error messages go to this stream
         public string errMsgFormat = "Zeile {0}, Spalte {1}: {2}"; // 0=line, 1=column, 2=text
-
-        public void SynErr(int line, int col, int n)
+        private static readonly Dictionary<Kinds, string> messages = new Dictionary<Kinds, string>
         {
-            string s;
-            switch (n)
+            { Kinds.EOF, "Dateiende erwartet" },
+            { Kinds.Identifier, "Bezeichner erwartet" },
+            { Kinds.IntegerValue, "Integer-Wert erwartet" },
+            { Kinds.FloatValue, "Dateiende erwartet" },
+            { Kinds.StringValue, "Dateiende erwartet" },
+            { Kinds.Int, "int erwartet" },
+            { Kinds.String, "string erwartet" },
+            { Kinds.Float, "float erwartet" },
+            { Kinds.Void, "void erwartet" },
+            { Kinds.Var, "var erwartet" },
+            { Kinds.Const, "const erwartet" },
+            { Kinds.Instance, "instance erwartet" },
+            { Kinds.If, "if erwartet" },
+            { Kinds.Else, "else erwartet" },
+            { Kinds.Prototype, "prototype erwartet" },
+            { Kinds.Return, "return erwartet" },
+            { Kinds.CItem, "c_item erwartet" },
+            { Kinds.CNpc, "c_npc erwartet" },
+            { Kinds.CMission, "c_mission erwartet" },
+            { Kinds.CFocus, "c_focus erwartet" },
+            { Kinds.CInfo, "c_info erwartet" },
+            { Kinds.CItemReact, "c_itemreact erwartet" },
+            { Kinds.CSpell, "c_spell erwartet" },
+            { Kinds.Function, "func erwartet" },
+            { Kinds.Class, "class erwartet" },
+            { Kinds.Assign, "\"=\" erwartet" },
+            { Kinds.BraceOpen, "\"{\" erwartet" },
+            { Kinds.Comma, "\",\" erwartet" },
+            { Kinds.BraceClose, "\"}\" erwartet" },
+            { Kinds.Semicolon, "\";\" erwartet" },
+            { Kinds.BracketOpen, "\"[\" erwartet" },
+            { Kinds.BracketClose, "\"]\" erwartet" },
+            { Kinds.ParenOpen, "\"(\" erwartet" },
+            { Kinds.ParenClose, "\")\" erwartet" },
+            { Kinds.AssignMul, "\"*=\" erwartet" },
+            { Kinds.AssignDiv, "\"/=\" erwartet" },
+            { Kinds.AssignMod, "\"%=\" erwartet" },
+            { Kinds.AssignAdd, "\"+=\" erwartet" },
+            { Kinds.AssignSub, "\"-=\" erwartet" },
+            { Kinds.AssignAnd, "\"&=\" erwartet" },
+            { Kinds.AssignXOr, "\"^=\" erwartet" },
+            { Kinds.AssignOr, "\"|=\" erwartet" },
+            { Kinds.AssignShiftLeft, "\"<<=\" erwartet" },
+            { Kinds.AssignShiftRight, "\">>=\" erwartet" },
+            { Kinds.Or, "\"||\" erwartet" },
+            { Kinds.And, "\"&&\" erwartet" },
+            { Kinds.BitOr, "\"|\" erwartet" },
+            { Kinds.BitXOr, "\"^\" erwartet" },
+            { Kinds.BitAnd, "\"&\" erwartet" },
+            { Kinds.NotEquals, "\"!=\" erwartet" },
+            { Kinds.Equals, "\"==\" erwartet" },
+            { Kinds.LesserEquals, "\"<=\" erwartet" },
+            { Kinds.Lesser, "\"<\" erwartet" },
+            { Kinds.GreaterEquals, "\">=\" erwartet" },
+            { Kinds.Greater, "\">\" erwartet" },
+            { Kinds.ShiftLeft, "\"<<\" erwartet" },
+            { Kinds.ShiftRight, "\">>\" erwartet" },
+            { Kinds.Add, "\"+\" erwartet" },
+            { Kinds.Sub, "\"-\" erwartet" },
+            { Kinds.Mul, "\"*\" erwartet" },
+            { Kinds.Div, "\"/\" erwartet" },
+            { Kinds.Mod, "\"%\" erwartet" },
+            { Kinds.Incr, "\"++\" erwartet" },
+            { Kinds.Decr, "\"--\" erwartet" },
+            { Kinds.BitNot, "\"~\" erwartet" },
+            { Kinds.Not, "\"!\" erwartet" },
+            { Kinds.Dot, "\".\" erwartet" },
+            { Kinds.Unknown, "Unbekannt" },
+            { Kinds.ErrInvalidBlock, "Ungültiger Block" },
+            { Kinds.ErrInvalidDeclaration, "Ungültige Deklaration" },
+            { Kinds.ErrInvalidFunction, "Ungültige Funktion" },
+            { Kinds.ErrInvalidInstance, "Ungültige Instance" },
+            { Kinds.ErrInvalidPrototype, "Ungültiger Prototyp" },
+            { Kinds.ErrInvalidClass, "Ungültige Klasse" },
+            { Kinds.ErrInvalidConstantDeclaration, "Ungültige Konstantendeklaration" },
+            { Kinds.ErrInvalidVariableDeclaration, "Ungültige Variablendeklaration" },
+            { Kinds.ErrInvalidTypeDeclaration, "Ungültige Typendeklaration" },
+            { Kinds.ErrInvalidType, "Ungültiger Typ" },
+            { Kinds.ErrInvalidClassName, "Ungültiger Klassenname" },
+            { Kinds.ErrInvalidBlocKBody, "Ungültiger Block" },
+            { Kinds.ErrInvalidStatement, "Ungültiger Ausdruck" },
+            { Kinds.ErrInvalidIfStatement, "Ungültige Abfrage" },
+            { Kinds.ErrInvalidAssignment, "Ungültige Zuweisung" },
+            { Kinds.ErrInvalidOperator, "Ungültiger Operator" },
+            { Kinds.ErrInvalidExpression, "Ungültiger Ausdruck" },
+            { Kinds.Identifier, "Dateiendeerwartet" },
+            { Kinds.Identifier, "Dateiendeerwartet" },
+            { Kinds.Identifier, "Dateiendeerwartet" },
+        };
+
+        public void SynErr(int line, int col, Kinds kind)
+        {
+            if (!messages.TryGetValue(kind, out var s))
             {
-                case 0: s = "Dateiende erwartet"; break;
-                case 1: s = "Bezeichner erwartet"; break;
-                case 2: s = "Integer-Wert erwartet"; break;
-                case 3: s = "Float-Wert erwartet"; break;
-                case 4: s = "String-Wert erwartet"; break;
-                case 5: s = "int erwartet"; break;
-                case 6: s = "string erwartet"; break;
-                case 7: s = "float erwartet"; break;
-                case 8: s = "void erwartet"; break;
-                case 9: s = "var erwartet"; break;
-                case 10: s = "const erwartet"; break;
-                case 11: s = "instance erwartet"; break;
-                case 12: s = "if erwartet"; break;
-                case 13: s = "else erwartet"; break;
-                case 14: s = "prototype erwartet"; break;
-                case 15: s = "return erwartet"; break;
-                case 16: s = "c_item erwartet"; break;
-                case 17: s = "c_npc erwartet"; break;
-                case 18: s = "c_mission erwartet"; break;
-                case 19: s = "c_focus erwartet"; break;
-                case 20: s = "c_info erwartet"; break;
-                case 21: s = "c_itemreact erwartet"; break;
-                case 22: s = "c_spell erwartet"; break;
-                case 23: s = "func erwartet"; break;
-                case 24: s = "class erwartet"; break;
-                case 25: s = "\"=\" erwartet"; break;
-                case 26: s = "\"{\" erwartet"; break;
-                case 27: s = "\",\" erwartet"; break;
-                case 28: s = "\"}\" erwartet"; break;
-                case 29: s = "\";\" erwartet"; break;
-                case 30: s = "\"[\" erwartet"; break;
-                case 31: s = "\"]\" erwartet"; break;
-                case 32: s = "\"(\" erwartet"; break;
-                case 33: s = "\")\" erwartet"; break;
-                case 34: s = "\"*=\" erwartet"; break;
-                case 35: s = "\"/=\" erwartet"; break;
-                case 36: s = "\"%=\" erwartet"; break;
-                case 37: s = "\"+=\" erwartet"; break;
-                case 38: s = "\"-=\" erwartet"; break;
-                case 39: s = "\"&=\" erwartet"; break;
-                case 40: s = "\"^=\" erwartet"; break;
-                case 41: s = "\"|=\" erwartet"; break;
-                case 42: s = "\"<<=\" erwartet"; break;
-                case 43: s = "\">>=\" erwartet"; break;
-                case 44: s = "\"||\" erwartet"; break;
-                case 45: s = "\"&&\" erwartet"; break;
-                case 46: s = "\"|\" erwartet"; break;
-                case 47: s = "\"^\" erwartet"; break;
-                case 48: s = "\"&\" erwartet"; break;
-                case 49: s = "\"!=\" erwartet"; break;
-                case 50: s = "\"==\" erwartet"; break;
-                case 51: s = "\"<=\" erwartet"; break;
-                case 52: s = "\"<\" erwartet"; break;
-                case 53: s = "\">=\" erwartet"; break;
-                case 54: s = "\">\" erwartet"; break;
-                case 55: s = "\"<<\" erwartet"; break;
-                case 56: s = "\">>\" erwartet"; break;
-                case 57: s = "\"+\" erwartet"; break;
-                case 58: s = "\"-\" erwartet"; break;
-                case 59: s = "\"*\" erwartet"; break;
-                case 60: s = "\"/\" erwartet"; break;
-                case 61: s = "\"%\" erwartet"; break;
-                case 62: s = "\"++\" erwartet"; break;
-                case 63: s = "\"--\" erwartet"; break;
-                case 64: s = "\"~\" erwartet"; break;
-                case 65: s = "\"!\" erwartet"; break;
-                case 66: s = "\".\" erwartet"; break;
-                case 67: s = "??? erwartet"; break;
-                case 68: s = "Ungültiger Block"; break;
-                case 69: s = "Ungültige Deklaration"; break;
-                case 70: s = "Ungültige Funktion"; break;
-                case 71: s = "Ungültige Instance"; break;
-                case 72: s = "Ungültiger Prototyp"; break;
-                case 73: s = "Ungültige Klasse"; break;
-                case 74: s = "Ungültige Konstantendeklaration"; break;
-                case 75: s = "Ungültige Variablendeklaration"; break;
-                case 76: s = "Ungültige Typendeklaration"; break;
-                case 77: s = "Ungültiger Typ"; break;
-                case 78: s = "Ungültige Klasse"; break;
-                case 79: s = "Ungültiger Block"; break;
-                case 80: s = "Ungültiger Ausdruck"; break;
-                case 81: s = "Ungültige Abfrage"; break;
-                case 82: s = "Ungültige Zuweisung"; break;
-                case 83: s = "Ungültiger Operator"; break;
-                case 84: s = "Ungültiger Ausdruck"; break;
-                default: s = "error " + n; break;
+                switch (kind)
+                {
+                    default: s = $"error {(int)kind}"; break;
+                }
+            }
+            else
+            {
+                s = $"{kind}: {s}";
             }
             errorStream.WriteLine(errMsgFormat, line, col, s);
             count++;
@@ -909,5 +951,4 @@ namespace DaedalusLib.Parser
     {
         public FatalError(string m) : base(m) { }
     }
-
 }
