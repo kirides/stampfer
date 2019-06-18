@@ -485,7 +485,7 @@ namespace DaedalusLib.Parser
                 case -1: { t.kind = eofSym; break; } // NextCh already done
                 case 0: { t.kind = noSym; break; }   // NextCh already done
                 case 1:
-                    if (ch >= '0' && ch <= '9' || ch == '_' || ch >= 'a' && ch <= 'z' || ch == 196 || ch == 214 || ch == 220 || ch == 223 || ch == 228 || ch == 246 || ch == 252) { AddCh(); goto case 1; }
+                    if (ch >= '0' && ch <= '9' || ch == '_' || ch == '@' || ch == '^' || ch >= 'a' && ch <= 'z' || ch == 196 || ch == 214 || ch == 220 || ch == 223 || ch == 228 || ch == 246 || ch == 252) { AddCh(); goto case 1; }
                     else { t.kind = 1; t.val = new string(tval, 0, tlen); CheckLiteral(); return t; }
                 case 2:
                     if (ch == '+' || ch == '-') { AddCh(); goto case 3; }
