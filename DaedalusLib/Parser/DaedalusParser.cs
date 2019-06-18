@@ -443,44 +443,12 @@ namespace DaedalusLib.Parser
 
         private void Type()
         {
-            switch (la.Kind)
-            {
-                case Kinds.Int:
-                case Kinds.String:
-                case Kinds.Float:
-                case Kinds.CNpc:
-                case Kinds.CItem:
-                case Kinds.CMission:
-                case Kinds.CInfo:
-                case Kinds.CSpell:
-                case Kinds.CFocus:
-                case Kinds.CItemReact:
-                case Kinds.Function:
-                    {
-                        Get();
-                        break;
-                    }
-                default: SynErr(Kinds.ErrInvalidType); break;
-            }
+            Get();
         }
 
         private void Classname()
         {
-            switch (la.Kind)
-            {
-                case Kinds.CNpc:
-                case Kinds.CItem:
-                case Kinds.CMission:
-                case Kinds.CInfo:
-                case Kinds.CSpell:
-                case Kinds.CFocus:
-                case Kinds.CItemReact:
-                    {
-                        Get();
-                        break;
-                    }
-                default: SynErr(Kinds.ErrInvalidClassName); break;
-            }
+            Get();
         }
 
         private void Body()
@@ -901,9 +869,6 @@ namespace DaedalusLib.Parser
             { Kinds.ErrInvalidAssignment, "Ungültige Zuweisung" },
             { Kinds.ErrInvalidOperator, "Ungültiger Operator" },
             { Kinds.ErrInvalidExpression, "Ungültiger Ausdruck" },
-            { Kinds.Identifier, "Dateiendeerwartet" },
-            { Kinds.Identifier, "Dateiendeerwartet" },
-            { Kinds.Identifier, "Dateiendeerwartet" },
         };
 
         public void SynErr(int line, int col, Kinds kind)

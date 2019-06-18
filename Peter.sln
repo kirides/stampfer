@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PeterInterface", "PeterInte
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DaedalusLib", "DaedalusLib\DaedalusLib.csproj", "{58581378-81B1-4D94-B6BC-9767B5B41F53}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DaedalusLanguageServer", "DaedalusLanguageServer\DaedalusLanguageServer.csproj", "{1D470BA8-88A9-4941-94BF-128529FFFD55}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{58581378-81B1-4D94-B6BC-9767B5B41F53}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58581378-81B1-4D94-B6BC-9767B5B41F53}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58581378-81B1-4D94-B6BC-9767B5B41F53}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D470BA8-88A9-4941-94BF-128529FFFD55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D470BA8-88A9-4941-94BF-128529FFFD55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D470BA8-88A9-4941-94BF-128529FFFD55}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D470BA8-88A9-4941-94BF-128529FFFD55}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
