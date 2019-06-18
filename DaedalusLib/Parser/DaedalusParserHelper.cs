@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace DaedalusLib.Parser
@@ -21,10 +23,27 @@ namespace DaedalusLib.Parser
 
     public static class DaedalusParserHelper
     {
-        public static ParserResult Parse(string fileName) {
-            string errorAusgabe = "";
+        public static ParserResult Load(string fileName)
+        {
+            using(var fs = File.OpenRead(fileName))
+            {
+                return Load(fs);
+            }
+        }
+
+        public static ParserResult Parse(string code)
+        {
+            using (var ms = new MemoryStream(Encoding.Default.GetBytes(code)))
+            {
+                return Load(ms);
+            }
+        }
+
+        public static ParserResult Load(Stream stream)
+        {
+            var errorAusgabe = "";
             DaedalusParser parser;
-            using (var scanner = new Scanner(fileName))
+            using (var scanner = new Scanner(stream))
             {
                 parser = new DaedalusParser(scanner);
                 TextWriter errorString = new StringWriter();
@@ -41,29 +60,17 @@ namespace DaedalusLib.Parser
                 for (var iErr = 0; iErr < err.Length; iErr++)
                 {
                     var error = err[iErr].Trim();
+                    if (string.IsNullOrWhiteSpace(error)) continue;
 
-                    var rxLine = new Regex("Zeile ");
-                    var rxCol = new Regex("Spalte ");
+                    var rxLine = new Regex(@"Zeile (\d+)");
+                    var rxCol = new Regex(@"Spalte (\d+)");
                     var matchLine = rxLine.Match(error);
                     var matchCol = rxCol.Match(error);
                     var line = "";
                     var column = "";
-                    for (var i = matchLine.Index + matchLine.Length; i < error.Length; i++)
-                    {
-                        if (error[i] == ',')
-                        {
-                            break;
-                        }
-                        line += error[i];
-                    }
-                    for (var i = matchCol.Index + matchCol.Length; i < error.Length; i++)
-                    {
-                        if (error[i] == ':')
-                        {
-                            break;
-                        }
-                        column += error[i];
-                    }
+
+                    if (matchLine.Success) line = matchLine.Groups[1].Value;
+                    if (matchCol.Success) column = matchCol.Groups[1].Value;
 
                     int.TryParse(line, out var lineVal);
                     int.TryParse(column, out var colVal);

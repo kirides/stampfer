@@ -90,7 +90,7 @@ namespace DemoLanguageServer.Services
                 path = Path.GetFullPath(path.Substring(1));
             }
             _router.Window.LogInfo(path);
-            var parserResult = DaedalusParserHelper.Parse(path);
+            var parserResult = DaedalusParserHelper.Load(path);
             if (parserResult.ErrorMessages.Count > 0)
             {
                 _router.Document.PublishDiagnostics(new PublishDiagnosticsParams
@@ -100,7 +100,7 @@ namespace DemoLanguageServer.Services
                         .Select(x => new Diagnostic
                         {
                             Message = x.Message,
-                            Range = new Range(new Position(x.Line, x.Column), new Position(x.Line, x.Column)),
+                            Range = new Range(new Position(x.Line - 1, x.Column), new Position(x.Line - 1, x.Column)),
                         }))
                 });
             }

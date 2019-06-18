@@ -120,7 +120,7 @@ namespace DaedalusLib.Parser
 
         private void SynErr(Kinds kind)
         {
-            if (errDist >= minErrDist) errors.SynErr(la.line, la.col, kind);
+            if (errDist >= minErrDist) errors.SynErr(t.line, t.col, kind);
             errDist = 0;
         }
 
@@ -884,30 +884,29 @@ namespace DaedalusLib.Parser
             {
                 s = $"{kind}: {s}";
             }
-            errorStream.WriteLine(errMsgFormat, line, col, s);
+            WriteErrLine(errMsgFormat, line, col, s);
             count++;
         }
 
         public void SemErr(int line, int col, string s)
         {
-            errorStream.WriteLine(errMsgFormat, line, col, s);
+            WriteErrLine(errMsgFormat, line, col, s);
             count++;
         }
 
         public void SemErr(string s)
         {
-            errorStream.WriteLine(s);
+            WriteErrLine(s);
             count++;
         }
 
-        public void Warning(int line, int col, string s)
+        private void WriteErrLine(string format, object p1, object p2, object p3)
         {
-            errorStream.WriteLine(errMsgFormat, line, col, s);
+            errorStream.WriteLine(format, p1, p2, p3);
         }
-
-        public void Warning(string s)
+        private void WriteErrLine(string value)
         {
-            errorStream.WriteLine(s);
+            errorStream.WriteLine(value);
         }
     } // Errors
 
